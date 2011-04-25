@@ -97,9 +97,9 @@ class SessionsController < ApplicationController
 						@user = OpenidUser.new(:invitation_token => params[:invitation_token])
 						assign_registration_attributes!(registration, identity_url)
 						if @user.save
-	            redirect_to root_path
-	    				flash[:notice] = "Thanks for signing up! "
+	    				    flash[:notice] = "Thanks for signing up! "
 							flash[:notice] += ((in_beta? && @user.emails_match?) ? "You can now log into 																		your account." : "We're sending you an email with your activation code.")
+	                        redirect_to root_path
 						else
 							flash.now[:error] = "We need some additional details before we can create your account."
 							render :template => "user/openid_accounts/new"
@@ -144,8 +144,8 @@ class SessionsController < ApplicationController
     self.current_user = user
     new_cookie_flag = (params[:remember_me] == "1")
     handle_remember_cookie! new_cookie_flag
-    redirect_back_or_default('/')
     flash[:notice] = "Logged in successfully."
+    redirect_back_or_default('/')
   end
 
 	def failed_login(message, login_name, openid = nil) 	

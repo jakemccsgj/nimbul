@@ -24,10 +24,10 @@ class User::ProfilesController < ApplicationController
 
       success = @user && @user.save
       if success && @user.errors.empty?
-        # redirect_back_or_default('/')
-        redirect_to new_session_path
         flash[:notice] = "Thanks for signing up! "
         flash[:notice] += ((in_beta? && @user.emails_match?) ? "You can now log into your account." : "We're sending you 														an email with your activation code.")
+        # redirect_back_or_default('/')
+        redirect_to new_session_path
       else
         flash.now[:error]  = "We couldn't set up that account, sorry.  Please try again, or %s."
         flash[:error_item] = ["contact us", contact_site]
