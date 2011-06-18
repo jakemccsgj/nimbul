@@ -1,20 +1,11 @@
-<h1>Editing account_group</h1>
+<% subtitle "Edit Account Group" %>
 
-<% form_for(@account_group) do |f| %>
-  <%= f.error_messages %>
+<h1>
+  <%= link_to 'Admin Controls', admin_controls_path %>
+  / <%= link_to 'Available Account Groups', account_groups_path %>
+  / Edit Account Group
+</h1>
 
-  <p>
-    <%= f.label :name %><br />
-    <%= f.text_field :name %>
-  </p>
-  <p>
-    <%= f.label :description %><br />
-    <%= f.text_area :description %>
-  </p>
-  <p>
-    <%= f.submit "Update" %>
-  </p>
-<% end %>
+<br/>
 
-<%= link_to 'Show', @account_group %> |
-<%= link_to 'Back', account_groups_path %>
+<%= render :partial => 'form' %>

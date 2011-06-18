@@ -65,7 +65,7 @@ class AccountGroupsController < ApplicationController
     respond_to do |format|
       if @account_group.update_attributes(params[:account_group])
         flash[:notice] = 'AccountGroup was successfully updated.'
-        format.html { redirect_to(@account_group) }
+        format.html { redirect_to account_groups_path }
         format.xml  { head :ok }
       else
         format.html { render :action => "edit" }

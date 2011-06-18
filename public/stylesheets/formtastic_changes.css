@@ -13,3 +13,5 @@ form.formtastic fieldset ol li { display:table-row; }
 form.formtastic fieldset ol li label { display:table-cell; }
 form.formtastic fieldset ol li input { display:table-cell; }
 form.formtastic fieldset ol li.error label { color:red; }
+form.formtastic fieldset ol div { display:table-row; }
+form.formtastic fieldset ol div div { display:table-cell; }
