@@ -43,16 +43,22 @@ class AccountGroupsController < ApplicationController
   # POST /account_groups
   # POST /account_groups.xml
   def create
-    @account_group = AccountGroup.new(params[:account_group])
+    redirect_url = account_groups_url
 
-    respond_to do |format|
-      if @account_group.save
-        flash[:notice] = 'AccountGroup was successfully created.'
-        format.html { redirect_to(@account_group) }
-        format.xml  { render :xml => @account_group, :status => :created, :location => @account_group }
-      else
-        format.html { render :action => "new" }
-        format.xml  { render :xml => @account_group.errors, :status => :unprocessable_entity }
+    if params[:cancel_button]
+      redirect_to redirect_url
+    else
+      @account_group = AccountGroup.new(params[:account_group])
+
+      respond_to do |format|
+        if @account_group.save
+          flash[:notice] = 'AccountGroup was successfully created.'
+          format.html { redirect_to(@account_group) }
+          format.xml  { render :xml => @account_group, :status => :created, :location => @account_group }
+        else
+          format.html { render :action => "new" }
+          format.xml  { render :xml => @account_group.errors, :status => :unprocessable_entity }
+        end
       end
     end
   end
@@ -60,16 +66,22 @@ class AccountGroupsController < ApplicationController
   # PUT /account_groups/1
   # PUT /account_groups/1.xml
   def update
-    @account_group = AccountGroup.find(params[:id])
+    redirect_url = account_groups_url
 
-    respond_to do |format|
-      if @account_group.update_attributes(params[:account_group])
-        flash[:notice] = 'AccountGroup was successfully updated.'
-        format.html { redirect_to account_groups_path }
-        format.xml  { head :ok }
-      else
-        format.html { render :action => "edit" }
-        format.xml  { render :xml => @account_group.errors, :status => :unprocessable_entity }
+    if params[:cancel_button]
+      redirect_to redirect_url
+    else
+      @account_group = AccountGroup.find(params[:id])
+
+      respond_to do |format|
+        if @account_group.update_attributes(params[:account_group])
+          flash[:notice] = 'AccountGroup was successfully updated.'
+          format.html { redirect_to account_groups_path }
+          format.xml  { head :ok }
+        else
+          format.html { render :action => "edit" }
+          format.xml  { render :xml => @account_group.errors, :status => :unprocessable_entity }
+        end
       end
     end
   end

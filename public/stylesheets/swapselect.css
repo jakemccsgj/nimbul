@@ -1,13 +1,13 @@
-
 div.swap_select .swap_select_all,
-div.swap_select .swap_select_select {
+div.swap_select .swap_select_select,
+div.swap_select p select {
 	float:left;
-	width:45%;
+	width:250px;
 }
 
 div.swap_select .swap_select_options {
 	float:left;
-	width:10%;
+	width:30px;
 	margin-top:1.5em;
 }
 
@@ -37,7 +37,7 @@ div.swap_select select:focus {
 
 div.swap_select p.swap_select_available,
 div.swap_select p.swap_select_selected {
-	font-size:9px;
+	font-size:12px;
 	background-color:#EEEEEE;
 	border:1px solid #CBCBCB;
 	border-bottom:none;
