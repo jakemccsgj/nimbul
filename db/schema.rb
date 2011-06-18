@@ -9,7 +9,50 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110618153328) do
+ActiveRecord::Schema.define(:version => 20110618195605) do
+
+  create_table "access_requests", :force => true do |t|
+    t.string   "state"
+    t.integer  "provider_account_id"
+    t.boolean  "admin_access"
+    t.integer  "requester_id"
+    t.integer  "approver_id"
+    t.text     "description"
+    t.string   "token"
+    t.datetime "sent_at"
+    t.datetime "approved_at"
+    t.datetime "rejected_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "access_requests", ["approver_id"], :name => "index_access_requests_on_approver_id"
+  add_index "access_requests", ["provider_account_id"], :name => "index_access_requests_on_provider_account_id"
+  add_index "access_requests", ["requester_id"], :name => "index_access_requests_on_requester_id"
+  add_index "access_requests", ["token"], :name => "index_access_requests_on_token"
+
+  create_table "access_requests_security_groups", :id => false, :force => true do |t|
+    t.integer "access_request_id"
+    t.integer "security_group_id"
+  end
+
+  add_index "access_requests_security_groups", ["access_request_id"], :name => "index_access_requests_security_groups_on_access_request_id"
+  add_index "access_requests_security_groups", ["security_group_id"], :name => "index_access_requests_security_groups_on_security_group_id"
+
+  create_table "account_groups", :force => true do |t|
+    t.string   "name"
+    t.text     "description"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "account_groups_provider_accounts", :id => false, :force => true do |t|
+    t.integer "account_group_id"
+    t.integer "provider_account_id"
+  end
+
+  add_index "account_groups_provider_accounts", ["account_group_id"], :name => "index_account_groups_provider_accounts_on_account_group_id"
+  add_index "account_groups_provider_accounts", ["provider_account_id"], :name => "index_account_groups_provider_accounts_on_provider_account_id"
 
   create_table "addresses", :force => true do |t|
     t.integer  "provider_account_id"
@@ -382,6 +425,8 @@ ActiveRecord::Schema.define(:version => 20110618153328) do
     t.integer  "zone_id"
   end
 
+  add_index "instance_allocation_records", ["cluster_id", "server_id"], :name => "index_instance_allocation_records_on_cluster_id_and_server_id"
+  add_index "instance_allocation_records", ["created_at"], :name => "index_instance_allocation_records_on_created_at"
   add_index "instance_allocation_records", ["stat_record_id"], :name => "index_iars_on_srids"
   add_index "instance_allocation_records", ["zone_id"], :name => "index_instance_allocation_records_on_zone_id"
 
@@ -965,6 +1010,7 @@ ActiveRecord::Schema.define(:version => 20110618153328) do
     t.datetime "updated_at"
   end
 
+  add_index "server_stats", ["cluster_id", "server_id", "instance_type"], :name => "index_server_stats_on_cluster_id_and_server_id_and_instance_type"
   add_index "server_stats", ["cluster_id", "server_id", "taken_at"], :name => "index_server_stats_on_cluster_id_and_server_id_and_taken_at"
   add_index "server_stats", ["instance_type"], :name => "index_server_stats_on_instance_type"
   add_index "server_stats", ["server_id"], :name => "index_server_stats_on_server_id"
