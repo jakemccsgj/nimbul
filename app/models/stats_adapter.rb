@@ -2,61 +2,26 @@ class StatsAdapter
     def self.refresh_account(provider_account)
 	frequency = 1.hour
         current_bucket = Time.at((Time.now.to_f / frequency).ceil * frequency).utc
-        latest_stats = ServerStat.find_all_by_sql([
+
+        latest_stats = ServerStat.find_by_sql([
             'select s.cluster_id as cluster_id, i.server_id, i.instance_type, count(i.id) as instance_count '+
             'from servers s, instances i where s.id = i.server_id and i.provider_account_id = :provider_account_id '+
             'group by cluster_id, server_id',
             { :provider_account_id => provider_account.id }
         ])
 
-        values = Instance.count(
-            :id,
-            :group => 'server_id',
-            :conditions => ['provider_account_id=:provider_account_id'
-
-        # collect this 5 minutes stats (if they haven't been collected already)
-    		now = Time.now
-        this_period = Time.at((now.to_f / period).floor * period)
-        stat_record = StatRecord.find(:first, :conditions => [
-                'provider_account_id=:provider_account_id AND taken_at=:taken_at',
-                { :provider_account_id => 1, :taken_at => this_period.utc }
-        ] )
-        unless stat_record
-            stat_record = StatRecord.new({
-                :provider_account_id => provider_account.id,
-                :taken_at => this_period,
-            })
-            stat_record.save
-            iaRecords = InstanceAllocationRecord.find_by_sql([
-                "select server_id, zone_id, instance_type, count(id) as running from instances where provider_account_id=? and state='running' group by server_id, zone_id, instance_type order by zone_id, instance_type",
-                provider_account.id
+        latest_stats.each do |s|
+            r = ServerStat.find(:first, :conditions => [
+                'cluster_id=:cluster_id AND server_id=:server_id AND instance_type=:instance_type AND taken_at=:taken_at',
+                { :cluster_id => s.cluster_id, :server_id => s.server_id, :instance_type => s.instance_type, :taken_at => current_bucket }
             ])
-            iaRecords.each do |iaRecord|
-                server_id = nil
-                server_name = ''
-                cluster_id = nil
-                cluster_name = ''
-                unless iaRecord.server_id.blank?
-                    server = Server.find(iaRecord.server_id)
-                    cluster = Cluster.find(server.cluster_id) if server
-                    server_id = server.id if server
-                    server_name = server.name if server
-                    cluster_id = cluster.id if cluster
-                    cluster_name = cluster.name if cluster
-                end
-                instance_allocation_record = stat_record.instance_allocation_records.build({
-                    :server_id => server_id,
-                    :server_name => server_name,
-                    :cluster_id => cluster_id,
-                    :cluster_name => cluster_name,
-                    :zone_id => iaRecord.zone_id,
-                    :instance_type => iaRecord.instance_type,
-                    :running => iaRecord.running,
-                })
-                instance_allocation_record.save 
+            if r.nil?
+                r = s.clone
+                r.taken_at = current_bucket
+                r.save
+            elsif s.instance_count > r.instance_count
+                r.update_attribute(:instance_count, s.instance_count)
             end
         end
-    rescue Exception => e
-      Rails.logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
     end
 end
