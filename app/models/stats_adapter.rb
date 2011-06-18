@@ -1,5 +1,19 @@
 class StatsAdapter
-    def self.refresh_account(provider_account, period=5.minutes)
+    def self.refresh_account(provider_account)
+	frequency = 1.hour
+        current_bucket = Time.at((Time.now.to_f / frequency).ceil * frequency).utc
+        latest_stats = ServerStat.find_all_by_sql([
+            'select s.cluster_id as cluster_id, i.server_id, i.instance_type, count(i.id) as instance_count '+
+            'from servers s, instances i where s.id = i.server_id and i.provider_account_id = :provider_account_id '+
+            'group by cluster_id, server_id',
+            { :provider_account_id => provider_account.id }
+        ])
+
+        values = Instance.count(
+            :id,
+            :group => 'server_id',
+            :conditions => ['provider_account_id=:provider_account_id'
+
         # collect this 5 minutes stats (if they haven't been collected already)
     		now = Time.now
         this_period = Time.at((now.to_f / period).floor * period)
