@@ -10,7 +10,7 @@ class ProviderAccount < BaseModel
 	service_child_relationship :clusters
 	
 	belongs_to :provider
-        has_and_belongs_to_many :account_groups
+        belongs_to :account_group
 	has_many :instances, :dependent => :destroy
 	has_many :server_images, :dependent => :destroy
 	has_many :key_pairs, :dependent => :destroy

@@ -46,14 +46,6 @@ ActiveRecord::Schema.define(:version => 20110618195605) do
     t.datetime "updated_at"
   end
 
-  create_table "account_groups_provider_accounts", :id => false, :force => true do |t|
-    t.integer "account_group_id"
-    t.integer "provider_account_id"
-  end
-
-  add_index "account_groups_provider_accounts", ["account_group_id"], :name => "index_account_groups_provider_accounts_on_account_group_id"
-  add_index "account_groups_provider_accounts", ["provider_account_id"], :name => "index_account_groups_provider_accounts_on_provider_account_id"
-
   create_table "addresses", :force => true do |t|
     t.integer  "provider_account_id"
     t.string   "name"
@@ -741,8 +733,10 @@ ActiveRecord::Schema.define(:version => 20110618195605) do
     t.string   "messaging_info",         :default => "info",     :null => false
     t.string   "messaging_request",      :default => "request",  :null => false
     t.string   "messaging_control",      :default => "control",  :null => false
+    t.integer  "account_group_id"
   end
 
+  add_index "provider_accounts", ["account_group_id"], :name => "index_provider_accounts_on_account_group_id"
   add_index "provider_accounts", ["id", "type"], :name => "index_provider_accounts_on_id_and_type"
   add_index "provider_accounts", ["provider_id"], :name => "index_provider_accounts_on_provider_id"
 

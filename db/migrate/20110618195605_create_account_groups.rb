@@ -6,12 +6,8 @@ class CreateAccountGroups < ActiveRecord::Migration
 
       t.timestamps
     end
-    create_table :account_groups_provider_accounts, :id => false do |t|
-      t.integer :account_group_id
-      t.integer :provider_account_id
-    end
-    add_index :account_groups_provider_accounts, :account_group_id
-    add_index :account_groups_provider_accounts, :provider_account_id
+    add_column :provider_accounts, :account_group_id, :integer
+    add_index :provider_accounts, :account_group_id
   end
 
   def self.down

@@ -49,11 +49,12 @@ class AccountGroupsController < ApplicationController
       redirect_to redirect_url
     else
       @account_group = AccountGroup.new(params[:account_group])
+      @account_group.provider_account_ids = params[:account_group][:provider_account_ids]
 
       respond_to do |format|
         if @account_group.save
           flash[:notice] = 'AccountGroup was successfully created.'
-          format.html { redirect_to(@account_group) }
+          format.html { redirect_to redirect_url }
           format.xml  { render :xml => @account_group, :status => :created, :location => @account_group }
         else
           format.html { render :action => "new" }
@@ -72,6 +73,7 @@ class AccountGroupsController < ApplicationController
       redirect_to redirect_url
     else
       @account_group = AccountGroup.find(params[:id])
+      @account_group.provider_account_ids = params[:account_group][:provider_account_ids]
 
       respond_to do |format|
         if @account_group.update_attributes(params[:account_group])
