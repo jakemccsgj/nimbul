@@ -37,7 +37,7 @@ class AccountGroupsController < ApplicationController
 
   # GET /account_groups/1/edit
   def edit
-    @account_group = AccountGroup.find(params[:id])
+    @account_group = AccountGroup.find(params[:id], :include => :provider_accounts)
   end
 
   # POST /account_groups

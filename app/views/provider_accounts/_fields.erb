@@ -14,6 +14,10 @@
         <% end %>
     </tr>
     <tr>
+        <th><%= f.label :provider_id, "Account Group" %></th>
+        <td><%= f.collection_select :account_group_id, AccountGroup.find(:all, :order => 'name'), :id, :name, { :prompt => true, :include_blank => 'Not Set' } %></td>
+    </tr>
+    <tr>
         <th><%= f.label :name, "Name (e.g. 'Development Account')" %></th>
         <td><%= f.text_field :name %></td>
     </tr>

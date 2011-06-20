@@ -7,12 +7,17 @@
       :required => false
     %>
   <% end %>
+  <h1>Provider Accounts</h1>
+  <br/>
+  You can also just edit an Account, to move it in and out of the Account Group
+  <br/>
+  <br/>
   <fieldset class="inputs">
     <ol>
     <%= swapselect :account_group,
       @account_group,
       :provider_accounts,
-      ProviderAccount.all.map{ |account| [account.name, account.id] }
+      ProviderAccount.all.select{|account| account.account_group_id.nil? or (account.account_group_id == @account_group.id)}.map{ |account| [account.name, account.id]}
     %>
     </ol>
   </fieldset>

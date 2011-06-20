@@ -1,13 +1,34 @@
 class ProviderAccount::StatsController < ApplicationController
-	before_filter :login_required
-	require_role  :admin,
-		:unless => "current_user.has_provider_account_access?(ProviderAccount.find(params[:provider_account_id])) "
+    before_filter :login_required
+    require_role  :admin,
+	:unless => "current_user.has_provider_account_access?(ProviderAccount.find(params[:provider_account_id])) "
 
-	def index
-        @provider_account = ProviderAccount.find(params[:provider_account_id], :include => [ :clusters, :reserved_instances, :zones ])
+    def index
+        @provider_account = ProviderAccount.find(params[:provider_account_id], :include => [ :clusters, :reserved_instances, :zones, :account_group ])
         @zones = @provider_account.zones
-        @reserved_instances = @provider_account.reserved_instances
-        
+
+        if @provider_account.account_group.nil?
+            @reserved_instances = @provider_account.reserved_instances
+            @running_instances = @provider_account.instances.select{|instance| instance.running?}
+        else
+            @account_group = @provider_account.account_group
+            @reserved_instances = ReservedInstance.find_by_sql([
+                'select zone_id, instance_type, sum(count) as count, usage_price from reserved_instances '+
+                'where provider_account_id in (select id from provider_accounts where account_group_id=:account_group_id) '+
+                'group by zone_id, instance_type, usage_price '+
+                'order by usage_price',
+                { :account_group_id => @provider_account.account_group_id }
+            ])
+            @running_instances = ReservedInstance.find_by_sql([
+                'select z.name as zone, instance_type, count(i.id) as count from instances i, zones z '+
+                'where i.zone_id = z.id and '+
+                'i.provider_account_id in (select id from provider_accounts where account_group_id=:account_group_id) '+
+                'group by zone, instance_type '+
+                'order by z.name',
+                { :account_group_id => @provider_account.account_group_id }
+            ])
+        end
+
         @cluster_names = @provider_account.clusters.collect{|a| a.name}.sort
         @cluster_names << ''
         @latest_stat_record = StatRecord.find_by_provider_account_id(@provider_account.id, :order => 'taken_at DESC', :include => :instance_allocation_records)

@@ -392,7 +392,7 @@ class ProviderAccount < BaseModel
 	end
 
 	def self.sort_fields
-		%w(name description external_id last_published refreshed_at created_at)
+		%w(name account_group_id description external_id last_published refreshed_at created_at)
 	end
 
 	def self.search_fields

@@ -1,9 +1,9 @@
 <% @reserved_instances ||= [] %>
-<h1>Reserved Instances</h1>
+<h1>Reserved Instances<%= h(@account_group.nil? ? '' : " in Account Group '#{@account_group.name}'") %></h1>
 
 <% if @reserved_instances.empty? %>
     <br/>
-    No instances have been reserved for this account.
+    No reserved instances.
     <br/>
 <% else %>
 <br/>
@@ -12,26 +12,14 @@
         <th>Zone</th>
         <th>Type</th>
         <th>Total</th>
-        <th>Reserved</th>
-        <th>Expires</th>
-        <th>Duration (months)</th>
         <th>Usage Price</th>
-        <th>Fixed Price</th>
-        <th>State</th>
-        <th>Description</th>
     </tr>
-<% @reserved_instances.sort{|i,j| i.start <=> j.start}.each do |i| %>
+<% @reserved_instances.each do |i| %>
     <tr class="<%= cycle("even", "odd") %>">
         <td><%= i.zone %></td>
         <td><%= i.instance_type %></td>
         <td><%= i.count %></td>
-        <td><%= i.start.strftime("%Y-%m-%d") %></td>
-        <td><%= (i.start + i.duration).strftime("%Y-%m-%d") %></td>
-        <td><%= i.duration.to_i / (60*60*24*30) %></td>
         <td><%= i.usage_price %></td>
-        <td><%= i.fixed_price %></td>
-        <td class="<%= i.state %>"><%= i.state %></td>
-        <td><%= i.description %></td>
     </tr>
 <% end %>
 </table>
@@ -39,6 +27,31 @@
 
 <hr style="margin: 1.5em 0;">
 
+<h1>Running Instances<%= h(@account_group.nil? ? '' : " in Account Group '#{@account_group.name}'") %></h1>
+
+<% if @running_instances.empty? %>
+    <br/>
+    No running instances.
+    <br/>
+<% else %>
+<br/>
+<table>
+    <tr>
+        <th>Zone</th>
+        <th>Type</th>
+        <th>Total</th>
+    </tr>
+<% @running_instances.each do |i| %>
+    <tr class="<%= cycle("even", "odd") %>">
+        <td><%= i.zone %></td>
+        <td><%= i.instance_type %></td>
+        <td><%= i.count %></td>
+    </tr>
+<% end %>
+</table>
+<% end %>
+
+<hr style="margin: 1.5em 0;">
 <h1>Stats</h1>
 
 <% if @latest_stat_record.nil? %>
