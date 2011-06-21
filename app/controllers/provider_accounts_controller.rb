@@ -12,7 +12,8 @@ class ProviderAccountsController < ApplicationController
 			:search => params[:search],
 			:page => params[:page],
 			:order => params[:sort],
-			:filter => params[:filter]
+			:filter => params[:filter],
+			:include => :account_group
 		}
 		@provider_accounts = ProviderAccount.search_by_user(current_user, options)
 

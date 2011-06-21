@@ -10,6 +10,7 @@ class ProviderAccount < BaseModel
 	service_child_relationship :clusters
 	
 	belongs_to :provider
+        belongs_to :account_group
 	has_many :instances, :dependent => :destroy
 	has_many :server_images, :dependent => :destroy
 	has_many :key_pairs, :dependent => :destroy
@@ -391,7 +392,7 @@ class ProviderAccount < BaseModel
 	end
 
 	def self.sort_fields
-		%w(name description external_id last_published refreshed_at created_at)
+		%w(name account_group_id description external_id last_published refreshed_at created_at)
 	end
 
 	def self.search_fields

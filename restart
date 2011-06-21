@@ -7,7 +7,9 @@ cd "${NIMBUL_HOME}"
 
 sleep 30
 
-/etc/init.d/mysql restart
+if [ -f /var/lib/mysql/mysql.sock ]; then
+    /etc/init.d/mysql restart
+fi
 
 ./start
 
