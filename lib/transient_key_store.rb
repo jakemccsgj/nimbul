@@ -240,7 +240,7 @@ private
       raise e if (e.class.to_s.downcase !~ /^(errno::(einval|eidrm)|systemvipc::error)/)
 
       # lost our shared memory pool (possible destroy?)
-      unlock; @data = {}; restart; lock
+      unlock; @data = {}; reload; lock
       retry
     ensure unlock; end
   end
