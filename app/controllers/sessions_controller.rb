@@ -25,11 +25,11 @@ class SessionsController < ApplicationController
 		
 		if using_open_id?
 			open_id_authentication(params[:openid_identifier])
-	    elsif using_ldap?
+		elsif using_ldap?
 			ldap_authentication(params[:login], params[:password])
 		else
 			password_authentication(params[:login], params[:password])
-	    end
+		end
 	end
 	
 	def show
@@ -47,7 +47,7 @@ class SessionsController < ApplicationController
 
 	def password_authentication(name, password)
 		SiteUser.authenticate(name, password) do |user, message, item_msg, item_path|
-			(successful_login(user) and return) if user
+			return successful_login(user) if user
 			(flash[:error_item] = [item_msg, send(item_path)]) if item_path
 			failed_login(message, name)
 		end
@@ -55,7 +55,7 @@ class SessionsController < ApplicationController
 
 	def ldap_authentication(name, password)
 		LdapUser.authenticate(name, password) do |user, message, item_msg, item_path|
-			(successful_login(user) and return) if user
+			return successful_login(user) if user
 			(flash[:error_item] = [item_msg, send(item_path)]) if item_path
 			failed_login(message, name)
 		end

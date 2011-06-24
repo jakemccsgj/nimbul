@@ -113,7 +113,7 @@ class Instance < BaseModel
 	def initiate_reboot
 		if self.is_locked?
 			self.errors.add(:is_locked, "Instance '#{self.instance_id}' is locked; unlock to reboot/stop.")
-			raise ActiveRecord::Rollback
+			raise ActiveRecord::Rollback, "Instance '#{self.instance_id}' is locked; unlock to reboot/stop."
 		else
 			begin
 				Ec2Adapter.reboot_instance(self)
@@ -130,7 +130,7 @@ class Instance < BaseModel
 	def initiate_termination
 		if self.is_locked?
 			self.errors.add(:is_locked, "Instance '#{self.instance_id}' is locked; unlock to reboot/stop.")
-			raise ActiveRecord::Rollback
+			raise ActiveRecord::Rollback, "Instance '#{self.instance_id}' is locked; unlock to reboot/stop."
 		else
 			begin
 				self.release_dns_leases
