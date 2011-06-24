@@ -62,11 +62,11 @@
 			:href => '#tasks'
 		) %>
     </li>
-    <li class="tab-unselected" id="security_tab">
+    <li class="tab-unselected" id="acl_tab">
         <%= link_to_function(
-			'Security',
-			"tabselect($('security_tab')); paneselect($('security_pane')); return true;",
-			:href => '#security'
+			'Access Control',
+			"tabselect($('acl_tab')); paneselect($('acl_pane')); return true;",
+			:href => '#acls'
 		) %>
     </li>
 </ul>
@@ -93,8 +93,8 @@
 		<h1>Server Tasks</h1><br/>
 		<div id="server_<%= @server.id %>_tasks_index"></div>
 	</li>
-    <li id="security_pane" class="pane-unselected">
-        <%= render :partial => 'security' %>
+    <li id="acl_pane" class="pane-unselected">
+        <%= render :partial => 'acls' %>
     </li>
 </ul>
 </div>

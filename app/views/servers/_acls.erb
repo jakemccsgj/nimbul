@@ -1,7 +1,7 @@
 <% form_for :server,
     :url => server_path(@server),
     :html => { :method => 'put' } do |f| %>
-	<%= hidden_field_tag :anchor, :security %>
+	<%= hidden_field_tag :anchor, :acl %>
     <%= f.error_messages %>
     <table>
      <tr>
