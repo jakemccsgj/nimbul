@@ -24,6 +24,10 @@ class RestoreSnapshotMountType < ServerVolumeMountType
         ['CloudSnapshot', 'CloudVolume']
     end
 
+    def self.selectable_resource_types
+        ['CloudSnapshot']
+    end
+
     def self.care_about_zone?
         false
     end

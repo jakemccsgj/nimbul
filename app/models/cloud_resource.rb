@@ -157,7 +157,7 @@ class CloudResource < BaseModel
 		mount_type_lookup = {}
 		unless mount_types.empty?
 			mount_types.each do |mt|
-				cloud_resource_types = mt.value.constantize.cloud_resource_types
+				cloud_resource_types = mt.value.constantize.selectable_resource_types
 				cloud_resource_types.each do |crt|
 					mtl = mount_type_lookup[crt] || []
 					mtl << mt.value

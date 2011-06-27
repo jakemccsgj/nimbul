@@ -16,6 +16,10 @@ class ServerResourceMountType
         raise 'cloud_resource_types should be overwritten in subclasses of ServerResourceMountType'
     end
 
+    def self.selectable_resource_types
+        raise 'selectable_resource_types should be overwritten in subclasses of ServerResourceMountType'
+    end
+
     def self.care_about_zone?
         raise 'care_about_zone? should be overwritten in subclasses of ServerResourceMountType'
     end
