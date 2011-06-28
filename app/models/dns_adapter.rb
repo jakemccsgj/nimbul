@@ -31,11 +31,14 @@ class DnsAdapter
         instances.private_dns                     AS instance_private_dns,
         instances.public_ip                       AS instance_public_ip,
         instances.private_ip                      AS instance_private_ip,
+        addresses.cloud_id                        AS elastic_ip_address,
+        addresses.name                            AS elastic_ip_name,
         server_profile_revision_parameters.value  AS roles 
       ),
       :joins => [
+        'LEFT  JOIN cloud_resources AS addresses ON instances.instance_id = addresses.cloud_instance_id AND addresses.state = "in-use"',
         'INNER JOIN server_profile_revisions ON server_profile_revisions.id = servers.server_profile_revision_id',
-        'LEFT JOIN server_profile_revision_parameters ON
+        'LEFT  JOIN server_profile_revision_parameters ON
                 server_profile_revision_parameters.server_profile_revision_id = server_profile_revisions.id AND
                 server_profile_revision_parameters.name = "ROLES"',
       ],
@@ -126,6 +129,8 @@ class DnsAdapter
         :public_ip    => lease[:instance_public_ip],
         :private_dns  => lease[:instance_private_dns],
         :private_ip   => lease[:instance_private_ip],
+        :elastic_ip   => lease[:elastic_ip_address],
+        :elastic_name => lease[:elastic_ip_name],
         :nimbul_fqdn  => fqdn.gsub('_', '-'),
         :nimbul_host  => hostname,
         :base_name    => base_name
