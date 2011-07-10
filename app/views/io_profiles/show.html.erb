@@ -1,0 +1,18 @@
+<p>
+  <b>Position:</b>
+  <%=h @io_profile.position %>
+</p>
+
+<p>
+  <b>Name:</b>
+  <%=h @io_profile.name %>
+</p>
+
+<p>
+  <b>Desc:</b>
+  <%=h @io_profile.desc %>
+</p>
+
+
+<%= link_to 'Edit', edit_io_profile_path(@io_profile) %> |
+<%= link_to 'Back', io_profiles_path %>
