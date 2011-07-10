@@ -53,7 +53,7 @@ class IoProfilesController < ApplicationController
       respond_to do |format|
         if @io_profile.save
           flash[:notice] = 'IoProfile was successfully created.'
-          format.html { redirect_to(@io_profile) }
+          format.html { redirect_to redirect_url }
           format.xml  { render :xml => @io_profile, :status => :created, :location => @io_profile }
         else
           format.html { render :action => "new" }
@@ -76,7 +76,7 @@ class IoProfilesController < ApplicationController
       respond_to do |format|
         if @io_profile.update_attributes(params[:io_profile])
           flash[:notice] = 'IoProfile was successfully updated.'
-          format.html { redirect_to(@io_profile) }
+          format.html { redirect_to redirect_url }
           format.xml  { head :ok }
         else
           format.html { render :action => "edit" }

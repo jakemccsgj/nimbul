@@ -8,19 +8,25 @@
     <th>&nbsp;</th>
     <th>Name</th>
     <th>Description</th>
+    <th>Actions</th>
   </tr>
-
-  <% for io_profile in @io_profiles %>
-    <% fields_for "io_profile", io_profile do |f| %>
-      <% content_tag_for :tr, io_profile, :readonly => false, :class => '' do %>
-        <%= f.hidden_field :id, :index => nil %>
-    	<td class="handle">[drag]</td>
-        <td><%= link_to h(io_profile.name), edit_io_profile_path(io_profile) %></td>
-        <td><%=h io_profile.desc %></td>
+  <tbody id="io_profiles">
+    <% for io_profile in @io_profiles %>
+      <% fields_for "io_profile", io_profile do |f| %>
+        <% content_tag_for :tr, io_profile, :readonly => false, :class => '' do %>
+          <%= f.hidden_field :id, :index => nil %>
+          <td class="handle">[drag]</td>
+          <td><%= link_to h(io_profile.name), edit_io_profile_path(io_profile) %></td>
+          <td><%=h io_profile.desc %></td>
+          <td>
+            <%= link_to image_tag('trash.png', { :alt => "Delete", :class => 'control-icon' }), io_profile, :confirm => 'Are you sure?', :method => :delete -%>
+          </td>
+        <% end %>
       <% end %>
     <% end %>
-  <% end %>
+  </tbody>
 </table>
+<%= sortable_element("io_profiles", :url => sort_io_profiles_path, :tag => "tr", :handle => "handle" ) %>
 
 <br />
 
