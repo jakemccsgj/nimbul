@@ -4,7 +4,7 @@ class SecurityGroup::FirewallRulesController < ApplicationController
         :unless => "current_user.has_security_group_access?(SecurityGroup.find(params[:security_group_id])) "
 
     def create
-        @security_group = SecurityGroup.find(params[:security_group_id])
+        @security_group = SecurityGroup.find(params[:security_group_id], :include => :firewall_rules)
         @firewall_rule = FirewallRule.find(params[:firewall_rule][:id])
 
         if @firewall_rule.nil?
@@ -36,7 +36,7 @@ class SecurityGroup::FirewallRulesController < ApplicationController
     end
 
     def destroy
-        @security_group = SecurityGroup.find(params[:security_group_id])
+        @security_group = SecurityGroup.find(params[:security_group_id], :include => :firewall_rules)
         @firewall_rule = FirewallRule.find(params[:id])        
 
         if @firewall_rule.nil?
