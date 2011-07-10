@@ -99,7 +99,7 @@ class IoProfilesController < ApplicationController
   end
 
   def sort
-    params[:io_profile].each_with_index do |id, index|
+    params[:io_profiles].each_with_index do |id, index|
       IoProfile.update_all(['position=?', index+1], ['id=?', id])
     end
     render :nothing => true
