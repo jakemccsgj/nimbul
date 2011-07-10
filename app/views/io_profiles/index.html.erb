@@ -1,24 +1,27 @@
-<h1>Listing io_profiles</h1>
+<% subtitle 'IO Profiles' %>
+
+<h1><%= link_to 'Admin Controls', admin_controls_path %> / IO Profiles</h1>
+<br/>
 
 <table>
   <tr>
-    <th>Position</th>
+    <th>&nbsp;</th>
     <th>Name</th>
-    <th>Desc</th>
+    <th>Description</th>
   </tr>
 
-<% for io_profile in @io_profiles %>
-  <tr>
-    <td><%=h io_profile.position %></td>
-    <td><%=h io_profile.name %></td>
-    <td><%=h io_profile.desc %></td>
-    <td><%= link_to 'Show', io_profile %></td>
-    <td><%= link_to 'Edit', edit_io_profile_path(io_profile) %></td>
-    <td><%= link_to 'Destroy', io_profile, :confirm => 'Are you sure?', :method => :delete %></td>
-  </tr>
-<% end %>
+  <% for io_profile in @io_profiles %>
+    <% fields_for "io_profile", io_profile do |f| %>
+      <% content_tag_for :tr, io_profile, :readonly => false, :class => '' do %>
+        <%= f.hidden_field :id, :index => nil %>
+    	<td class="handle">[drag]</td>
+        <td><%= link_to h(io_profile.name), edit_io_profile_path(io_profile) %></td>
+        <td><%=h io_profile.desc %></td>
+      <% end %>
+    <% end %>
+  <% end %>
 </table>
 
 <br />
 
-<%= link_to 'New io_profile', new_io_profile_path %>
+<%= link_to 'Add IO Profile', new_io_profile_path %>

@@ -1,5 +1,5 @@
 ActionController::Routing::Routes.draw do |map|
-  map.resources :io_profiles
+  map.resources :io_profiles, :collection => { :sort => :post }
 
   map.resources :account_groups
 

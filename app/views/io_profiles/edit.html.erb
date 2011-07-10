@@ -1,24 +1,11 @@
-<h1>Editing io_profile</h1>
+<% subtitle "Edit IO Profile" %>
 
-<% form_for(@io_profile) do |f| %>
-  <%= f.error_messages %>
+<h1>
+  <%= link_to 'Admin Controls', admin_controls_path %>
+  / <%= link_to 'IO Profiles', io_profiles_path %>
+  / Edit IO Profile
+</h1>
 
-  <p>
-    <%= f.label :position %><br />
-    <%= f.text_field :position %>
-  </p>
-  <p>
-    <%= f.label :name %><br />
-    <%= f.text_field :name %>
-  </p>
-  <p>
-    <%= f.label :desc %><br />
-    <%= f.text_field :desc %>
-  </p>
-  <p>
-    <%= f.submit "Update" %>
-  </p>
-<% end %>
+<br/>
 
-<%= link_to 'Show', @io_profile %> |
-<%= link_to 'Back', io_profiles_path %>
+<%= render :partial => 'form' %>
