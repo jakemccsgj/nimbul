@@ -1,7 +1,6 @@
 <table>
   <tr>
     <th>Name</th>
-    <th>Short name</th>
     <th>Description</th>
     <th>Endpoint url</th>
     <th>State</th>
@@ -10,7 +9,6 @@
 <% for region in @regions %>
   <tr>
     <td><%=h region.name %></td>
-    <td><%=h region.short_name %></td>
     <td><%=h region.description %></td>
     <td><%=h region.endpoint_url %></td>
     <td class="<%=h region.state %>"><%=h region.state %></td>
