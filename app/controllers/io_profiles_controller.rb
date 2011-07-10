@@ -5,7 +5,7 @@ class IoProfilesController < ApplicationController
   # GET /io_profiles
   # GET /io_profiles.xml
   def index
-    @io_profiles = IoProfile.find(:all)
+    @io_profiles = IoProfile.find(:all, :order => 'position')
 
     respond_to do |format|
       format.html # index.html.erb
