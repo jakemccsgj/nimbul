@@ -1,6 +1,4 @@
 ActionController::Routing::Routes.draw do |map|
-  map.resources :io_profiles
-
   map.resources :account_groups
 
   map.resources :dashboard, :only => [ :index ]
