@@ -1,0 +1,38 @@
+<table>
+  <tr>
+    <th>&nbsp;</th>
+    <th>Name</th>
+    <th>Description</th>
+    <th>Memory</th>
+    <th>CPU</th>
+    <th>Storage</th>
+    <th>Platform</th>
+    <th>I/O Performance</th>
+    <th>API Name</th>
+    <th>Actions</th>
+  </tr>
+  <tbody id="instance_vm_types">
+  <% for instance_vm_type in @instance_vm_types %>
+    <% fields_for "instance_vm_type", instance_vm_type do |f| %>
+    <% content_tag_for :tr, instance_vm_type, :readonly => false, :class => '' do %>
+    <%= f.hidden_field :id, :index => nil %>
+    <td class="handle">[drag]</td>
+    <td><%= link_to h(instance_vm_type.name), send("edit_#{ @parent_type }_instance_vm_type_path", @parent, instance_vm_type) %></td>
+    <td><%=h instance_vm_type.name %></td>
+    <td><%=h instance_vm_type.desc %></td>
+    <td><%=h instance_vm_type.ram %></td>
+    <td><%=h instance_vm_type.cpu %></td>
+    <td><%=h instance_vm_type.storage %></td>
+    <td><%=h instance_vm_type.platform %></td>
+    <td><%=h instance_vm_type.io %></td>
+    <td><%=h instance_vm_type.api_name %></td>
+    <td><%= link_to 'Destroy', send("#{ @parent_type }_instance_vm_type_path", @parent, instance_vm_type), :confirm => 'Are you sure?', :method => :delete %></td>
+    <% end %>
+    <% end %>
+  <% end %>
+  </tbody>
+</table>
+<%= sortable_element("instance_vm_types", :url => send("sort_#{ @parent_type }_instance_vm_types_path", @parent), :tag => "tr", :handle => "handle" ) %>
+
+<%= link_to 'Add Instance Type', send("new_#{ @parent_type }_instance_vm_type_path", @parent) %>
+<br/><br/>

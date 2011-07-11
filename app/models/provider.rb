@@ -13,4 +13,5 @@ class Provider < BaseModel
     has_many :provider_accounts, :dependent => :nullify
     has_many :operating_systems, :dependent => :destroy
     has_many :instance_kind_categories, :dependent => :destroy, :include => :instance_kinds, :order => :position
+    has_many :instance_vm_types, :dependent => :destroy, :order => :position
 end

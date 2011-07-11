@@ -19,7 +19,7 @@ module ProvidersHelper
       html_options = {
         :href => url,
         :method => :get,
-        :title => "Show #{objects.to_s} for Provider '#{provider.name}'",
+        :title => "Show #{objects.to_s.humanize} for Provider '#{provider.name}'",
       }
       link = link_to_remote link_text, options, html_options
     rescue

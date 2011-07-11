@@ -4,6 +4,7 @@ class Admin::ControlsController < ApplicationController
 
     def index
         @users = User.count
+	@providers = Provider.count
         @account_groups = AccountGroup.count
         @service_types = ServiceType.count
         @service_providers = ServiceProvider.count

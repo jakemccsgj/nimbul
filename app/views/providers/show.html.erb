@@ -57,9 +57,13 @@ Regions
 <hr>
 <div id="<%= provider_objects_id(@provider, :regions) %>"></div>
 
-<h1>Instance Types</h1>
+<h1>
+<%= expand_provider_objects_link(@provider, :instance_vm_types) -%>
+<%= compress_provider_objects_link(@provider, :instance_vm_types) -%>
+Instance Types
+</h1>
 <hr>
-<div id="provider-<%= @provider.id %>-instance_types"></div>
+<div id="provider-<%= @provider.id %>-instance_vm_types"></div>
 
 <h1>Operating Systems</h1>
 <hr>

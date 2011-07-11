@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110710201838) do
+ActiveRecord::Schema.define(:version => 20110710220317) do
 
   create_table "access_requests", :force => true do |t|
     t.string   "state"
@@ -239,6 +239,15 @@ ActiveRecord::Schema.define(:version => 20110710201838) do
   add_index "clusters_users", ["cluster_id"], :name => "index_clusters_users_on_cluster_id"
   add_index "clusters_users", ["user_id"], :name => "index_clusters_users_on_user_id"
 
+  create_table "cpu_profiles", :force => true do |t|
+    t.integer  "position"
+    t.string   "name"
+    t.string   "api_name"
+    t.string   "desc"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "dns_hostname_assignments", :force => true do |t|
     t.integer  "dns_hostname_id", :null => false
     t.integer  "server_id",       :null => false
@@ -454,6 +463,25 @@ ActiveRecord::Schema.define(:version => 20110710201838) do
 
   add_index "instance_resources", ["cloud_resource_id"], :name => "index_instance_resources_on_cloud_resource_id"
   add_index "instance_resources", ["instance_id", "type"], :name => "index_instance_resources_on_instance_id_and_type"
+
+  create_table "instance_vm_types", :force => true do |t|
+    t.integer  "position"
+    t.integer  "provider_id"
+    t.string   "name"
+    t.string   "api_name"
+    t.text     "desc"
+    t.float    "ram_gb"
+    t.string   "ram_type"
+    t.string   "ram_desc"
+    t.float    "cpu_units"
+    t.string   "cpu_type"
+    t.string   "cpu_desc"
+    t.integer  "storage_gb"
+    t.string   "storage_type"
+    t.string   "storage_desc"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "instances", :force => true do |t|
     t.string   "instance_id"

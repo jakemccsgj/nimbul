@@ -1,4 +1,6 @@
 ActionController::Routing::Routes.draw do |map|
+  map.resources :cpu_profiles, :collection => { :sort => :post }
+
   map.resources :io_profiles, :collection => { :sort => :post }
 
   map.resources :account_groups
@@ -13,6 +15,7 @@ ActionController::Routing::Routes.draw do |map|
     provider.resources :instance_kind_categories, :controller => 'instance_kind_categories'
     provider.resources :instance_kinds, :controller => 'instance_kinds'
     provider.resources :operating_systems, :controller => 'operating_systems'
+    provider.resources :instance_vm_types, :collection => { :sort => :post }
   end
 
   map.resources :regions do |region|
