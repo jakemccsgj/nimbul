@@ -861,6 +861,7 @@ ActiveRecord::Schema.define(:version => 20110717002643) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "name"
+    t.integer  "position"
   end
 
   add_index "regions", ["api_name"], :name => "index_regions_on_name"
