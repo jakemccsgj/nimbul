@@ -1,67 +1,11 @@
-<h1>New instance_vm_type</h1>
+<% subtitle "New Instance Type" %>
 
-<% form_for(@instance_vm_type) do |f| %>
-  <%= f.error_messages %>
+<h1>
+  <%= link_to 'Admin Controls', admin_controls_path %>
+  / <%= link_to 'Instance Types', send("#{ @parent_type }_instance_vm_types_path", @parent) %>
+  / New Instance Type 
+</h1>
 
-  <p>
-    <%= f.label :position %><br />
-    <%= f.text_field :position %>
-  </p>
-  <p>
-    <%= f.label :provider_id %><br />
-    <%= f.text_field :provider_id %>
-  </p>
-  <p>
-    <%= f.label :name %><br />
-    <%= f.text_field :name %>
-  </p>
-  <p>
-    <%= f.label :api_name %><br />
-    <%= f.text_field :api_name %>
-  </p>
-  <p>
-    <%= f.label :desc %><br />
-    <%= f.text_area :desc %>
-  </p>
-  <p>
-    <%= f.label :ram_gb %><br />
-    <%= f.text_field :ram_gb %>
-  </p>
-  <p>
-    <%= f.label :ram_type %><br />
-    <%= f.text_field :ram_type %>
-  </p>
-  <p>
-    <%= f.label :ram_desc %><br />
-    <%= f.text_field :ram_desc %>
-  </p>
-  <p>
-    <%= f.label :cpu_units %><br />
-    <%= f.text_field :cpu_units %>
-  </p>
-  <p>
-    <%= f.label :cpu_type %><br />
-    <%= f.text_field :cpu_type %>
-  </p>
-  <p>
-    <%= f.label :cpu_desc %><br />
-    <%= f.text_field :cpu_desc %>
-  </p>
-  <p>
-    <%= f.label :storage_gb %><br />
-    <%= f.text_field :storage_gb %>
-  </p>
-  <p>
-    <%= f.label :storage_type %><br />
-    <%= f.text_field :storage_type %>
-  </p>
-  <p>
-    <%= f.label :storage_desc %><br />
-    <%= f.text_field :storage_desc %>
-  </p>
-  <p>
-    <%= f.submit "Create" %>
-  </p>
-<% end %>
+<br/>
 
-<%= link_to 'Back', instance_vm_types_path %>
+<%= render :partial => 'form' %>

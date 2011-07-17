@@ -1,0 +1,11 @@
+<% subtitle "New Storage Type" %>
+
+<h1>
+  <%= link_to 'Admin Controls', admin_controls_path %>
+  / <%= link_to 'Storage Types', send("#{ @parent_type }_storage_types_path", @parent) %>
+  / New Storage Type 
+</h1>
+
+<br/>
+
+<%= render :partial => 'form' %>

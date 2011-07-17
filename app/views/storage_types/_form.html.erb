@@ -1,0 +1,22 @@
+<% semantic_remote_form_for [@parent, @storage_type], :remote => true do |f| %>
+    <%= hidden_field_tag :anchor, 'storage_types' %>
+    <%= hidden_field_tag :update, 'provider_storage_types' %>
+    <%= f.error_messages %>
+    <% f.inputs do %>
+      <%= f.input :api_name,
+        :class => 'short'
+      %>
+      <%= f.input :name,
+        :class => 'short'
+      %>
+      <%= f.input :desc,
+        :label => 'Description',
+        :required => false
+      %>
+    <% end %>
+    <% f.buttons do %>
+      <%= f.submit %>
+      <%= cancel_add_provider_storage_type_button 'Cancel', @provider %>
+    <% end %>
+  <% end %>
+</div>

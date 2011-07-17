@@ -1,0 +1,19 @@
+    <% fields_for "instance_vm_type", instance_vm_type do |f| %>
+    <% content_tag_for :tr, instance_vm_type, :readonly => false, :class => '' do %>
+        <%= f.hidden_field :id, :index => nil %>
+        <td class="handle">[drag]</td>
+        <td><%= link_to_remote h(instance_vm_type.api_name), :url => send("edit_#{ @parent_type }_instance_vm_type_url", @parent, instance_vm_type), :method => :get %></td>
+        <td><%=h instance_vm_type.name %></td>
+        <td><%=h instance_vm_type.ram_gb %></td>
+        <td><%=h instance_vm_type.cpu_units %></td>
+        <td><%=h instance_vm_type.storage_gb %></td>
+        <td class="nowrap">
+            <%= instance_vm_type.storage_types.collect{ |sp| h(sp.name) }.join('<br/>') %>
+        </td>
+        <td><%= (instance_vm_type.io_profile.nil? ? '&nbsp;' : h(instance_vm_type.io_profile.name)) %></td>
+        <td class="nowrap">
+            <%= instance_vm_type.cpu_profiles.collect{ |cp| h(cp.name) }.join('<br/>') %>
+        </td>
+        <td><%= remove_provider_instance_vm_type_link('Delete', @parent, instance_vm_type) %></td>
+    <% end %>
+    <% end %>

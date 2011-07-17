@@ -1,0 +1,3 @@
+page[:edit_instance_vm_type].replace_html :partial => "form", :object => @instance_vm_type
+page[:add_instance_vm_type].hide
+page[:edit_instance_vm_type].appear
