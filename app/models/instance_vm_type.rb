@@ -5,7 +5,7 @@ class InstanceVmType < BaseModel
     has_and_belongs_to_many :storage_types, :order => 'position'
 
     validates_presence_of :api_name, :name, :ram_gb, :cpu_units, :storage_gb
-    validates_uniqueness_of :api_name, :name
+    validates_uniqueness_of :api_name, :name, :scope => :provider_id
     validates_numericality_of :ram_gb, :cpu_units, :storage_gb
     validate :has_io_profile?
     validate :has_cpu_profiles?

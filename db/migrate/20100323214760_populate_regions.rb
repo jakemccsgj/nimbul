@@ -13,7 +13,7 @@ regions = [
   end
 
   def self.down
-    provider = Provider.find_by_adapter_class('Ec2Adapter')
+    provider = Provider.find_by_adapter_class('Ec2Adapter', :include => :regions)
     provider.regions.delete_all if provider
   end
 end
