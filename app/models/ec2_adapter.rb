@@ -443,17 +443,18 @@ class Ec2Adapter
     def self.refresh_server_images(account)
         ec2 = get_ec2(account)
         account_images = ServerImage.find_all_by_provider_account_id(account.id)
+        account_storage_types = StorageType.find_all_by_provider_id(account.provider_id)
 
         # refresh images imported from other accounts
         # AWS call fails if we try to batch-refresh with any invalid image_ids included
         # so we refresh them one-by-one
         account_images.select{ |i| i.owner_id != account.external_id }.each do |oi|
-            refresh_server_image(oi)
+            refresh_server_image(oi, account_images, account_storage_types)
         end
 
         # refresh our images
         opts = { :owners => [ 'self' ]}
-           images = ec2.describe_images(opts)
+        images = ec2.describe_images(opts)
         cloud_images = ec2.describe_images(opts)
 
         # presume all our images are unavailable unless we find them at Amazon
@@ -464,21 +465,16 @@ class Ec2Adapter
         # refresh server images, add new ones if any
         cloud_images.each do |cloud_image|
             # parse image info
-            cloud_image = parse_server_image_info(account, cloud_image)
-            account_image = account_images.detect{ |i| i.image_id == cloud_image[:image_id] }
-            if account_image.nil?
-                # for new server images, set their name to image_id
-                cloud_image[:name] = cloud_image[:image_id] if cloud_image[:name].blank?
-                account_image = account.server_images.build(cloud_image)
-            else
-                account_image.attributes = cloud_image
-            end
-               account_image.save
+            server_image = parse_server_image_info(account, cloud_image, account_images, account_storage_types)
+            server_image.save
         end
     end
 
-    def self.refresh_server_image(server_image)
+    def self.refresh_server_image(server_image, account_server_images=nil, account_storage_types=nil)
         account = server_image.provider_account
+        account_server_images ||= account.server_images
+        account_storage_types ||= account.storage_types
+
         ec2 = get_ec2(account)
         opts = { :image_ids => [ server_image.image_id ] }
         begin
@@ -487,21 +483,53 @@ class Ec2Adapter
                 i = images[0]
                 # preserve the name
                 i[:name] = server_image.name if i[:name].blank?
-                server_image.attributes = parse_server_image_info(account, i)
+                server_image = parse_server_image_info(account, i, account_server_images, account_storage_types)
                 server_image.save
             end
-        rescue
-            server_image.location = 'This server image is no longer available'
+        rescue Exception => e
+            server_image.description = "Failed to refresh from Provider: #{e.message}"
             server_image.state = 'unavailable'
             server_image.save
         end
     end
 
-    def self.parse_server_image_info(account, attributes)
+    def self.parse_server_image_info(account, attributes, account_server_images=nil, account_storage_types=nil)
+        account_server_images ||= account.server_images
+        account_storage_types ||= account.storage_types
+
         # delete :id attribute before building a server image record - :id is a special rails attribute
         attributes[:image_id] = attributes[:id]
         attributes.delete(:id)
-        return attributes
+
+        # TODO add support for blockDeviceMapping element
+        # delete :block_device_mapping attribute for now
+        attributes.delete(:block_device_mapping)
+
+        # map rootDeviceType element to StorageType
+        if attributes[:root_device_type]
+            storage_type = StorageType.find_by_provider_id_and_api_name(account.provider_id, attributes[:root_device_type])
+            if storage_type.nil?
+                storage_type = StorageType.create({
+                    :provider_id => account.provider_id,
+                    :api_name => attributes[:root_device_type],
+                    :name => attributes[:root_device_type],
+                    :desc => 'Created by Ec2Adapter during the Image import',
+                })
+            end
+            attributes[:storage_type_id] = storage_type.id
+            attributes.delete(:root_device_type)
+        end
+
+	# detect / update or construct a new server_image
+        server_image = account_server_images.detect{ |i| i.image_id == attributes[:image_id] }
+        if server_image.nil?
+            # for new server images, set their name to image_id
+            attributes[:name] = attributes[:image_id] if attributes[:name].blank?
+            server_image = account.server_images.build(attributes)
+        else
+            server_image.attributes = attributes
+        end
+        return server_image
     end
 
     def self.refresh_instances(account)

@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110717173807) do
+ActiveRecord::Schema.define(:version => 20110718045735) do
 
   create_table "access_requests", :force => true do |t|
     t.string   "state"
@@ -960,7 +960,17 @@ ActiveRecord::Schema.define(:version => 20110717173807) do
     t.string   "server_image_type"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "is_enabled",          :default => true
+    t.boolean  "is_enabled",              :default => true
+    t.integer  "image_type_id"
+    t.string   "platform"
+    t.integer  "state_reason_type_id"
+    t.string   "image_owner_alias"
+    t.string   "description"
+    t.integer  "storage_type_id"
+    t.string   "root_device_name"
+    t.integer  "block_device_mapping_id"
+    t.integer  "virtualizaton_type_id"
+    t.integer  "hipervisor_id"
   end
 
   add_index "server_images", ["image_id"], :name => "index_server_images_on_image_id"
