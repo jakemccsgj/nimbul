@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110710220317) do
+ActiveRecord::Schema.define(:version => 20110718045735) do
 
   create_table "access_requests", :force => true do |t|
     t.string   "state"
@@ -248,6 +248,11 @@ ActiveRecord::Schema.define(:version => 20110710220317) do
     t.datetime "updated_at"
   end
 
+  create_table "cpu_profiles_instance_vm_types", :id => false, :force => true do |t|
+    t.integer "cpu_profile_id"
+    t.integer "instance_vm_type_id"
+  end
+
   create_table "dns_hostname_assignments", :force => true do |t|
     t.integer  "dns_hostname_id", :null => false
     t.integer  "server_id",       :null => false
@@ -481,6 +486,12 @@ ActiveRecord::Schema.define(:version => 20110710220317) do
     t.string   "storage_desc"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "io_profile_id"
+  end
+
+  create_table "instance_vm_types_storage_types", :id => false, :force => true do |t|
+    t.integer "instance_vm_type_id"
+    t.integer "storage_type_id"
   end
 
   create_table "instances", :force => true do |t|
@@ -842,17 +853,19 @@ ActiveRecord::Schema.define(:version => 20110710220317) do
 
   create_table "regions", :force => true do |t|
     t.integer  "provider_id"
-    t.string   "name"
+    t.string   "api_name"
     t.text     "description"
     t.string   "endpoint_url"
     t.string   "state"
     t.text     "meta_data"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "name"
+    t.integer  "position"
   end
 
-  add_index "regions", ["name"], :name => "index_regions_on_name"
-  add_index "regions", ["provider_id", "name"], :name => "index_regions_on_provider_id_and_name", :unique => true
+  add_index "regions", ["api_name"], :name => "index_regions_on_name"
+  add_index "regions", ["provider_id", "api_name"], :name => "index_regions_on_provider_id_and_name", :unique => true
 
   create_table "reserved_instances", :force => true do |t|
     t.integer  "provider_account_id"
@@ -947,7 +960,17 @@ ActiveRecord::Schema.define(:version => 20110710220317) do
     t.string   "server_image_type"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "is_enabled",          :default => true
+    t.boolean  "is_enabled",              :default => true
+    t.integer  "image_type_id"
+    t.string   "platform"
+    t.integer  "state_reason_type_id"
+    t.string   "image_owner_alias"
+    t.string   "description"
+    t.integer  "storage_type_id"
+    t.string   "root_device_name"
+    t.integer  "block_device_mapping_id"
+    t.integer  "virtualizaton_type_id"
+    t.integer  "hipervisor_id"
   end
 
   add_index "server_images", ["image_id"], :name => "index_server_images_on_image_id"
@@ -1173,6 +1196,16 @@ ActiveRecord::Schema.define(:version => 20110710220317) do
   end
 
   add_index "stat_records", ["provider_account_id", "taken_at"], :name => "index_stat_records_on_provider_account_id_and_taken_at"
+
+  create_table "storage_types", :force => true do |t|
+    t.integer  "provider_id"
+    t.string   "api_name"
+    t.string   "name"
+    t.string   "desc"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "position"
+  end
 
   create_table "task_parameters", :force => true do |t|
     t.integer  "task_id"

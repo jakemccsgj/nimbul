@@ -1,0 +1,12 @@
+    <% fields_for "region", region do |f| %>
+    <% content_tag_for :tr, region, :readonly => false, :class => '' do %>
+        <%= f.hidden_field :id, :index => nil %>
+        <td class="handle">[drag]</td>
+        <td><%= link_to_remote h(region.api_name), :url => send("edit_#{ @parent_type }_region_url", @parent, region), :method => :get %></td>
+        <td><%=h region.endpoint_url %></td>
+        <td><%=h region.name %></td>
+        <td><%=h region.description %></td>
+        <td><%=h region.state %></td>
+        <td><%= remove_provider_region_link('Delete', @parent, region) %></td>
+    <% end %>
+    <% end %>

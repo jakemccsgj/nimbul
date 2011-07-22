@@ -1,0 +1,26 @@
+<table>
+  <tr>
+    <th>&nbsp;</th>
+    <th>API Name</th>
+    <th>Name</th>
+    <th>Memory (GB)</th>
+    <th>CPU (units)</th>
+    <th>Storage (GB)</th>
+    <th>Supported Storage Type(s)</th>
+    <th>I/O Performance</th>
+    <th>Platform(s)</th>
+    <th>Actions</th>
+  </tr>
+  <tbody id="provider_instance_vm_types">
+    <%= render :partial => 'list', :locals => { :instance_vm_types => @instance_vm_types } %>
+  </tbody>
+</table>
+<%= sortable_element("provider_instance_vm_types", :url => send("sort_#{ @parent_type }_instance_vm_types_path", @parent), :tag => "tr", :handle => "handle" ) %>
+
+<hr>
+
+<div id="add_instance_vm_type" <% unless @provider.can_use_more_of?('InstanceVmType') %>style="display:none;"<% end %>>
+  <%= new_provider_instance_vm_type_button 'add', @provider %>
+</div>
+
+<div id="edit_instance_vm_type" style="display:none;overflow:auto;"></div>

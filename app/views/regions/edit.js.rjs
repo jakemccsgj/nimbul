@@ -1,0 +1,3 @@
+page[:edit_region].replace_html :partial => "form", :object => @region
+page[:add_region].hide
+page[:edit_region].appear

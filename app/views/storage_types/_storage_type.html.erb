@@ -1,0 +1,10 @@
+    <% fields_for "storage_type", storage_type do |f| %>
+    <% content_tag_for :tr, storage_type, :readonly => false, :class => '' do %>
+        <%= f.hidden_field :id, :index => nil %>
+        <td class="handle">[drag]</td>
+        <td><%= link_to_remote h(storage_type.api_name), :url => send("edit_#{ @parent_type }_storage_type_url", @parent, storage_type), :method => :get %></td>
+        <td><%=h storage_type.name %></td>
+        <td><%=h storage_type.desc %></td>
+        <td><%= remove_provider_storage_type_link('Delete', @parent, storage_type) %></td>
+    <% end %>
+    <% end %>

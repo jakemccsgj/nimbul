@@ -11,10 +11,8 @@ ActionController::Routing::Routes.draw do |map|
     provider.resources :services, :controller => 'parent/services',
       :collection => { :list => :any },
       :only => [ :index, :list, :new, :create, :destroy ]
-    provider.resources :regions, :controller => 'regions'
-    provider.resources :instance_kind_categories, :controller => 'instance_kind_categories'
-    provider.resources :instance_kinds, :controller => 'instance_kinds'
-    provider.resources :operating_systems, :controller => 'operating_systems'
+    provider.resources :regions, :collection => { :sort => :post }
+    provider.resources :storage_types, :collection => { :sort => :post }
     provider.resources :instance_vm_types, :collection => { :sort => :post }
   end
 
