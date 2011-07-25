@@ -1,8 +1,9 @@
-<% content_tag_for :tr, cluster do %>
-	<td><%= link_to cluster.name, cluster %></td>
-	<td><%=h cluster.description %></td>
-	<td><%= link_to cluster.instances.length, cluster_path(cluster, :anchor => :instances) %></td>
-	<% if current_user.has_provider_account_access?(cluster.provider_account_id) %>
-		<td><%= remove_cluster_link 'Delete', cluster %></td>
-	<% end %>
+<% content_tag_for :tr, cluster, :class => cluster.state do %>
+  <td><%= link_to cluster.name, cluster %></td>
+  <td><%=h cluster.description %></td>
+  <td><%= link_to cluster.instances.length, cluster_path(cluster, :anchor => :instances) %></td>
+  <td class="<%=h cluster.state %>"><%=h cluster.state %></td>
+  <% if current_user.has_provider_account_access?(cluster.provider_account_id) %>
+    <td><%= remove_cluster_link 'Delete', cluster %></td>
+  <% end %>
 <% end %>
