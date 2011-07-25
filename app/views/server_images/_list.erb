@@ -13,34 +13,34 @@
         <% end -%>
     </th>
     <% end -%>
-    <th <%= sort_td_class_helper "name" %>>
-      <%= server_images_sort_link "Name", "name" %>
-    </th>
     <% if @parent.is_a?(User) -%>
         <th <%= sort_td_class_helper "provider_account_id" %>>
           <%= server_images_sort_link "Account", "provider_account_id" %>
         </th>
     <% end -%>
     <th <%= sort_td_class_helper "image_id" %>>
-      <%= server_images_sort_link "AMI", "image_id" %>
+      <%= server_images_sort_link "API Name", "image_id" %>
     </th>
-    <th <%= sort_td_class_helper "location" %>>
-      <%= server_images_sort_link "Manifest", "location" %>
+    <th <%= sort_td_class_helper "name" %>>
+      <%= server_images_sort_link "Name", "name" %>
     </th>
-    <th <%= sort_td_class_helper "architecture" %>>
-      <%= server_images_sort_link "Arch", "architecture" %>
+    <th <%= sort_td_class_helper "storage_type_id" %>>
+      <%= server_images_sort_link "Storage", "storage_type_id" %>
     </th>
-    <th <%= sort_td_class_helper "state" %>>
-      <%= server_images_sort_link "State", "state" %>
+    <th <%= sort_td_class_helper "cpu_profile_id" %>>
+      <%= server_images_sort_link "Arch", "cpu_profile_id" %>
     </th>
     <th <%= sort_td_class_helper "owner_id" %>>
       <%= server_images_sort_link "Owner", "owner_id" %>
     </th>
+    <th <%= sort_td_class_helper "location" %>>
+      <%= server_images_sort_link "Manifest", "location" %>
+    </th>
     <th <%= sort_td_class_helper "is_public" %>>
       <%= server_images_sort_link "Is Public", "is_public" %>
     </th>
-    <th <%= sort_td_class_helper "is_enabled" %>>
-      <%= server_images_sort_link "Enabled", "is_enabled" %>
+    <th <%= sort_td_class_helper "state" %>>
+      <%= server_images_sort_link "State", "state" %>
     </th>
   </tr>
   </thead>

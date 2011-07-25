@@ -11,31 +11,32 @@ class Instance < BaseModel
   belongs_to :server, :counter_cache => true
   belongs_to :user
   belongs_to :auto_scaling_group
+  belongs_to :instance_vm_type
 
-  has_and_belongs_to_many :security_groups
+  has_and_belongs_to_many :security_groups, :uniq => true
 
-	has_many :operations, :dependent => :destroy
+  has_many :operations, :dependent => :destroy
 
-	has_many :dns_leases, :dependent => :nullify
-	has_many :dns_requests, :dependent => :destroy
-	has_many :dns_hostname_assignments, :foreign_key => :server_id, :primary_key => :server_id
-	has_many :dns_hostnames, :through => :dns_leases, :source => :dns_hostname_assignment
-	
-	has_many :cloud_resources, :dependent => :nullify
-	has_many :instance_resources, :dependent => :destroy
-	has_many :addresses, :class_name => 'InstanceAddress', :dependent => :destroy
-	has_many :volumes, :class_name => 'InstanceVolume', :dependent => :destroy
-	
-	has_one :resource_bundle, :dependent => :nullify
+  has_many :dns_leases, :dependent => :nullify
+  has_many :dns_requests, :dependent => :destroy
+  has_many :dns_hostname_assignments, :foreign_key => :server_id, :primary_key => :server_id
+  has_many :dns_hostnames, :through => :dns_leases, :source => :dns_hostname_assignment
+  
+  has_many :cloud_resources, :dependent => :nullify
+  has_many :instance_resources, :dependent => :destroy
+  has_many :addresses, :class_name => 'InstanceAddress', :dependent => :destroy
+  has_many :volumes, :class_name => 'InstanceVolume', :dependent => :destroy
+  
+  has_one :resource_bundle, :dependent => :nullify
 
-	# auditing
-	has_many :audit_logs, :as => :auditable, :dependent => :nullify
+  # auditing
+  has_many :audit_logs, :as => :auditable, :dependent => :nullify
 
-	alias :hostnames :dns_hostname_assignments
-	
+  alias :hostnames :dns_hostname_assignments
+  
   attr_accessor :should_destroy
-	attr_accessor :console_timestamp
-	attr_accessor :console_output
+  attr_accessor :console_timestamp
+  attr_accessor :console_output
 
   def should_destroy?
     should_destroy.to_i == 1
@@ -43,6 +44,11 @@ class Instance < BaseModel
 
   def name
     self.instance_id
+  end
+
+  def instance_type
+    return nil if self.instance_vm_type.nil?
+    return self.instance_vm_type.api_name
   end
 
 	def mountee_class_name
@@ -99,11 +105,11 @@ class Instance < BaseModel
 	end
 
 	def self.sort_fields
-		%w(instance_id zone_id server_name auto_scaling_group_id state launch_time image_id instance_type key_name public_dns dns_name private_dns volume_name is_locked is_ready user_id)
+		%w(instance_id zone_id server_name auto_scaling_group_id state launch_time image_id instance_vm_type_id key_name public_dns dns_name private_dns volume_name is_locked is_ready user_id)
 	end
 
 	def self.search_fields
-		%w(instance_id server_name state image_id instance_type key_name public_dns dns_name private_dns volume_name)
+		%w(instance_id server_name state image_id key_name public_dns dns_name private_dns volume_name)
 	end
 
 	def self.filter_fields

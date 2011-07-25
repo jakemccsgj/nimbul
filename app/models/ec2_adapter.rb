@@ -15,6 +15,9 @@ class Ec2Adapter
         Rails.logger.error "Account [#{account.id} - #{account.name}] failed to refresh - unable to load AWS::EC2 object using account credentials."
         return
       end
+
+      # used by many - preload
+      cpu_profiles = CpuProfile.all
       
       # always refresh zones
       begin
@@ -32,7 +35,8 @@ class Ec2Adapter
 
       if resources.nil? or resources == 'server_images' 
         begin
-          refresh_server_images(account)
+          account = ProviderAccount.find(account.id, :include => [:server_images, :storage_types])
+          refresh_server_images(account, account.server_images, account.storage_types, cpu_profiles)
         rescue Exception => e 
           Rails.logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
         end
@@ -46,7 +50,8 @@ class Ec2Adapter
       end
       if resources.nil? or resources == 'instances'
         begin
-          refresh_instances(account)
+          account = ProviderAccount.find(account.id, :include => [ :provider, { :instances => [:security_groups] }, :zones, :security_groups])
+          refresh_instances(account, account.instances, account.zones, account.security_groups, account.instance_vm_types)
         rescue Exception => e 
           Rails.logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
         end
@@ -325,9 +330,18 @@ class Ec2Adapter
       end
 
       cloud_groups.each do |group|
+        # import ec2 group id as api_name
+        group[:api_name] = group[:group_id]
+        group.delete(:group_id)
+
         # remove :grants element before building group record
         grants = group[:grants]
         group.delete(:grants)
+
+        # TODO add support for vpcId, ipPermissionsEgress, tagSet
+        group.delete(:vpc_id)
+        group.delete(:ip_permissions_egress)
+        group.delete(:tag_set)
         
         account_group = account_groups.detect{ |g| g.name == group[:name] }
         if account_group.nil?
@@ -440,16 +454,17 @@ class Ec2Adapter
         end
     end
 
-    def self.refresh_server_images(account)
+    def self.refresh_server_images(account, account_server_images=nil, account_storage_types=nil, cpu_profiles=nil)
         ec2 = get_ec2(account)
-        account_images = ServerImage.find_all_by_provider_account_id(account.id)
-        account_storage_types = StorageType.find_all_by_provider_id(account.provider_id)
+        account_server_images ||= account.server_images
+        account_storage_types ||= account.storage_types
+        cpu_profiles ||= CpuProfile.all
 
         # refresh images imported from other accounts
         # AWS call fails if we try to batch-refresh with any invalid image_ids included
         # so we refresh them one-by-one
-        account_images.select{ |i| i.owner_id != account.external_id }.each do |oi|
-            refresh_server_image(oi, account_images, account_storage_types)
+        account_server_images.select{ |i| i.owner_id != account.external_id }.each do |oi|
+            refresh_server_image(oi, account_server_images, account_storage_types)
         end
 
         # refresh our images
@@ -458,14 +473,14 @@ class Ec2Adapter
         cloud_images = ec2.describe_images(opts)
 
         # presume all our images are unavailable unless we find them at Amazon
-        account_images.select{ |i| i.owner_id == account.external_id }.each do |account_image|
-            account_image.state = 'unavailable'
+        account_server_images.select{ |i| i.owner_id == account.external_id }.each do |account_server_image|
+            account_server_image.state = 'unavailable'
         end
 
         # refresh server images, add new ones if any
         cloud_images.each do |cloud_image|
             # parse image info
-            server_image = parse_server_image_info(account, cloud_image, account_images, account_storage_types)
+            server_image = parse_server_image_info(account, cloud_image, account_server_images, account_storage_types, cpu_profiles)
             server_image.save
         end
     end
@@ -493,9 +508,10 @@ class Ec2Adapter
         end
     end
 
-    def self.parse_server_image_info(account, attributes, account_server_images=nil, account_storage_types=nil)
+    def self.parse_server_image_info(account, attributes, account_server_images=nil, account_storage_types=nil, cpu_profiles=nil)
         account_server_images ||= account.server_images
         account_storage_types ||= account.storage_types
+        cpu_profiles ||= CpuProfile.all
 
         # delete :id attribute before building a server image record - :id is a special rails attribute
         attributes[:image_id] = attributes[:id]
@@ -505,22 +521,28 @@ class Ec2Adapter
         # delete :block_device_mapping attribute for now
         attributes.delete(:block_device_mapping)
 
+        # map architecture to cpu profile
+        if attributes[:architecture]
+          cpu_profile = cpu_profiles.detect{ |p| p.api_name == attributes[:architecture] }
+          cpu_profile ||= CpuProfile.create( { :api_name => attributes[:architecture], :name => attributes[:architecture] } )
+          attributes[:cpu_profile_id] = cpu_profile.id
+          attributes.delete(:architecture) 
+        end
+
         # map rootDeviceType element to StorageType
         if attributes[:root_device_type]
-            storage_type = StorageType.find_by_provider_id_and_api_name(account.provider_id, attributes[:root_device_type])
-            if storage_type.nil?
-                storage_type = StorageType.create({
-                    :provider_id => account.provider_id,
-                    :api_name => attributes[:root_device_type],
-                    :name => attributes[:root_device_type],
-                    :desc => 'Created by Ec2Adapter during the Image import',
-                })
-            end
+            storage_type = account_storage_types.detect{|t| t.api_name == attributes[:root_device_type]}
+            storage_type ||= StorageType.create({
+              :provider_id => account.provider_id,
+              :api_name => attributes[:root_device_type],
+              :name => attributes[:root_device_type],
+              :desc => 'Created by Ec2Adapter during the Image import',
+            })
             attributes[:storage_type_id] = storage_type.id
             attributes.delete(:root_device_type)
         end
 
-	# detect / update or construct a new server_image
+    # detect / update or construct a new server_image
         server_image = account_server_images.detect{ |i| i.image_id == attributes[:image_id] }
         if server_image.nil?
             # for new server images, set their name to image_id
@@ -532,14 +554,15 @@ class Ec2Adapter
         return server_image
     end
 
-    def self.refresh_instances(account)
+    def self.refresh_instances(account, account_instances=nil, account_zones=nil, account_security_groups=nil, account_instance_vm_types=nil)
         ec2 = get_ec2(account)
         # refresh instances
         # there is a bug in EC2 library that calls reservations "instances"
         reservations = ec2.describe_instances
-        account_instances = account.instances
-        account_zones = account.zones
-        account_security_groups = account.security_groups
+        account_instances ||= account.instances
+        account_zones ||= account.zones
+        account_security_groups ||= account.security_groups
+        account_instance_vm_types ||= account.instance_vm_types
         
         # mark all the instances that are not in 'requested' state as to be destroyed
         # this will be reverted when we find a corresponding instance on the cloud
@@ -549,7 +572,7 @@ class Ec2Adapter
         
         reservations.each do |r|
             r[:instances].each do |i|
-                instance = parse_instance_info(account, r, i, account_instances, account_zones, account_security_groups)
+                instance = parse_instance_info(account, r, i, account_instances, account_zones, account_security_groups, account_instance_vm_types)
                 account_instances.collect{|ai| ai.should_destroy = 0 if ai.id == instance.id}
                 instance.save
             end
@@ -781,7 +804,7 @@ class Ec2Adapter
     end
 
     # also used by AsAdapter to process info about AS Group's instances
-    def self.parse_instance_info(account, reservation, attributes, account_instances=nil, account_zones=nil, account_security_groups=nil)
+    def self.parse_instance_info(account, reservation, attributes, account_instances=nil, account_zones=nil, account_security_groups=nil, account_instance_vm_types=nil)
         as_lifecycle_state_to_ec2_state = {}
         as_lifecycle_state_to_ec2_state['Pending'] = 'pending'
         as_lifecycle_state_to_ec2_state['InService'] = 'running'
@@ -791,14 +814,16 @@ class Ec2Adapter
         account_instances ||= account.instances
         account_zones ||= account.zones
         account_security_groups ||= account.security_groups
+        account_instance_vm_types ||= account.instance_vm_types
         
-    # delete :id attribute before building a instance record - :id is a special rails attribute
-    attributes[:instance_id] = attributes[:id]
-    attributes.delete(:id)
+        # delete :id attribute before building a instance record - :id is a special rails attribute
+        attributes[:instance_id] = attributes[:id]
+        attributes.delete(:id)
 
-    # store :type attribute in the instance_type - :type is a special rails attribute
-    attributes[:instance_type] = attributes[:type]
-    attributes.delete(:type)
+        # store :type attribute in the instance_type - :type is a special rails attribute
+        vm_type = account_instance_vm_types.detect{ |t| t.api_name == attributes[:type] }
+        attributes[:instance_vm_type_id] = vm_type.id unless vm_type.nil?
+        attributes.delete(:type)
     
         # process ec2 instance info
         if attributes[:lifecycle_state].blank?
@@ -816,29 +841,30 @@ class Ec2Adapter
         # replace states like shutting-down with states like shutting_down
         attributes[:state].gsub!('-','_')
 
-        # get security groups
-        security_groups = []
-        if reservation and reservation[:groups]
-            security_groups = (account_security_groups.select{ |g| reservation[:groups].include?(g.name) })
-        end
-        
+        # get / build the instance model
         instance = account_instances.detect{ |s| s.instance_id == attributes[:instance_id] }
         if instance.nil?
             instance = account.instances.build(attributes)
         else
             instance.attributes = attributes
         end
-        instance.should_destroy = 0
+
+        # get security groups
+        security_groups = []
+        if reservation and reservation[:groups]
+            security_groups = (account_security_groups.select{ |g| reservation[:groups].include?(g.api_name) })
+        end
         instance.security_groups = ( security_groups || [] )
 
         # get zone information
         unless zone_name.blank?
             zone = account_zones.detect{ |z| z.name == zone_name }
             if zone and !zone.instances.include?(instance)
-                  zone.instances << instance
-              end
+                zone.instances << instance
+            end
         end
 
+        instance.should_destroy = 0
         return instance    
     end
 
@@ -868,10 +894,10 @@ class Ec2Adapter
         ec2.delete_snapshot(snapshot.cloud_id)
     end
 
-    def self.create_security_group(group)
+    def self.create_security_group(group, vpc_api_name=nil)
         return false if group.nil?
         ec2 = get_ec2(group.provider_account)
-        ec2.create_security_group(group.name, group.description)
+        security_group = ec2.create_security_group(group.name, group.description, vpc_api_name)
     end
 
     def self.delete_security_group(group)

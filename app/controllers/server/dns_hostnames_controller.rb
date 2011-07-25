@@ -69,7 +69,6 @@ class Server::DnsHostnamesController < ApplicationController
   def acquire
     @error_messages = []
 
-    debugger    
     DnsHostname.unassigned_hostname_instances(@hostname, @model).each { |i| i.acquire @hostname }
 
     @leases = DnsLease.find_all_by_server_id_and_hostname_id(@server, @hostname)

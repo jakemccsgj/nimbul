@@ -3,7 +3,6 @@
         <%= better_check_box_tag "server_image_ids[]", server_image.id, false, :server_image %>
     </td>
 <% end -%>
-<td><%= edit_in_place(server_image, :name, :class => 'server-image-editable') %></td>
 <% if @parent.is_a?(User) -%>
     <td>
         <% if server_image.provider_account -%>
@@ -14,14 +13,15 @@
     </td>
 <% end -%>
 <td><%=h server_image.image_id %></td>
-<td><%= text_field_tag nil, server_image.location, { :readonly => 'readonly', :class => :long, :onclick => '$(this).focus();$(this).select()' } %></td>
+<td><%= edit_in_place(server_image, :name, :class => 'server-image-editable') %></td>
+<td><%= server_image.storage_type.nil? ? '&nbsp;' : h(server_image.storage_type.api_name) %></td>
 <td><%=h server_image.architecture %></td>
-<td class="<%=h server_image.state %>"><%=h server_image.state %></td>
 <td>
     <%=h server_image.owner_id %>
   	    <% if server_image.provider_account and server_image.owner_id == server_image.provider_account.account_id -%>
   	        - me
   	    <% end -%>
 </td>
+<td><%= text_field_tag nil, server_image.location, { :readonly => 'readonly', :onclick => '$(this).focus();$(this).select()' } %></td>
 <td><%=h server_image.is_public %></td>
-<td class="<%=h server_image.is_enabled %>"><%=h server_image.is_enabled %></td>
+<td class="<%=h server_image.state %>"><%=h server_image.state %></td>

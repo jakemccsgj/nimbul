@@ -30,7 +30,7 @@ class ClustersController < ApplicationController
 	# GET /clusters/1
 	# GET /clusters/1.xml
 	def show
-		@cluster = Cluster.find(params[:id], :include => :cluster_parameters)
+		@cluster = Cluster.find(params[:id], :include => [ :provider_account, :instance_vm_types, :cluster_parameters])
 		@provider_account = ProviderAccount.find(@cluster.provider_account_id, :include => :provider_account_parameters)
 		@users = User.find(:all, :order => :login)
 		
@@ -59,7 +59,7 @@ class ClustersController < ApplicationController
 	# GET /clusters/1/edit.json
 	def edit
 		@provider_accounts = provider_accounts_for_user
-		@cluster = Cluster.find(params[:id])
+		@cluster = Cluster.find(params[:id], :include => [ :provider_account, :instance_vm_types, :cluster_parameters])
 		@users = User.find(:all, :order => :login)
  
 		respond_to do |format|

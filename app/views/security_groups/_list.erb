@@ -6,6 +6,9 @@
 <table>
   <thead>
   <tr>
+    <th <%= sort_td_class_helper "api_name" %>>
+      <%= security_groups_sort_link "API Name", "api_name" %>
+    </th>
     <th <%= sort_td_class_helper "name" %>>
       <%= security_groups_sort_link "Name", "name" %>
     </th>

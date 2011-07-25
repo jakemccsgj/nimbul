@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110718045735) do
+ActiveRecord::Schema.define(:version => 20110725040708) do
 
   create_table "access_requests", :force => true do |t|
     t.string   "state"
@@ -230,6 +230,11 @@ ActiveRecord::Schema.define(:version => 20110718045735) do
 
   add_index "clusters", ["provider_account_id"], :name => "index_clusters_on_provider_account_id"
   add_index "clusters", ["state"], :name => "index_clusters_on_state"
+
+  create_table "clusters_instance_vm_types", :id => false, :force => true do |t|
+    t.integer "cluster_id"
+    t.integer "instance_vm_type_id"
+  end
 
   create_table "clusters_users", :id => false, :force => true do |t|
     t.integer "cluster_id"
@@ -500,7 +505,6 @@ ActiveRecord::Schema.define(:version => 20110718045735) do
     t.integer  "server_id"
     t.integer  "server_pool_id"
     t.string   "image_id"
-    t.string   "instance_type"
     t.string   "key_name"
     t.string   "state"
     t.string   "public_dns"
@@ -534,12 +538,14 @@ ActiveRecord::Schema.define(:version => 20110718045735) do
     t.integer  "zone_id"
     t.integer  "pending_launch_configuration_id"
     t.integer  "auto_scaling_group_id"
+    t.integer  "instance_vm_type_id"
   end
 
   add_index "instances", ["auto_scaling_group_id"], :name => "index_instances_on_auto_scaling_group_id"
   add_index "instances", ["cluster_id"], :name => "index_instances_on_cluster_id"
   add_index "instances", ["dns_name"], :name => "index_instances_on_dns_name"
   add_index "instances", ["instance_id"], :name => "index_instances_on_instance_id"
+  add_index "instances", ["instance_vm_type_id"], :name => "index_instances_on_instance_vm_type_id"
   add_index "instances", ["key_name"], :name => "index_instances_on_key_name"
   add_index "instances", ["provider_account_id"], :name => "index_instances_on_provider_account_id"
   add_index "instances", ["public_ip"], :name => "index_instances_on_public_ip"
@@ -924,10 +930,14 @@ ActiveRecord::Schema.define(:version => 20110718045735) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "state"
+    t.string   "api_name"
+    t.string   "vpc_api_name"
   end
 
+  add_index "security_groups", ["api_name"], :name => "index_security_groups_on_api_name"
   add_index "security_groups", ["name"], :name => "index_security_groups_on_name"
   add_index "security_groups", ["provider_account_id", "name"], :name => "index_security_groups_on_provider_account_id_and_name", :unique => true
+  add_index "security_groups", ["vpc_api_name"], :name => "index_security_groups_on_vpc_api_name"
 
   create_table "security_groups_servers", :id => false, :force => true do |t|
     t.integer "security_group_id"
@@ -956,7 +966,6 @@ ActiveRecord::Schema.define(:version => 20110718045735) do
     t.boolean  "is_public"
     t.string   "state"
     t.string   "location"
-    t.string   "architecture"
     t.string   "server_image_type"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -971,8 +980,10 @@ ActiveRecord::Schema.define(:version => 20110718045735) do
     t.integer  "block_device_mapping_id"
     t.integer  "virtualizaton_type_id"
     t.integer  "hipervisor_id"
+    t.integer  "cpu_profile_id"
   end
 
+  add_index "server_images", ["cpu_profile_id"], :name => "index_server_images_on_cpu_profile_id"
   add_index "server_images", ["image_id"], :name => "index_server_images_on_image_id"
   add_index "server_images", ["name"], :name => "index_server_images_on_name"
   add_index "server_images", ["provider_account_id"], :name => "index_server_images_on_provider_account_id"
@@ -1056,16 +1067,16 @@ ActiveRecord::Schema.define(:version => 20110718045735) do
   create_table "server_stats", :force => true do |t|
     t.integer  "cluster_id"
     t.integer  "server_id"
-    t.string   "instance_type"
     t.integer  "instance_count"
     t.datetime "taken_at"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "instance_vm_type_id"
   end
 
-  add_index "server_stats", ["cluster_id", "server_id", "instance_type"], :name => "index_server_stats_on_cluster_id_and_server_id_and_instance_type"
   add_index "server_stats", ["cluster_id", "server_id", "taken_at"], :name => "index_server_stats_on_cluster_id_and_server_id_and_taken_at"
-  add_index "server_stats", ["instance_type"], :name => "index_server_stats_on_instance_type"
+  add_index "server_stats", ["cluster_id", "server_id"], :name => "index_server_stats_on_cluster_id_and_server_id_and_instance_type"
+  add_index "server_stats", ["instance_vm_type_id"], :name => "index_server_stats_on_instance_vm_type_id"
   add_index "server_stats", ["server_id"], :name => "index_server_stats_on_server_id"
   add_index "server_stats", ["taken_at"], :name => "index_server_stats_on_taken_at"
 

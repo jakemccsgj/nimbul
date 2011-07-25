@@ -4,8 +4,4 @@
 
 <br />
 
-<% form_for :cluster,
-    :url => clusters_path do |f| %>
-    <%= render :partial => 'fields', :locals => { :f => f } %>
-    <%= submit_tag 'Cancel', :name => 'cancel_button' %>
-<% end %>
+<%= render :partial => 'form' %>
