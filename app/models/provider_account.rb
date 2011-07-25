@@ -10,7 +10,8 @@ class ProviderAccount < BaseModel
 	service_child_relationship :clusters
 	
 	belongs_to :provider
-        belongs_to :account_group
+  belongs_to :account_group
+  
 	has_many :instances, :dependent => :destroy
 	has_many :server_images, :dependent => :destroy
 	has_many :key_pairs, :dependent => :destroy
@@ -21,7 +22,7 @@ class ProviderAccount < BaseModel
 	has_many :out_messages, :dependent => :destroy
 	has_many :in_messages, :dependent => :destroy
 	has_many :launch_configurations, :dependent => :destroy
-	has_many :clusters, :dependent => :destroy
+	has_many :clusters, :dependent => :destroy, :order => :name
 	has_many :publishers, :dependent => :destroy
 	has_many :dns_hostnames, :dependent => :destroy
 	has_many :zones, :dependent => :destroy, :order => :name
@@ -35,10 +36,10 @@ class ProviderAccount < BaseModel
 	has_many :volumes, :class_name => 'CloudVolume', :dependent => :destroy
 	has_many :snapshots, :class_name => 'CloudSnapshot', :dependent => :destroy
 
-# iam service
-#    has_many :iam_resources, :dependent => :destroy
-#    has_many :iam_users, :dependent => :destroy
-#    has_many :iam_groups, :dependent => :destroy
+  # iam service
+  #    has_many :iam_resources, :dependent => :destroy
+  #    has_many :iam_users, :dependent => :destroy
+  #    has_many :iam_groups, :dependent => :destroy
 
 	has_and_belongs_to_many :users, :order => :name
 	has_and_belongs_to_many :server_profiles, :order => :name
@@ -68,7 +69,7 @@ class ProviderAccount < BaseModel
 	include TrackChanges # must follow any before filters
 
   def messaging_valid?
-	if service(:events).nil? or service(:events).first_active_instance.nil?
+    if service(:events).nil? or service(:events).first_active_instance.nil?
       errors.add(:messaging_uri, 'Events Service does not appear to be created. Please go to Admin Controls -> Services and create an Events service, and provider.')
     else
       unless messaging_can_connect?
@@ -135,12 +136,12 @@ class ProviderAccount < BaseModel
 		self.destroyed = true
 	end
 
-#    def can_use_more_of?(iam_resource)
-#        iam_resource = iam_resource.is_a?(Class) ? iam_resource : iam_resource.class
-#        iam_resource = iam_resource.to_s
-#        return (self.iam_users.empty? or ( self.iam_users.size < 150 )) if (iam_resource == 'IamUser')
-#        return (self.iam_groups.empty? or ( self.iam_groups.size < 150 )) if (iam_resource == 'IamGroup')
-#    end
+  #    def can_use_more_of?(iam_resource)
+  #        iam_resource = iam_resource.is_a?(Class) ? iam_resource : iam_resource.class
+  #        iam_resource = iam_resource.to_s
+  #        return (self.iam_users.empty? or ( self.iam_users.size < 150 )) if (iam_resource == 'IamUser')
+  #        return (self.iam_groups.empty? or ( self.iam_groups.size < 150 )) if (iam_resource == 'IamGroup')
+  #    end
 
 	# interfacing with TransientKeyStore and User Interface
 	def aws_access_key_attribute
@@ -294,10 +295,10 @@ class ProviderAccount < BaseModel
       parameter.update_attribute( :is_readonly, readonly ) unless readonly.nil?
     else
       parameter = provider_account_parameters.build({
-        :name => name,
-        :value => value,
-        :is_readonly => readonly.nil? ? false : true
-      })
+          :name => name,
+          :value => value,
+          :is_readonly => readonly.nil? ? false : true
+        })
     end
     parameter.save
   end
@@ -355,26 +356,26 @@ class ProviderAccount < BaseModel
 		end
 		
 		unless extra_joins.blank?
-		    joins = [ '' ] if joins.nil?
-		    extra_joins = [ extra_joins ] if not extra_joins.is_a? Array
-		    joins = joins + extra_joins
+      joins = [ '' ] if joins.nil?
+      extra_joins = [ extra_joins ] if not extra_joins.is_a? Array
+      joins = joins + extra_joins
 		end
 
-	    unless extra_conditions.blank?
+    unless extra_conditions.blank?
 			conditions = [ '' ] if conditions.nil?
-		    extra_conditions = [ extra_conditions ] if not extra_conditions.is_a? Array
-		    conditions[0] << ' AND ' unless conditions[0].blank?
-		    conditions[0] << extra_conditions[0]
-		    conditions << extra_conditions[1..-1]
-	    end
+      extra_conditions = [ extra_conditions ] if not extra_conditions.is_a? Array
+      conditions[0] << ' AND ' unless conditions[0].blank?
+      conditions[0] << extra_conditions[0]
+      conditions << extra_conditions[1..-1]
+    end
 	    
-	    order = table_name()+'.name' if order.blank?
+    order = table_name()+'.name' if order.blank?
 
 		options.merge!({
-			:joins => joins,
-			:conditions => conditions,
-			:order => order,
-		})
+        :joins => joins,
+        :conditions => conditions,
+        :order => order,
+      })
 		
 		return options
 	end

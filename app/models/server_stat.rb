@@ -1,6 +1,9 @@
 class ServerStat < ActiveRecord::Base
-    attr_accessor :zone
-    def count
-        instance_count
-    end
+  belongs_to :cluster
+  belongs_to :server
+
+  attr_accessor :zone
+  def count
+    instance_count
+  end
 end
