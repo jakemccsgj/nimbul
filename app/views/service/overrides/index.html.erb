@@ -24,6 +24,7 @@ To add a new Service Override, click here:
     <th>Actions</th>
   </tr> 
   <% @service_overrides.each do |service_override|  %>
+    <% if not service_override.provider.nil? %>
     <tr>
       <td><%=h service_override.type.name.titleize%></td>
       <td><%=h service_override.provider.name %></td>
@@ -34,5 +35,10 @@ To add a new Service Override, click here:
         <%= link_to image_tag('trash.png', { :alt => "Delete", :class => 'control-icon' }), service_override, :confirm => 'Are you sure?', :method => :delete -%>
       </td>
     </tr>
+    <% else %>
+    <tr>
+      <td>Override <%=h service_override.id %> is missing provider info</td>
+    </tr>
+    <% end %>
   <% end %>
 </table>

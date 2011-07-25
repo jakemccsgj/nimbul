@@ -43,6 +43,8 @@ class Server::UserDataController < ApplicationController
     payload = ERB.new(File.read(payload_template), nil, "%-").result(binding)
 
     if compress
+      payload.gsub!(/^\s*\n/,'')
+      payload.gsub!(/^#\s+.*\n/,'')
       loader = File.read(loader_template)
       StringIO.open(loader, 'ab') do |f|
         gz = Zlib::GzipWriter.new(f)
@@ -51,6 +53,7 @@ class Server::UserDataController < ApplicationController
       end
       payload = loader
     end
+
     return payload
   end
 end

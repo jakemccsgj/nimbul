@@ -4,7 +4,7 @@ class ServiceOverride < BaseModel
   belongs_to :target, :polymorphic => true
  
   def name
-    provider.name
+      provider.name
   end
   
   def provider 
@@ -12,7 +12,7 @@ class ServiceOverride < BaseModel
   end
   
   def type
-    provider.service_type 
+      provider.type 
   end
   
   def validate

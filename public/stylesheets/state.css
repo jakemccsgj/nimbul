@@ -3,16 +3,16 @@
 .waiting,
 .update,
 .creating {
-	font-weight: bold;
-	color: #FFD700;
+    font-weight: bold;
+    color: #FFD700;
 }
 
 .grant,
 .approved,
 .create,
 .attached {
-	font-weight: bold;
-	color: #00AA00;
+    font-weight: bold;
+    color: #00AA00;
 }
 
 .deny,
@@ -22,13 +22,13 @@
 .timedout,
 .false,
 .detached {
-	font-weight: bold;
-	color: #AA0000;
+    font-weight: bold;
+    color: #AA0000;
 }
 
 .available,
 .true {
-	color: #00AA00;
+    color: #00AA00;
 }
 
 .ready {
@@ -36,25 +36,25 @@
 }
 
 .ok {
-	font-weight: bold;
-	color: #00AA00;
+    font-weight: bold;
+    color: #00AA00;
 }
 
 .too-high {
-	font-weight: bold;
-	color: #0000AA;
+    font-weight: bold;
+    color: #0000AA;
 }
 
 .too-low {
-	font-weight: bold;
-	color: #AA0000;
+    font-weight: bold;
+    color: #AA0000;
 }
 
 .removed,
 .in-use,
 .unavailable,
 .deleting {
-	color: #AA0000;
+    color: #AA0000;
 }
 
 td.true,
@@ -70,7 +70,7 @@ td.ready {
 }
 
 tr.admin {
-	font-weight: bold;
+    font-weight: bold;
     color:#00AA00;
 }
 
@@ -78,7 +78,7 @@ td.false,
 td.failure,
 td.stopped,
 td.terminated	{
-	background-color: #FFCCCC;
+    background-color: #FFCCCC;
 }
 
 td.pending,
@@ -89,6 +89,13 @@ td.rebooting,
 td.disabled,
 td.disabling {
     background-color: #FFFFCC;
+}
+tr.maintenance {
+    border:3px solid #AA0000;
+}
+td.maintenance {
+    font-weight: bold;
+    color: #AA0000;
 }
 
 td.shutting_down,

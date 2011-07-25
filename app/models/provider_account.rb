@@ -36,10 +36,10 @@ class ProviderAccount < BaseModel
     has_many :volumes, :class_name => 'CloudVolume', :dependent => :destroy
     has_many :snapshots, :class_name => 'CloudSnapshot', :dependent => :destroy
 
-# iam service
-#    has_many :iam_resources, :dependent => :destroy
-#    has_many :iam_users, :dependent => :destroy
-#    has_many :iam_groups, :dependent => :destroy
+  # iam service
+  #    has_many :iam_resources, :dependent => :destroy
+  #    has_many :iam_users, :dependent => :destroy
+  #    has_many :iam_groups, :dependent => :destroy
 
     has_and_belongs_to_many :users, :order => :name
     has_and_belongs_to_many :server_profiles, :order => :name
@@ -140,12 +140,12 @@ class ProviderAccount < BaseModel
         self.destroyed = true
     end
 
-#    def can_use_more_of?(iam_resource)
-#        iam_resource = iam_resource.is_a?(Class) ? iam_resource : iam_resource.class
-#        iam_resource = iam_resource.to_s
-#        return (self.iam_users.empty? or ( self.iam_users.size < 150 )) if (iam_resource == 'IamUser')
-#        return (self.iam_groups.empty? or ( self.iam_groups.size < 150 )) if (iam_resource == 'IamGroup')
-#    end
+  #    def can_use_more_of?(iam_resource)
+  #        iam_resource = iam_resource.is_a?(Class) ? iam_resource : iam_resource.class
+  #        iam_resource = iam_resource.to_s
+  #        return (self.iam_users.empty? or ( self.iam_users.size < 150 )) if (iam_resource == 'IamUser')
+  #        return (self.iam_groups.empty? or ( self.iam_groups.size < 150 )) if (iam_resource == 'IamGroup')
+  #    end
 
     # interfacing with TransientKeyStore and User Interface
     def aws_access_key_attribute
@@ -299,10 +299,10 @@ class ProviderAccount < BaseModel
       parameter.update_attribute( :is_readonly, readonly ) unless readonly.nil?
     else
       parameter = provider_account_parameters.build({
-        :name => name,
-        :value => value,
-        :is_readonly => readonly.nil? ? false : true
-      })
+          :name => name,
+          :value => value,
+          :is_readonly => readonly.nil? ? false : true
+        })
     end
     parameter.save
   end

@@ -145,7 +145,7 @@ begin
     puts "Adding Tasks for Account: #{pa[:name]} - total tasks: #{instances.size}"
 
     instances.each do |instance|
-      $manager.add_task do
+#      $manager.add_task do
         send_output = command_output = ''
         begin
           @provider_account = pa
@@ -192,7 +192,7 @@ begin
             puts "Exception on Logging:\n#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
           end
         end
-      end
+#      end
     end
   end
 

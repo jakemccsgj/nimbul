@@ -1,5 +1,8 @@
 class ServerStat < ActiveRecord::Base
     belongs_to :instance_vm_type
+    belongs_to :cluster
+    belongs_to :server
+
 
     attr_accessor :zone
     def count
