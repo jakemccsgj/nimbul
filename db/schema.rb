@@ -9,7 +9,35 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110725040708) do
+ActiveRecord::Schema.define(:version => 20110726113836) do
+
+  create_table "access_requests", :force => true do |t|
+    t.string   "state"
+    t.integer  "provider_account_id"
+    t.boolean  "admin_access"
+    t.integer  "requester_id"
+    t.integer  "approver_id"
+    t.text     "description"
+    t.string   "token"
+    t.datetime "sent_at"
+    t.datetime "approved_at"
+    t.datetime "rejected_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "access_requests", ["approver_id"], :name => "index_access_requests_on_approver_id"
+  add_index "access_requests", ["provider_account_id"], :name => "index_access_requests_on_provider_account_id"
+  add_index "access_requests", ["requester_id"], :name => "index_access_requests_on_requester_id"
+  add_index "access_requests", ["token"], :name => "index_access_requests_on_token"
+
+  create_table "access_requests_security_groups", :id => false, :force => true do |t|
+    t.integer "access_request_id"
+    t.integer "security_group_id"
+  end
+
+  add_index "access_requests_security_groups", ["access_request_id"], :name => "index_access_requests_security_groups_on_access_request_id"
+  add_index "access_requests_security_groups", ["security_group_id"], :name => "index_access_requests_security_groups_on_security_group_id"
 
   create_table "account_groups", :force => true do |t|
     t.string   "name"
@@ -395,24 +423,6 @@ ActiveRecord::Schema.define(:version => 20110725040708) do
 
   add_index "iam_statements", ["iam_policy_id", "sid"], :name => "index_iam_statements_on_iam_policy_id_and_sid", :unique => true
 
-  create_table "instance_allocation_records", :force => true do |t|
-    t.integer  "stat_record_id"
-    t.integer  "cluster_id"
-    t.string   "cluster_name",   :default => "Default"
-    t.integer  "server_id"
-    t.string   "server_name",    :default => "Default"
-    t.string   "instance_type"
-    t.integer  "running"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "zone_id"
-  end
-
-  add_index "instance_allocation_records", ["cluster_id", "server_id"], :name => "index_instance_allocation_records_on_cluster_id_and_server_id"
-  add_index "instance_allocation_records", ["created_at"], :name => "index_instance_allocation_records_on_created_at"
-  add_index "instance_allocation_records", ["stat_record_id"], :name => "index_iars_on_srids"
-  add_index "instance_allocation_records", ["zone_id"], :name => "index_instance_allocation_records_on_zone_id"
-
   create_table "instance_list_readers", :force => true do |t|
     t.integer  "provider_account_id"
     t.string   "type"
@@ -728,6 +738,16 @@ ActiveRecord::Schema.define(:version => 20110725040708) do
   add_index "provider_account_parameters", ["name"], :name => "index_provider_account_parameters_on_name"
   add_index "provider_account_parameters", ["provider_account_id", "name"], :name => "index_account_parameters_on_account_id_and_name", :unique => true
 
+  create_table "provider_account_regions", :force => true do |t|
+    t.integer  "provider_account_id"
+    t.integer  "region_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "provider_account_regions", ["provider_account_id"], :name => "index_provider_account_regions_on_provider_account_id"
+  add_index "provider_account_regions", ["region_id"], :name => "index_provider_account_regions_on_region_id"
+
   create_table "provider_accounts", :force => true do |t|
     t.string   "name"
     t.string   "description"
@@ -848,7 +868,6 @@ ActiveRecord::Schema.define(:version => 20110725040708) do
   create_table "reserved_instances", :force => true do |t|
     t.integer  "provider_account_id"
     t.string   "reserved_instances_id"
-    t.string   "instance_type"
     t.datetime "start"
     t.integer  "duration"
     t.float    "usage_price"
@@ -859,10 +878,12 @@ ActiveRecord::Schema.define(:version => 20110725040708) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "zone_id"
+    t.integer  "instance_vm_type_id"
   end
 
-  add_index "reserved_instances", ["provider_account_id", "instance_type"], :name => "index_type_zone_on_reserved_instances"
+  add_index "reserved_instances", ["instance_vm_type_id"], :name => "index_reserved_instances_on_instance_vm_type_id"
   add_index "reserved_instances", ["provider_account_id", "reserved_instances_id"], :name => "index_ri_id_on_reserved_instances"
+  add_index "reserved_instances", ["provider_account_id"], :name => "index_type_zone_on_reserved_instances"
   add_index "reserved_instances", ["zone_id"], :name => "index_reserved_instances_on_zone_id"
 
   create_table "resource_bundles", :force => true do |t|

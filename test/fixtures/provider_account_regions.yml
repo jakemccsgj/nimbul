@@ -1,0 +1,9 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  provider_account_id: 1
+  region_id: 1
+
+two:
+  provider_account_id: 1
+  region_id: 1

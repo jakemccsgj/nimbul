@@ -12,6 +12,10 @@ class ProviderAccount < BaseModel
     belongs_to :provider
     belongs_to :account_group
 
+    has_many :provider_account_regions
+    has_many :regions, :through => :provider_account_regions, :order => :position
+    has_many :zones, :through => :regions, :order => :name
+
     has_many :instances, :dependent => :destroy
     has_many :server_images, :dependent => :destroy
     has_many :key_pairs, :dependent => :destroy
@@ -25,7 +29,6 @@ class ProviderAccount < BaseModel
     has_many :clusters, :dependent => :destroy
     has_many :publishers, :dependent => :destroy
     has_many :dns_hostnames, :dependent => :destroy
-    has_many :zones, :dependent => :destroy, :order => :name
     has_many :auto_scaling_groups, :dependent => :destroy
     has_many :auto_scaling_triggers, :dependent => :destroy
     has_many :load_balancers, :dependent => :destroy
@@ -69,7 +72,7 @@ class ProviderAccount < BaseModel
     include TrackChanges # must follow any before filters
 
     def instance_vm_types
-        self.provider.instance_vm_types
+        provider.instance_vm_types
     end
 
   def messaging_valid?

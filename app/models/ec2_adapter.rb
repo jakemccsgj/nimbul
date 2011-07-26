@@ -16,9 +16,6 @@ class Ec2Adapter
         return
       end
 
-      # used by many - preload
-      cpu_profiles = CpuProfile.all
-      
       # always refresh zones
       begin
         refresh_zones(account)
@@ -35,8 +32,7 @@ class Ec2Adapter
 
       if resources.nil? or resources == 'server_images' 
         begin
-          account = ProviderAccount.find(account.id, :include => [:server_images, :storage_types])
-          refresh_server_images(account, account.server_images, account.storage_types, cpu_profiles)
+          refresh_server_images(account)
         rescue Exception => e 
           Rails.logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
         end
@@ -50,8 +46,7 @@ class Ec2Adapter
       end
       if resources.nil? or resources == 'instances'
         begin
-          account = ProviderAccount.find(account.id, :include => [ :provider, { :instances => [:security_groups] }, :zones, :security_groups])
-          refresh_instances(account, account.instances, account.zones, account.security_groups, account.instance_vm_types)
+          refresh_instances(account)
         rescue Exception => e 
           Rails.logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
         end
@@ -454,11 +449,12 @@ class Ec2Adapter
         end
     end
 
-    def self.refresh_server_images(account, account_server_images=nil, account_storage_types=nil, cpu_profiles=nil)
+    def self.refresh_server_images(account)
+        account = ProviderAccount.find(account.id, :include => [:server_images, :storage_types])
         ec2 = get_ec2(account)
-        account_server_images ||= account.server_images
-        account_storage_types ||= account.storage_types
-        cpu_profiles ||= CpuProfile.all
+        account_server_images = account.server_images
+        account_storage_types = account.storage_types
+        cpu_profiles = CpuProfile.all
 
         # refresh images imported from other accounts
         # AWS call fails if we try to batch-refresh with any invalid image_ids included
@@ -554,15 +550,16 @@ class Ec2Adapter
         return server_image
     end
 
-    def self.refresh_instances(account, account_instances=nil, account_zones=nil, account_security_groups=nil, account_instance_vm_types=nil)
+    def self.refresh_instances(account)
+        account = ProviderAccount.find(account.id,
+          :include => [ { :provider => [:instance_vm_types] }, { :instances => [:security_groups] }, :security_groups])
         ec2 = get_ec2(account)
-        # refresh instances
         # there is a bug in EC2 library that calls reservations "instances"
         reservations = ec2.describe_instances
-        account_instances ||= account.instances
-        account_zones ||= account.zones
-        account_security_groups ||= account.security_groups
-        account_instance_vm_types ||= account.instance_vm_types
+        account_instances = account.instances
+        account_zones = account.zones
+        account_security_groups = account.security_groups
+        account_instance_vm_types = account.instance_vm_types
         
         # mark all the instances that are not in 'requested' state as to be destroyed
         # this will be reverted when we find a corresponding instance on the cloud
@@ -584,20 +581,29 @@ class Ec2Adapter
     end
 
     def self.refresh_reserved_instances(account)
+        account = ProviderAccount.find(account.id, :include => [ { :provider => [:instance_vm_types] }])
         ec2 = get_ec2(account)
         account_zones = account.zones
+        account_instance_vm_types = account.instance_vm_types
 
         reserved_instances = ec2.describe_reserved_instances
         reserved_instances.each do |i|
             reserved_instance = account.reserved_instances.detect{ |s| s.reserved_instances_id == i[:reserved_instances_id] }
+
             zone = account_zones.detect{ |z| z.name == i[:zone] }
-            i[:zone_id] = zone.id if zone
+            i[:zone_id] = zone.id unless zone.nil?
             i.delete(:zone)
+
+            vm_type = account_instance_vm_types.detect{ |z| z.api_name == i[:instance_type] }
+            i[:instance_vm_type_id] = vm_type.id unless vm_type.nil?
+            i.delete(:instance_type)
+
             if reserved_instance.nil?
                 reserved_instance = account.reserved_instances.build(i)
             else
                 reserved_instance.attributes = i
             end
+
             reserved_instance.save
         end
     end
