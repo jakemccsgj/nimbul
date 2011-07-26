@@ -1,7 +1,11 @@
 class StatsAdapter
+    def self.frequency
+        1.hour
+    end
+
     def self.refresh_account(provider_account)
-	frequency = 1.hour
-        current_bucket = Time.at((Time.now.to_f / frequency).ceil * frequency).utc
+	f = frequency() 
+        current_bucket = Time.at((Time.now.to_f / f).ceil * f).utc
 
         latest_stats = ServerStat.find_by_sql([
             'select s.cluster_id as cluster_id, i.server_id, i.instance_vm_type_id, count(i.id) as instance_count '+

@@ -107,3 +107,19 @@ td.shutting-down {
 .image_deregistered		{ background-color: #CCCCCC; }
 .image_public			{ background-color: #FFFF99; }
 .image_private			{ background-color: transparent; }
+
+
+td.more {
+    font-weight: bold;
+    color: #AA0000;
+}
+
+td.optimal {
+    color: #00AA00;
+}
+
+td.fill {
+    font-weight: bold;
+    color: #0000AA;
+}
+

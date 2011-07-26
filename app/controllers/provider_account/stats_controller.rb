@@ -35,7 +35,11 @@ class ProviderAccount::StatsController < ApplicationController
     @running_instances = ReservedInstance.find_by_sql([running_select.join(' '), condition])
 
     latest_taken_at = ServerStat.maximum(:taken_at, :conditions => { :cluster_id => @provider_account.cluster_ids })
-    @server_stats = ServerStat.find_all_by_cluster_id_and_taken_at(@provider_account.cluster_ids, latest_taken_at, :include => [:instance_vm_type, :cluster, :server])
+    @server_stats = ServerStat.find_all_by_cluster_id_and_taken_at(
+      @provider_account.cluster_ids, latest_taken_at,
+      :include => [:instance_vm_type, :cluster, :server]
+    )
+    @server_stats.sort!{ |a,b| a.cluster.name <=> b.cluster.name }
 
     respond_to do |format|
       format.html

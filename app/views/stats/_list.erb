@@ -10,7 +10,7 @@
     <tr>
       <th>Zone</th>
       <th>Type</th>
-      <th>Total</th>
+      <th>Reserved</th>
       <th>Usage Price</th>
     </tr>
     <% @reserved_instances.each do |i| %>
@@ -36,23 +36,47 @@
     <tr>
       <th>Zone</th>
       <th>Type</th>
-      <th>Total</th>
+      <th>Running</th>
+      <th>Reserved</th>
+      <th>&nbsp;</th>
     </tr>
     <% @running_instances.each do |i| %>
       <tr class="<%= cycle("even", "odd") %>">
         <td><%= i.zone %></td>
         <td><%= i.instance_type %></td>
         <td><%= i.count %></td>
+        <%
+          ri = @reserved_instances.detect{
+            |r| r.zone_id == i.zone_id and r.instance_vm_type_id == i.instance_vm_type_id
+          }
+          reserved_count = 0
+          reserved_desc = ''
+          unless ri.nil?
+            reserved_count = ri.count
+          end
+          if reserved_count < i.count
+            reserved_desc = 'reserve more'
+          elsif reserved_count > i.count
+            reserved_desc = 'fill from other zones'
+          else
+            reserved_desc = 'optimal'
+          end
+        %>
+        <td><%= reserved_count %></td>
+        <td class="<%= reserved_desc %>"><%= reserved_desc %></td>
       </tr>
     <% end %>
   </table>
 <% end %>
 
 <% @server_stats ||= [] %>
-<h1>Statistics</h1>
+<h1>
+  Statistics
+  <%= (@server_stats.empty? ? '' : " as of "+time_and_time_ago(@server_stats[0].taken_at)) %>
+</h1>
 <hr/>
 <% if @server_stats.empty? %>
-  The Statistics are collected every 5 minutes. No Statistics have been collected for this Account yet.
+  The Statistics are collected every <%=time_ago_in_words(Time.now - StatsAdapter.frequency()).sub('about ','') %>. No Statistics have been collected for this Account yet.
   <br/>
   <br/>
 <% else %>
