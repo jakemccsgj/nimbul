@@ -6,7 +6,7 @@
         <td><%= (vm_price.region.nil? ? '&nbsp;' : h(vm_price.region.name)) %></td>
         <td><%= (vm_price.instance_vm_type.nil? ? '&nbsp;' : h(vm_price.instance_vm_type.name)) %></td>
         <td><%= (vm_price.vm_os_type.nil? ? '&nbsp;' : h(vm_price.vm_os_type.name)) %></td>
-        <td><%=h number_to_currency(vm_price.price, :unit => vm_price.unit) %> per <%=h vm_price.period %></td>
+        <td><%=h number_to_currency(vm_price.price, :unit => vm_price.price_unit) %> per <%=h vm_price.price_period %></td>
         <td>
           <%= link_to_remote 'Edit', :url => send("edit_#{ @parent_type }_vm_price_url", @parent, vm_price), :method => :get %>
           <%= remove_provider_vm_price_link('Delete', @parent, vm_price) %>

@@ -3,15 +3,30 @@
     <%= hidden_field_tag :update, 'provider_vm_prices' %>
     <%= f.error_messages %>
     <% f.inputs do %>
-      <%= f.input :api_name,
+      <%= f.input :vm_price_type, :label => 'Type',
+          :as => :select,
+          :collection => @parent.vm_price_types
+      %>
+      <%= f.input :region, :label => 'Region',
+          :as => :select,
+          :collection => @parent.regions
+      %>
+      <%= f.input :instance_vm_type, :label => 'VM Type',
+          :as => :select,
+          :collection => @parent.instance_vm_types
+      %>
+      <%= f.input :vm_os_type, :label => 'Operating System',
+          :as => :select,
+          :collection => @parent.vm_os_types
+      %>
+      <%= f.input :price,
         :class => 'short'
       %>
-      <%= f.input :name,
+      <%= f.input :price_unit, :label => 'Currency',
         :class => 'short'
       %>
-      <%= f.input :desc, :label => 'Description',
-        :input_html => { :class => 'autogrow', :warp => 'soft', :size => '40x2' },
-        :required => false
+      <%= f.input :price_period, :label => 'Per Each',
+        :class => 'short'
       %>
     <% end %>
     <% f.buttons do %>
