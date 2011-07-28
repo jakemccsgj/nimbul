@@ -1,0 +1,10 @@
+    <% fields_for "vm_price_type", vm_price_type do |f| %>
+    <% content_tag_for :tr, vm_price_type, :readonly => false, :class => '' do %>
+        <%= f.hidden_field :id, :index => nil %>
+        <td class="handle">[drag]</td>
+        <td><%= link_to_remote h(vm_price_type.api_name), :url => send("edit_#{ @parent_type }_vm_price_type_url", @parent, vm_price_type), :method => :get %></td>
+        <td><%=h vm_price_type.name %></td>
+        <td><%=h vm_price_type.desc %></td>
+        <td><%= remove_provider_vm_price_type_link('Delete', @parent, vm_price_type) %></td>
+    <% end %>
+    <% end %>

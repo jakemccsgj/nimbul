@@ -1,0 +1,26 @@
+<% semantic_remote_form_for [@parent, @vm_os_type], :remote => true do |f| %>
+    <%= hidden_field_tag :anchor, 'vm_os_types' %>
+    <%= hidden_field_tag :update, 'provider_vm_os_types' %>
+    <%= f.error_messages %>
+    <% f.inputs do %>
+      <%= f.input :os_type, :label => 'Base OS',
+          :as => :select,
+          :collection => OsType.find(:all, :order => 'position')
+      %>
+      <%= f.input :api_name,
+        :class => 'short'
+      %>
+      <%= f.input :name,
+        :class => 'short'
+      %>
+      <%= f.input :desc, :label => 'Description',
+        :input_html => { :class => 'autogrow', :warp => 'soft', :size => '40x2' },
+        :required => false
+      %>
+    <% end %>
+    <% f.buttons do %>
+      <%= f.submit %>
+      <%= cancel_add_provider_vm_os_type_button 'Cancel', @provider %>
+    <% end %>
+  <% end %>
+</div>

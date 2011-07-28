@@ -1,0 +1,11 @@
+    <% fields_for "vm_os_type", vm_os_type do |f| %>
+    <% content_tag_for :tr, vm_os_type, :readonly => false, :class => '' do %>
+        <%= f.hidden_field :id, :index => nil %>
+        <td class="handle">[drag]</td>
+        <td><%= (vm_os_type.os_type.nil? ? '&nbsp;' : h(vm_os_type.os_type.name)) %></td>
+        <td><%= link_to_remote h(vm_os_type.api_name), :url => send("edit_#{ @parent_type }_vm_os_type_url", @parent, vm_os_type), :method => :get %></td>
+        <td><%=h vm_os_type.name %></td>
+        <td><%=h vm_os_type.desc %></td>
+        <td><%= remove_provider_vm_os_type_link('Delete', @parent, vm_os_type) %></td>
+    <% end %>
+    <% end %>

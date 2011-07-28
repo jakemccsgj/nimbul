@@ -1,0 +1,11 @@
+<% subtitle "New OS Type" %>
+
+<h1>
+  <%= link_to 'Admin Controls', admin_controls_path %>
+  / <%= link_to 'OS Types', send("#{ @parent_type }_vm_os_types_path", @parent) %>
+  / New OS Type 
+</h1>
+
+<br/>
+
+<%= render :partial => 'form' %>

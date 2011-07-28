@@ -1,4 +1,6 @@
 ActionController::Routing::Routes.draw do |map|
+  map.resources :os_types, :collection => { :sort => :post }
+
   map.resources :cpu_profiles, :collection => { :sort => :post }
 
   map.resources :io_profiles, :collection => { :sort => :post }
@@ -13,7 +15,10 @@ ActionController::Routing::Routes.draw do |map|
       :only => [ :index, :list, :new, :create, :destroy ]
     provider.resources :regions, :collection => { :sort => :post }
     provider.resources :storage_types, :collection => { :sort => :post }
+    provider.resources :vm_os_types, :collection => { :sort => :post }
     provider.resources :instance_vm_types, :collection => { :sort => :post }
+    provider.resources :vm_price_types, :collection => { :sort => :post }
+    provider.resources :vm_prices, :collection => { :sort => :post }
   end
 
   map.resources :regions do |region|

@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110726113836) do
+ActiveRecord::Schema.define(:version => 20110728021602) do
 
   create_table "access_requests", :force => true do |t|
     t.string   "state"
@@ -724,6 +724,17 @@ ActiveRecord::Schema.define(:version => 20110726113836) do
 
   add_index "operations", ["state"], :name => "index_operations_on_state"
 
+  create_table "os_types", :force => true do |t|
+    t.integer  "position"
+    t.string   "api_name"
+    t.string   "name"
+    t.text     "desc"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "os_types", ["api_name"], :name => "index_os_types_on_api_name"
+
   create_table "provider_account_parameters", :force => true do |t|
     t.integer  "provider_account_id"
     t.integer  "position"
@@ -1298,6 +1309,54 @@ ActiveRecord::Schema.define(:version => 20110726113836) do
   add_index "users", ["email"], :name => "index_users_on_email"
   add_index "users", ["login"], :name => "index_users_on_login", :unique => true
   add_index "users", ["name"], :name => "index_users_on_name"
+
+  create_table "vm_os_types", :force => true do |t|
+    t.integer  "provider_id"
+    t.integer  "os_type_id"
+    t.string   "api_name"
+    t.string   "name"
+    t.text     "desc"
+    t.integer  "position"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "vm_os_types", ["api_name"], :name => "index_vm_os_types_on_api_name"
+  add_index "vm_os_types", ["os_type_id"], :name => "index_vm_os_types_on_os_type_id"
+  add_index "vm_os_types", ["provider_id"], :name => "index_vm_os_types_on_provider_id"
+
+  create_table "vm_price_types", :force => true do |t|
+    t.integer  "provider_id"
+    t.string   "api_name"
+    t.string   "name"
+    t.text     "desc"
+    t.integer  "position"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "vm_price_types", ["api_name"], :name => "index_vm_price_types_on_api_name"
+  add_index "vm_price_types", ["provider_id"], :name => "index_vm_price_types_on_provider_id"
+
+  create_table "vm_prices", :force => true do |t|
+    t.integer  "provider_id"
+    t.integer  "vm_price_type_id"
+    t.integer  "region_id"
+    t.integer  "instance_vm_type_id"
+    t.integer  "vm_os_type_id"
+    t.string   "price_unit"
+    t.string   "price_period"
+    t.integer  "position"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.decimal  "price",               :precision => 8, :scale => 4
+  end
+
+  add_index "vm_prices", ["instance_vm_type_id"], :name => "index_vm_prices_on_instance_vm_type_id"
+  add_index "vm_prices", ["provider_id"], :name => "index_vm_prices_on_provider_id"
+  add_index "vm_prices", ["region_id"], :name => "index_vm_prices_on_region_id"
+  add_index "vm_prices", ["vm_os_type_id"], :name => "index_vm_prices_on_vm_os_type_id"
+  add_index "vm_prices", ["vm_price_type_id"], :name => "index_vm_prices_on_vm_price_type_id"
 
   create_table "volumes", :force => true do |t|
     t.integer  "provider_account_id"

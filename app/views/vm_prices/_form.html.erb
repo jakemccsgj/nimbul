@@ -1,0 +1,22 @@
+<% semantic_remote_form_for [@parent, @vm_price], :remote => true do |f| %>
+    <%= hidden_field_tag :anchor, 'vm_prices' %>
+    <%= hidden_field_tag :update, 'provider_vm_prices' %>
+    <%= f.error_messages %>
+    <% f.inputs do %>
+      <%= f.input :api_name,
+        :class => 'short'
+      %>
+      <%= f.input :name,
+        :class => 'short'
+      %>
+      <%= f.input :desc, :label => 'Description',
+        :input_html => { :class => 'autogrow', :warp => 'soft', :size => '40x2' },
+        :required => false
+      %>
+    <% end %>
+    <% f.buttons do %>
+      <%= f.submit %>
+      <%= cancel_add_provider_vm_price_button 'Cancel', @provider %>
+    <% end %>
+  <% end %>
+</div>

@@ -1,0 +1,3 @@
+page[:edit_vm_price].replace_html :partial => "form", :object => @vm_price
+page[:add_vm_price].hide
+page[:edit_vm_price].appear

@@ -1,0 +1,11 @@
+<% subtitle "New Price Type" %>
+
+<h1>
+  <%= link_to 'Admin Controls', admin_controls_path %>
+  / <%= link_to 'Price Types', send("#{ @parent_type }_vm_price_types_path", @parent) %>
+  / New Price Type 
+</h1>
+
+<br/>
+
+<%= render :partial => 'form' %>

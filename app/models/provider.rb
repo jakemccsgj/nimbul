@@ -15,11 +15,17 @@ class Provider < BaseModel
     has_many :regions, :dependent => :nullify, :order => :position
     has_many :storage_types, :dependent => :nullify, :order => :position
     has_many :instance_vm_types, :include => [:storage_types, :io_profile, :cpu_profiles], :dependent => :nullify, :order => :position
+    has_many :vm_os_types, :include => [:os_type], :dependent => :nullify, :order => :position
+    has_many :vm_price_types, :dependent => :nullify, :order => :position
+    has_many :vm_prices, :dependent => :nullify, :order => :position
 
     def can_use_more_of?(provider_resource_type)
-        return true if provider_resource_type == 'InstanceVmType'
-        return true if provider_resource_type == 'StorageType'
         return true if provider_resource_type == 'Region'
+        return true if provider_resource_type == 'StorageType'
+        return true if provider_resource_type == 'InstanceVmType'
+        return true if provider_resource_type == 'VmOsType'
+        return true if provider_resource_type == 'VmPriceType'
+        return true if provider_resource_type == 'VmPrice'
         return false
     end
 end
