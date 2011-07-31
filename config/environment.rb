@@ -132,7 +132,7 @@ Rails::Initializer.run do |config|
   #Constant values
   # <NOTE>: We don't support micro until we support EBS-based root devices because micros are only supported using those
   # EC2_INSTANCE_TYPES = [ 't1.micro', 'm1.small', 'm1.large', 'm1.xlarge', 'c1.medium', 'c1.xlarge' ]
-  EC2_INSTANCE_TYPES = [ 'm1.small', 'm1.large', 'm1.xlarge', 'c1.medium', 'c1.xlarge' ]
+  #EC2_INSTANCE_TYPES = [ 'm1.small', 'm1.large', 'm1.xlarge', 'c1.medium', 'c1.xlarge' ]
   EC2_SERVER_USERS = [ 'root', 'dev', 'logpoll' ]
   PUBLISH_EVERY_VALUES = [ 0, 10, 20, 30, 60, 120, 300, 600, 1800, 3600 ]
   IN_MESSAGE_STATES = [ 'new', 'processed' ]
@@ -157,6 +157,8 @@ Rails::Initializer.run do |config|
     AS_TRIGGER_BREACH_SCALE_INCREMENT_UNITS = [ '%', 'instances' ]
     SERVER_VOLUME_MOUNT_TYPES_ARRAY = [ 'Mount Volume Mount Type', 'Restore Snapshot Mount Type', 'Restore Latest Snapshot Mount Type' ]
 	SERVER_VOLUME_MOUNT_TYPES = SERVER_VOLUME_MOUNT_TYPES_ARRAY.map{ |t| LabelValue.new(t.gsub('Mount Type',''), t.gsub(' ','')) }
+
+    PER_TIME_UNITS = [ 'hour', 'day', 'month', '1 year', '3 years' ]
 
   INSTANCE_KIND_IO_PERFORMANCES = [ 'Low', 'Moderate', 'High' ]
 

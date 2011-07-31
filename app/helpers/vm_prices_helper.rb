@@ -6,6 +6,23 @@ module VmPricesHelper
         end
     end
 
+    def edit_provider_vm_price_link(text, parent, vm_price)
+        url = edit_provider_vm_price_url(parent, vm_price)
+
+        link_text = image_tag("verify.png", :class => 'control-icon', :alt => text)
+
+        options = {
+            :url => url,
+            :method => :get,
+        }
+        html_options = {
+            :title => text,
+            :href => url,
+            :method => :get,
+        }
+        link_to_remote link_text, options, html_options
+    end
+
     def remove_provider_vm_price_link(text, parent, vm_price)
         url = provider_vm_price_url(parent, vm_price)
 

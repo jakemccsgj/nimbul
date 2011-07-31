@@ -19,14 +19,12 @@
           :as => :select,
           :collection => @parent.vm_os_types
       %>
-      <%= f.input :price,
+      <%= f.input :price, :hint => 'For example, 0.02', :label => 'Price, $',
         :class => 'short'
       %>
-      <%= f.input :price_unit, :label => 'Currency',
-        :class => 'short'
-      %>
-      <%= f.input :price_period, :label => 'Per Each',
-        :class => 'short'
+      <%= f.input :price_unit, :as => :hidden, :value => '$' %>
+      <%= f.input :price_period, :label => 'Per Each', :hint => 'For example, hour',
+        :as => :select, :collection => PER_TIME_UNITS
       %>
     <% end %>
     <% f.buttons do %>
