@@ -37,9 +37,22 @@ class ProviderAccount::StatsController < ApplicationController
     latest_taken_at = ServerStat.maximum(:taken_at, :conditions => { :cluster_id => @provider_account.cluster_ids })
     @server_stats = ServerStat.find_all_by_cluster_id_and_taken_at(
       @provider_account.cluster_ids, latest_taken_at,
-      :include => [:instance_vm_type, :cluster, :server]
+      :include => [ { :instance_vm_type => :vm_prices }, :cluster, :server]
     )
     @server_stats.sort!{ |a,b| a.cluster.name <=> b.cluster.name }
+
+    cluster_id = nil
+    first_ss = nil
+    @server_stats.each do |ss|
+       if cluster_id.nil? or cluster_id != ss.cluster_id
+           cluster_id = ss.cluster_id
+           first_ss = ss
+           first_ss.cluster_cost = BigDecimal.new('0.00')
+           first_ss.server_count = 0
+       end 
+       first_ss.cluster_cost += ss.server_cost
+       first_ss.server_count += 1
+    end
 
     respond_to do |format|
       format.html

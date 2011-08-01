@@ -55,7 +55,6 @@ class CloudVolume < CloudResource
         if self.destroy
             begin
                 Ec2Adapter.delete_volume(self)
-                self.update_attribute(:state, 'deleting')
             rescue Exception => e
                 msg = "Failed to delete volume '#{self.name}' [#{self.id}]: #{e.message}"
                 Rails.logger.error msg+"\n\t#{e.backtrace.join("\n\t")}"

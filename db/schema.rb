@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110728021602) do
+ActiveRecord::Schema.define(:version => 20110801010257) do
 
   create_table "access_requests", :force => true do |t|
     t.string   "state"
@@ -584,7 +584,6 @@ ActiveRecord::Schema.define(:version => 20110728021602) do
     t.string   "name"
     t.string   "launch_configuration_name"
     t.string   "description"
-    t.string   "instance_type"
     t.string   "image_id"
     t.string   "ramdisk_id"
     t.string   "kernel_id"
@@ -596,9 +595,11 @@ ActiveRecord::Schema.define(:version => 20110728021602) do
     t.enum     "state",                      :limit => [:disabled, :active], :default => :disabled
     t.integer  "server_profile_revision_id"
     t.integer  "server_image_id"
+    t.integer  "instance_vm_type_id"
   end
 
   add_index "launch_configurations", ["image_id"], :name => "index_launch_configurations_on_image_id"
+  add_index "launch_configurations", ["instance_vm_type_id"], :name => "index_launch_configurations_on_instance_vm_type_id"
   add_index "launch_configurations", ["launch_configuration_name"], :name => "index_launch_configurations_on_launch_configuration_name"
   add_index "launch_configurations", ["name"], :name => "index_launch_configurations_on_name"
   add_index "launch_configurations", ["provider_account_id", "launch_configuration_name"], :name => "unique_provider_account_id_launch_configuration_name", :unique => true
@@ -1020,7 +1021,7 @@ ActiveRecord::Schema.define(:version => 20110728021602) do
 
   create_table "server_profile_revisions", :force => true do |t|
     t.integer  "server_profile_id"
-    t.integer  "revision",          :default => 0
+    t.integer  "revision",            :default => 0
     t.integer  "creator_id"
     t.text     "commit_message"
     t.string   "image_id"
@@ -1029,8 +1030,10 @@ ActiveRecord::Schema.define(:version => 20110728021602) do
     t.text     "startup_script"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "instance_type",     :default => "m1.small"
+    t.integer  "instance_vm_type_id"
   end
+
+  add_index "server_profile_revisions", ["instance_vm_type_id"], :name => "index_server_profile_revisions_on_instance_vm_type_id"
 
   create_table "server_profile_user_accesses", :force => true do |t|
     t.integer  "server_profile_id"

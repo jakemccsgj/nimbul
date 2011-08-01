@@ -87,15 +87,44 @@
         <th>Server</th>
         <th>Instance Type</th>
         <th>Running</th>
+        <th>Server Cost / month</th>
+        <th>Cluster Cost / month</th>
       </tr>
     </thead>
     <tbody>
-      <% @server_stats.each do |ss| %>
+      <%
+        @server_stats.each do |ss|
+        td_class = (ss.server_count.nil? ? '' : ' top')
+      %>
         <tr class="<%= cycle("even", "odd") %>">
-          <td><%= ss.cluster.name %></td>
-          <td><%= ss.server.name %></td>
-          <td><%= ss.instance_type %></td>
-          <td><%= ss.instance_count %></td>
+          <% unless ss.server_count.nil? %>
+              <td rowspan="<%= ss.server_count  %>" class="left<%= td_class -%> right">
+                  <%= ss.cluster.name %>
+              </td>
+          <% end %>
+          <td class="<%= td_class -%>"><%= ss.server.name %></td>
+          <td class="<%= td_class -%>"><%= ss.instance_type %></td>
+          <td class="<%= td_class -%>"><%= ss.instance_count %></td>
+          <td class="<%= td_class -%>">
+            <%= (
+              ss.server_cost.nil? ?
+                'NA' :
+                 number_to_currency(ss.server_cost*730,
+                   :unit => '$',
+                   :precision => 2)
+            ) %>
+          </td>
+          <% unless ss.server_count.nil? %>
+          <td rowspan="<%= ss.server_count  %>" class="left<%= td_class -%> right">
+            <%= (
+              ss.cluster_cost.nil? ?
+                '&nbsp;' :
+                 number_to_currency(ss.cluster_cost*730,
+                   :unit => '$',
+                   :precision => 2)
+            ) %>
+          </td>
+          <% end %>
         </tr>
       <% end %>
   </tbody>

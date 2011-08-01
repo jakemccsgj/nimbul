@@ -123,3 +123,18 @@ td.fill {
     color: #0000AA;
 }
 
+td.top {
+    border-top:thin solid;
+}
+
+td.bottom {
+    border-bottom:thin solid;
+}
+
+td.left {
+    border-left:thin solid;
+}
+
+td.right {
+    border-right:thin solid;
+}

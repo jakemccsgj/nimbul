@@ -1,13 +1,13 @@
-
 class ServerProfileRevision < BaseModel
   belongs_to :server_profile
   belongs_to :creator, :class_name => 'User'
+  belongs_to :instance_vm_type
   
   has_many :servers
   has_many :server_profile_revision_parameters, :order => "position"
   
   validates_presence_of :revision, :creator_id, :commit_message
-  validates_presence_of :image_id, :instance_type
+  validates_presence_of :image_id, :instance_vm_type_id
   
   after_save :save_server_profile_revision_parameters
   
@@ -26,7 +26,12 @@ class ServerProfileRevision < BaseModel
     super
   end
   
-	attr_accessor :status_message
+    attr_accessor :status_message
+
+  def instance_type
+    return nil if self.instance_vm_type.nil?
+    return self.instance_vm_type.api_name
+  end
 
   def is_head?
     revision == 0
@@ -47,19 +52,19 @@ class ServerProfileRevision < BaseModel
     end
   end
 
-	def save_server_profile_revision_parameters
-		server_profile_revision_parameters.each do |c|
-			if c.should_destroy?
-				c.destroy
-			else
-				c.save(false)
-			end
-		end
-	end
+    def save_server_profile_revision_parameters
+        server_profile_revision_parameters.each do |c|
+            if c.should_destroy?
+                c.destroy
+            else
+                c.save(false)
+            end
+        end
+    end
 
-	#
+    #
     # sort, search and paginate parameters
-	#
+    #
     def self.per_page
         10
     end

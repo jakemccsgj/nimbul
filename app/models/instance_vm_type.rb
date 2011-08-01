@@ -2,12 +2,15 @@ class InstanceVmType < BaseModel
     belongs_to :provider
     belongs_to :io_profile
 
-    has_and_belongs_to_many :cpu_profiles, :order => 'position'
-    has_and_belongs_to_many :storage_types, :order => 'position'
-    has_and_belongs_to_many :clusters, :order => 'name'
+    has_and_belongs_to_many :cpu_profiles, :order => 'position', :uniq => true
+    has_and_belongs_to_many :storage_types, :order => 'position', :uniq => true
+    has_and_belongs_to_many :clusters, :order => 'name', :uniq => true
 
     has_many :instances, :dependent => :nullify
     has_many :server_stats, :dependent => :nullify
+    has_many :vm_prices, :dependent => :nullify, :order => :position
+    has_many :server_profile_revisions, :dependent => :nullify
+    has_many :launch_configurations, :dependent => :nullify
 
     validates_presence_of :api_name, :name, :ram_gb, :cpu_units, :storage_gb
     validates_uniqueness_of :api_name, :name, :scope => :provider_id

@@ -64,8 +64,8 @@
 			<td><%= f.collection_select :image_id, @server_images, :image_id, :name, :include_blank => "Choose Image" %></td>
 		</tr>
 		<tr>
-			<th><%= f.label :instance_type %></th>
-			<td><%= f.select :instance_type, EC2_INSTANCE_TYPES %></td>
+			<th><%= f.label :instance_vm_type_id, 'Instance Type' %></th>
+			<td><%= f.collection_select :instance_vm_type_id, @provider_account.instance_vm_types, :id, :api_name %></h1></td>
 		</tr>
 		<tr>
 			<th><%= f.label :key_name %> (optional, but strongly recommended)</th>

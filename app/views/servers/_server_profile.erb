@@ -17,8 +17,8 @@ Last Update: <%= time_ago_in_words @server_profile_revision.updated_at %>
     
     <%= f.error_messages %>
 
-    <h1><%= f.label :instance_type, 'Instance Type' %>
-    <%= f.select :instance_type, EC2_INSTANCE_TYPES %></h1>
+    <h1><%= f.label :instance_vm_type_id, 'Instance Type' %>
+    <%= f.collection_select :instance_vm_type_id, @cluster.instance_vm_types, :id, :api_name %></h1>
 
 <br />
 

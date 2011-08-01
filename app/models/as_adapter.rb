@@ -4,13 +4,13 @@ require 'base64'
 require 'pp'
 
 class AsAdapter
-	cattr_accessor :launch_configuration_name_regex, :launch_configuration_name_message
-	
-	self.launch_configuration_name_regex = /\A\w[\w\.\-_]+\z/ # alphanumeric
-	self.launch_configuration_name_message = "use only letters, numbers, and .-_ please.".freeze
-#	self.launch_configuration_name_regex = /\A\w[\w\.\-_@]+\z/ # ASCII, strict
-#	self.launch_configuration_name_message = "use only letters, numbers, and .-_@ please.".freeze
-	
+    cattr_accessor :launch_configuration_name_regex, :launch_configuration_name_message
+    
+    self.launch_configuration_name_regex = /\A\w[\w\.\-_]+\z/ # alphanumeric
+    self.launch_configuration_name_message = "use only letters, numbers, and .-_ please.".freeze
+#    self.launch_configuration_name_regex = /\A\w[\w\.\-_@]+\z/ # ASCII, strict
+#    self.launch_configuration_name_message = "use only letters, numbers, and .-_@ please.".freeze
+    
 #  self.login_regex       = /\A\w[\w\.\-_@]+\z/                     # ASCII, strict
   # self.login_regex       = /\A[[:alnum:]][[:alnum:]\.\-_@]+\z/     # Unicode, strict
   # self.login_regex       = /\A[^[:cntrl:]\\<>\/&]*\z/              # Unicode, permissive
@@ -25,7 +25,7 @@ class AsAdapter
 #  self.domain_tld_regex  = '(?:[A-Z]{2}|com|org|net|edu|gov|mil|biz|info|mobi|name|aero|jobs|museum)'.freeze
 #  self.email_regex       = /\A#{email_name_regex}@#{domain_head_regex}#{domain_tld_regex}\z/i
 #  self.bad_email_message = "should look like an email address.".freeze
-	
+    
     def self.get_as(account)
         return if account.nil?
         return if account.aws_access_key.blank? or account.aws_secret_key.blank?
@@ -72,38 +72,38 @@ class AsAdapter
     end
 
     def self.create_launch_configuration(c)
-    	as = get_as(c.provider_account)
+        as = get_as(c.provider_account)
         options = Hash.new
         c.attributes.each{ |a, value| options[a.to_sym] = value }
-    	options[:security_groups] = c.security_groups.collect{ |g| g.name }
+        options[:security_groups] = c.security_groups.collect{ |g| g.name }
         options[:block_device_mappings] = c.block_device_mappings.collect{ |m| { :virtual_name => m.virtual_name, :device_name => m.device_name } }
-    	
-    	# make sure we generate user_data if this LC is related to a Server
-    	unless c.server_id.nil?
+        
+        # make sure we generate user_data if this LC is related to a Server
+        unless c.server_id.nil?
             server = Server.find(c.server_id)
             if server
                 compress_user_data = true
                 options[:user_data] = Server::UserDataController.generate(server, compress_user_data)
             end
-    	end
-    	
-    	begin
+        end
+        
+        begin
             as.create_launch_configuration(options)
             return true
-    	rescue
+        rescue
             c.status_message = "#{$!}"
-    	end		
+        end        
         return false
     end
     
     def self.delete_launch_configuration(c)
-    	as = get_as(c.provider_account)
-    	begin
+        as = get_as(c.provider_account)
+        begin
             as.delete_launch_configuration({ :launch_configuration_name => c.launch_configuration_name})
             return true
-    	rescue
+        rescue
             c.status_message = "#{$!}"
-    	end		
+        end        
         return false
     end
     
@@ -123,36 +123,36 @@ class AsAdapter
     end
 
     def self.create_auto_scaling_group(g)
-    	as = get_as(g.provider_account)
+        as = get_as(g.provider_account)
         options = Hash.new
         g.attributes.each{ |a, value| options[a.to_sym] = value }
         options[:auto_scaling_group_name] = g.name
-    	options[:launch_configuration_name] = g.launch_configuration.launch_configuration_name
-    	options[:availability_zones] = g.zones.collect{ |z| z.name }
-    	begin
-		as.create_auto_scaling_group(options)
-		return true
-    	rescue
-	    	g.status_message = "#{$!}"
-    	end		
-	return false
+        options[:launch_configuration_name] = g.launch_configuration.launch_configuration_name
+        options[:availability_zones] = g.zones.collect{ |z| z.name }
+        begin
+        as.create_auto_scaling_group(options)
+        return true
+        rescue
+            g.status_message = "#{$!}"
+        end        
+    return false
     end
 
     def self.update_auto_scaling_group(g)
-    	as = get_as(g.provider_account)
+        as = get_as(g.provider_account)
         options = Hash.new
         g.attributes.each{ |a, value| options[a.to_sym] = value }
         options[:auto_scaling_group_name] = g.name
-    	options[:launch_configuration_name] = g.launch_configuration.launch_configuration_name
-    	options[:availability_zones] = g.zones.collect{ |z| z.name }
-		as.update_auto_scaling_group(options)
-		as.create_desired_capacity(options)
-		return true
+        options[:launch_configuration_name] = g.launch_configuration.launch_configuration_name
+        options[:availability_zones] = g.zones.collect{ |z| z.name }
+        as.update_auto_scaling_group(options)
+        as.create_desired_capacity(options)
+        return true
     end
 
     def self.disable_auto_scaling_group(g)
-    	as = get_as(g.provider_account)
-    	options = {
+        as = get_as(g.provider_account)
+        options = {
             :auto_scaling_group_name => g.name,
             :min_size => 0,
             :max_size => 0,
@@ -162,9 +162,9 @@ class AsAdapter
     end
     
     def self.delete_auto_scaling_group(g)
-    	as = get_as(g.provider_account)
+        as = get_as(g.provider_account)
         as.delete_auto_scaling_group({ :auto_scaling_group_name => g.name })
-		return true
+        return true
     end
     
     def self.refresh_auto_scaling_groups(account)
@@ -183,35 +183,35 @@ class AsAdapter
         account.save_auto_scaling_groups
     end
 
-	def self.create_update_auto_scaling_trigger(ast)
-		as = get_as(ast.auto_scaling_group.provider_account)
+    def self.create_update_auto_scaling_trigger(ast)
+        as = get_as(ast.auto_scaling_group.provider_account)
         options = Hash.new
         ast.attributes.each{ |a,value| options[a.to_sym] = value }
         
         options[:trigger_name] = ast.name
         options[:auto_scaling_group_name] = ast.auto_scaling_group.name
         options[:dimensions] = [
-			{
-				:name => 'AutoScalingGroupName',
-				:value => ast.auto_scaling_group.name,
-			}
-		]
+            {
+                :name => 'AutoScalingGroupName',
+                :value => ast.auto_scaling_group.name,
+            }
+        ]
         options[:namespace] = 'AWS/EC2'
         
-		as.create_trigger(options)
-		return true
-	end
+        as.create_trigger(options)
+        return true
+    end
 
-	def self.delete_auto_scaling_trigger(ast)
-		as = get_as(ast.auto_scaling_group.provider_account)
+    def self.delete_auto_scaling_trigger(ast)
+        as = get_as(ast.auto_scaling_group.provider_account)
 
         options = Hash.new
         options[:trigger_name] = ast.name
         options[:auto_scaling_group_name] = ast.auto_scaling_group.name
         
-		as.delete_trigger(options)
-		return true
-	end
+        as.delete_trigger(options)
+        return true
+    end
 
     def self.refresh_auto_scaling_triggers(account, auto_scaling_group)
         as = get_as(account)
@@ -241,18 +241,22 @@ class AsAdapter
         # convert parser object into hash
         attributes = parser.to_hash
 
-	    user_data = attributes['user_data']
-	    attributes.delete('user_data')
+        user_data = attributes['user_data']
+        attributes.delete('user_data')
 
-    	groups = attributes['security_groups'] || []
-	    attributes.delete('security_groups')
+        groups = attributes['security_groups'] || []
+        attributes.delete('security_groups')
 
-    	volumes = attributes['block_device_mappings'] || []
-	    attributes.delete('block_device_mappings')
-	    
-	    server_image = account.server_images.detect{ |s| s.image_id == attributes['image_id'] }
-	    attributes['server_image_id'] = server_image.id unless server_image.nil?
-	    
+        volumes = attributes['block_device_mappings'] || []
+        attributes.delete('block_device_mappings')
+        
+        server_image = account.server_images.detect{ |s| s.image_id == attributes['image_id'] }
+        attributes['server_image_id'] = server_image.id unless server_image.nil?
+
+        vm_type = account.instance_vm_types.detect{ |z| z.api_name == attributes['instance_type'] }
+        attributes[:instance_vm_type_id] = vm_type.id unless vm_type.nil?
+        attributes.delete('instance_type')
+        
         if launch_configuration.nil?
             attributes[:name] = attributes['launch_configuration_name']
             launch_configuration = account.launch_configurations.build(attributes)
@@ -267,17 +271,17 @@ class AsAdapter
         security_groups = (SecurityGroup.find_all_by_provider_account_id_and_name(account.id, groups))
         launch_configuration.security_groups = ( security_groups || [] )
 
-	    # get volumes
-	    volumes.each do |v|
+        # get volumes
+        volumes.each do |v|
             v_attr = v.to_hash
-		    mapping = launch_configuration.block_device_mappings.detect{ |m| m.virtual_name == v_attr['virtual_name'] }
-		    if mapping.nil?
-			    mapping = launch_configuration.block_device_mappings.build(v_attr)
-		    else
-			    mapping.attributes = v_attr
-		    end
-	    end
-		
+            mapping = launch_configuration.block_device_mappings.detect{ |m| m.virtual_name == v_attr['virtual_name'] }
+            if mapping.nil?
+                mapping = launch_configuration.block_device_mappings.build(v_attr)
+            else
+                mapping.attributes = v_attr
+            end
+        end
+        
         return launch_configuration
     end
 
@@ -293,15 +297,15 @@ class AsAdapter
         launch_configuration_name = attributes['launch_configuration_name']
         attributes.delete('launch_configuration_name')
         launch_configuration = (LaunchConfiguration.find_by_provider_account_id_and_launch_configuration_name(account.id, launch_configuration_name, :include => :server))
-		server = launch_configuration.nil? ? nil : launch_configuration.server 
+        server = launch_configuration.nil? ? nil : launch_configuration.server 
         
         # zones
-    	zone_names = attributes['availability_zones'] || []
+        zone_names = attributes['availability_zones'] || []
         attributes.delete('availability_zones')
         zones = (Zone.find_all_by_provider_account_id_and_name(account.id, zone_names))
 
         # balancers
-    	balancer_names = attributes['load_balancer_names'] || []
+        balancer_names = attributes['load_balancer_names'] || []
         attributes.delete('load_balancer_names')
         load_balancers = (LoadBalancer.find_all_by_provider_account_id_and_load_balancer_name(account.id, balancer_names))
 
@@ -309,21 +313,21 @@ class AsAdapter
         instance_parsers = attributes['instances'] || []
         attributes.delete('instances')
         instances = []
-	    instance_parsers.each do |i|
-			# TODO implement better transition here
-			h = {}
-			i.to_hash.each do |key,value|
-				h[key.to_sym] = value
-			end
-			instance = Ec2Adapter.parse_instance_info(account, {}, h)
-			unless server.nil?
-				instance.server_id = server.id
-				instance.server_name = server.name
-			end
-			instance.save
-			instances << instance
-	    end
-	    
+        instance_parsers.each do |i|
+            # TODO implement better transition here
+            h = {}
+            i.to_hash.each do |key,value|
+                h[key.to_sym] = value
+            end
+            instance = Ec2Adapter.parse_instance_info(account, {}, h)
+            unless server.nil?
+                instance.server_id = server.id
+                instance.server_name = server.name
+            end
+            instance.save
+            instances << instance
+        end
+        
         auto_scaling_group = account.auto_scaling_groups.detect{ |s| s.name == parser.auto_scaling_group_name }
         if auto_scaling_group.nil?
             auto_scaling_group = account.auto_scaling_groups.build(attributes)
@@ -352,11 +356,11 @@ class AsAdapter
         # TODO - process dimensions
         attributes.delete('dimensions')
 
-		# trigger name
+        # trigger name
         attributes[:name] = attributes['trigger_name']
         attributes.delete('trigger_name')
 
-		# delete extra attribute
+        # delete extra attribute
         attributes.delete('auto_scaling_group_name')
 
         auto_scaling_trigger = auto_scaling_group.auto_scaling_triggers.detect{ |s| s.name == parser.trigger_name }
@@ -375,11 +379,11 @@ class AsAdapter
         # convert parser object into hash
         attributes = parser.to_hash
 
-    	zone_names = attributes['availability_zones'] || []
-		attributes.delete('availability_zones')
+        zone_names = attributes['availability_zones'] || []
+        attributes.delete('availability_zones')
 
-    	listener_parsers = attributes['listeners'] || []
-		attributes.delete('listeners')
+        listener_parsers = attributes['listeners'] || []
+        attributes.delete('listeners')
 
         # TODO we don't import health checks yet
         health_check_parser = attributes['health_check']
