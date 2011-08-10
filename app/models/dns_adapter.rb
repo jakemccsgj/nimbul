@@ -8,6 +8,16 @@ class DnsAdapter
     DnsHostnameAssignment.create(server, hostname)
   end
 
+  def self.get_account_dns(account)
+    dns = {}
+    instances = Instance.find_all_by_provider_account_id(account.id, :include => [
+      { :server => [ :cluster , { :server_profile_revision => :server_profile_revision_parameters } ] },
+      :dns_hostname_assignments
+    ])
+    instances.each do |i|
+    end  
+  end
+
   def self.get_account_leases(account)
     DnsLease.find_by_model(account,
       :select => %Q(

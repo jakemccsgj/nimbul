@@ -1,0 +1,190 @@
+<div id='stats'>
+<% @reserved_instances ||= [] %>
+<% unless @reserved_instances.empty? %>
+  <h1>Reserved Instances in <%= @parent_type.to_s.titleize %> "<%=h @parent.name %>"</h1>
+  <hr/>
+  <table class="sortable" id="reserved_instances_table">
+    <thead>
+    <tr>
+      <th>Zone</th>
+      <th>Type</th>
+      <th>Reserved</th>
+      <th>Usage Price</th>
+    </tr>
+    </thead>
+    <% @reserved_instances.each do |i| %>
+      <tr class="<%= cycle("even", "odd") %>">
+        <td><%= i.zone %></td>
+        <td><%= i.instance_type %></td>
+        <td><%= i.count %></td>
+        <td><%= i.usage_price %></td>
+      </tr>
+    <% end %>
+  </table>
+<% end %>
+
+<% @running_instances ||= [] %>
+<% unless @running_instances.empty? %>
+  <h1>Running Instances by Zone, Type in <%= @parent_type.to_s.titleize %> "<%=h @parent.name %>"</h1>
+  <hr/>
+  <table class="sortable" id="running_instances_table">
+    <thead>
+    <tr>
+      <th>Zone</th>
+      <th>Type</th>
+      <th>Running</th>
+      <% unless @reserved_instances.empty? %>
+        <th>Reserved</th>
+        <th>&nbsp;</th>
+      <% end %>
+    </tr>
+    </thead>
+    <% @running_instances.each do |i| %>
+      <tr class="<%= cycle("even", "odd") %>">
+        <td><%= i.zone %></td>
+        <td><%= i.instance_type %></td>
+        <td><%= i.count %></td>
+        <% unless @reserved_instances.empty? %>
+          <%
+            ri = @reserved_instances.detect{
+              |r| r.zone_id == i.zone_id and r.instance_vm_type_id == i.instance_vm_type_id
+            }
+            reserved_count = 0
+            reserved_desc = ''
+            unless ri.nil?
+              reserved_count = ri.count
+            end
+            if reserved_count < i.count
+              reserved_desc = 'reserve more'
+            elsif reserved_count > i.count
+              reserved_desc = 'fill from other zones'
+            else
+              reserved_desc = 'optimal'
+            end
+          %>
+          <td><%= reserved_count %></td>
+          <td class="<%= reserved_desc %>"><%= reserved_desc %></td>
+        <% end %>
+      </tr>
+    <% end %>
+  </table>
+<% end %>
+
+<% @server_stats ||= [] %>
+<h1>
+  Spending by Cluster, Server in <%= @parent_type.to_s.titleize %> "<%=h @parent.name %>"
+</h1>
+<%= (@latest_taken_at.nil? ? '' : "Last updated: "+time_and_time_ago(@latest_taken_at)) %>
+<hr/>
+<% if @server_stats.empty? %>
+  The Statistics are collected every <%=time_ago_in_words(Time.now - StatsAdapter.frequency()).sub('about ','') %>. No Statistics have been collected for this Account yet.
+  <br/>
+  <br/>
+<% else %>
+  <table>
+    <thead>
+      <tr>
+        <th <%= sort_td_class_helper "cluster_id" %>>
+          <%= stats_sort_link "Cluster", "cluster_id" %>
+        </th>
+        <th <%= sort_td_class_helper "server_id" %>>
+          <%= stats_sort_link "Server", "server_id" %>
+        </th>
+        <th <%= sort_td_class_helper "instance_vm_type_id" %>>
+          <%= stats_sort_link "Instance Type", "instance_vm_type_id" %>
+        </th>
+        <th <%= sort_td_class_helper "instance_count" %>>
+          <%= stats_sort_link "Hours This Month", "instance_count" %>
+        </th>
+        <th <%= sort_td_class_helper "server_cost" %>>
+          <%= stats_sort_link "Server Cost This Month", "server_cost" %>
+        </th>
+        <th <%= sort_td_class_helper "cluster_cost" %>>
+          <%= stats_sort_link "Cluster Cost This Month", "cluster_cost" %>
+        </th>
+        <% unless @projection.nil? %>
+          <th <%= sort_td_class_helper "projection_cost" %>>
+            <%= stats_sort_link "Projection", "projection_cost" %>
+          </th>
+        <% end %>
+      </tr>
+    </thead>
+    <tbody>
+      <%
+        @server_stats.each do |ss|
+        td_class = (ss.server_count.nil? ? '' : ' top')
+      %>
+        <tr class="<%= cycle("even", "odd") %>">
+          <% unless ss.server_count.nil? %>
+              <td rowspan="<%= ss.server_count  %>" class="left<%= td_class -%> right">
+                  <%= ss.cluster.name %>
+              </td>
+          <% end %>
+          <td class="<%= td_class -%>"><%= (ss.server.nil? ? 'n/a' : ss.server.name) %></td>
+          <td class="<%= td_class -%>"><%= ss.instance_type %></td>
+          <td class="<%= td_class -%>"><%= ss.instance_count %></td>
+          <td class="<%= td_class -%>">
+            <%= (
+              ss.server_cost.nil? ?
+                'NA' :
+                 number_to_currency(ss.server_cost,
+                   :unit => '$',
+                   :precision => 2)
+            ) %>
+          </td>
+          <% unless ss.server_count.nil? %>
+            <td rowspan="<%= ss.server_count  %>" class="left right<%= td_class -%>">
+              <%= (
+                ss.cluster_cost.nil? ?
+                  '&nbsp;' :
+                   number_to_currency(ss.cluster_cost,
+                     :unit => '$',
+                     :precision => 2)
+              ) %>
+            </td>
+            <% unless @projection.nil? %>
+              <td rowspan="<%= ss.server_count  %>" class="right<%= td_class -%>">
+                <%= (
+                  ss.cluster_cost.nil? ?
+                  '&nbsp;' :
+                   number_to_currency(ss.cluster_cost*@multiplier,
+                     :unit => '$',
+                     :precision => 2)
+                ) %>
+              </td>
+            <% end %>
+          <% end %>
+        </tr>
+      <% end %>
+      <tr class="sortbottom">
+        <td class="top">&nbsp;</td>
+        <td class="top">&nbsp;</td>
+        <td class="top">&nbsp;</td>
+        <td class="top">&nbsp;</td>
+        <td class="top" align="right">
+          <b>Total</b>
+        </td>
+        <td class="left right top bottom">
+          <b>
+          <%= number_to_currency(@total,
+            :unit => '$',
+            :precision => 2)
+          %> 
+          </b>
+        </td>
+        <% unless @projection.nil? %>
+          <td class="top right bottom">
+            <b>
+            <%= number_to_currency(@projection,
+              :unit => '$',
+              :precision => 2)
+            %> 
+            </b>
+          </td>
+        <% end %>
+      </tr>
+  </tbody>
+</table>
+<% end %>
+</div>
+<%= javascript_tag('sortables_init();') %>

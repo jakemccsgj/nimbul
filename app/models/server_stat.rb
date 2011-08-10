@@ -26,4 +26,30 @@ class ServerStat < ActiveRecord::Base
 
     attr_accessor :cluster_cost
     attr_accessor :server_count
+
+    def self.sort_fields
+        %w(cluster_id server_id instance_vm_type_id instance_count)
+    end
+
+    def self.fix(date,reduce)
+      taken_at = "#{date}15".to_date
+      month_start = taken_at.beginning_of_month
+      month_end = taken_at.end_of_month
+      count = 0
+      ServerStat.find(
+        :all,
+        :conditions => ["taken_at between :start and :end", { :start => month_start, :end => taken_at}]
+      ).each do |ss|
+        ss.destroy unless count.modulo(reduce) == 0 
+        count += 1
+      end
+      count = 0
+      ServerStat.find(
+        :all,
+        :conditions => ["taken_at between :start and :end", { :start => taken_at, :end => month_end}]
+      ).each do |ss|
+        ss.destroy unless count.modulo(reduce) == 0 
+        count += 1
+      end
+    end
 end

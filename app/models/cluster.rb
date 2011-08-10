@@ -6,13 +6,15 @@ class Cluster < BaseModel
   service_child_relationship :servers
 
   belongs_to :provider_account
+  belongs_to :app
   
   has_and_belongs_to_many :users
   has_and_belongs_to_many :cloud_resources, :order => 'update_time DESC'
   has_and_belongs_to_many :instance_vm_types, :order => 'position', :uniq => true
   
   has_many :cluster_parameters, :dependent => :destroy
-  has_many :servers, :dependent => :destroy, :include => :server_profile_revision
+  #has_many :servers, :dependent => :destroy, :include => :server_profile_revision
+  has_many :servers, :dependent => :destroy
 
   # auditing
   has_many :logs, :class_name => 'AuditLog', :dependent => :nullify

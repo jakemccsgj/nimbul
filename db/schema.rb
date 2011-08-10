@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110801010257) do
+ActiveRecord::Schema.define(:version => 20110803143053) do
 
   create_table "access_requests", :force => true do |t|
     t.string   "state"
@@ -59,6 +59,19 @@ ActiveRecord::Schema.define(:version => 20110801010257) do
 
   add_index "addresses", ["name"], :name => "index_addresses_on_name"
   add_index "addresses", ["public_ip"], :name => "index_addresses_on_public_ip"
+
+  create_table "apps", :force => true do |t|
+    t.integer  "account_group_id"
+    t.string   "api_name"
+    t.string   "name"
+    t.text     "description"
+    t.integer  "position"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "apps", ["account_group_id"], :name => "index_apps_on_account_group_id"
+  add_index "apps", ["api_name"], :name => "index_apps_on_api_name"
 
   create_table "audit_logs", :force => true do |t|
     t.string   "provider_account_name"
@@ -203,6 +216,7 @@ ActiveRecord::Schema.define(:version => 20110801010257) do
   end
 
   add_index "cloud_resources_clusters", ["cloud_resource_id"], :name => "index_cloud_resources_clusters_on_cloud_resource_id"
+  add_index "cloud_resources_clusters", ["cluster_id", "cloud_resource_id"], :name => "index_crc_cluster_id_cloud_resource_id"
   add_index "cloud_resources_clusters", ["cluster_id"], :name => "index_cloud_resources_clusters_on_cluster_id"
 
   create_table "cluster_parameters", :force => true do |t|
@@ -217,6 +231,16 @@ ActiveRecord::Schema.define(:version => 20110801010257) do
     t.boolean  "is_readonly",  :default => false
   end
 
+  create_table "cluster_stats", :force => true do |t|
+    t.integer  "cluster_id"
+    t.string   "cluster_name"
+    t.datetime "taken_at"
+    t.string   "instance_type"
+    t.integer  "instance_count"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "clusters", :force => true do |t|
     t.string   "name"
     t.string   "description"
@@ -226,8 +250,10 @@ ActiveRecord::Schema.define(:version => 20110801010257) do
     t.integer  "provider_account_id"
     t.integer  "servers_count",       :default => 0
     t.string   "state",               :default => "active"
+    t.integer  "app_id"
   end
 
+  add_index "clusters", ["app_id"], :name => "index_clusters_on_app_id"
   add_index "clusters", ["provider_account_id"], :name => "index_clusters_on_provider_account_id"
   add_index "clusters", ["state"], :name => "index_clusters_on_state"
 
@@ -1082,7 +1108,6 @@ ActiveRecord::Schema.define(:version => 20110801010257) do
   end
 
   add_index "server_stats", ["cluster_id", "server_id", "taken_at"], :name => "index_server_stats_on_cluster_id_and_server_id_and_taken_at"
-  add_index "server_stats", ["cluster_id", "server_id"], :name => "index_server_stats_on_cluster_id_and_server_id_and_instance_type"
   add_index "server_stats", ["instance_vm_type_id"], :name => "index_server_stats_on_instance_vm_type_id"
   add_index "server_stats", ["server_id"], :name => "index_server_stats_on_server_id"
   add_index "server_stats", ["taken_at"], :name => "index_server_stats_on_taken_at"

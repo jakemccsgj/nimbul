@@ -1,0 +1,3 @@
+page[:edit_app].replace_html :partial => "form", :object => @app
+page[:add_app].hide
+page[:edit_app].appear

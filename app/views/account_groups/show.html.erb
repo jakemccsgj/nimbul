@@ -1,0 +1,9 @@
+<% subtitle "Account Groups: #{@account_group.name}" %>
+
+<h1>
+  <%= link_to 'Admin Controls', admin_controls_path %>
+  / <%= link_to 'Available Account Groups', account_groups_path %>
+  / <%= edit_in_place(@account_group, :name, :class => 'editable account_group-1-editable') %>
+</h1>
+
+<%= render :partial => 'tabs' %>

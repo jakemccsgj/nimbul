@@ -25,15 +25,17 @@
       - you are <strong>Account Administrator</strong>, <%= link_to "Add a new Cluster", new_provider_account_cluster_path(cluster.provider_account) %></h1>
     <% end -%>
     <hr/>
-    <table>
+    <table class="sortable" id="provider_account_<%= current_provider_account_id %>_clusters_table">
       <thead>
         <tr>
           <th>Name</th>
           <th>Description</th>
           <th>Instances</th>
           <th>State</th>
+          <th>Cost This Month</th>
+          <th>Projection</th>
           <% if current_user.has_provider_account_access?(cluster.provider_account_id) %>
-            <th>Actions</th>
+            <th class"unsortable">Actions</th>
           <% end %>
         </tr>
       </thead>

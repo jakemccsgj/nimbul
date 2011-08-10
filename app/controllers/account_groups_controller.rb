@@ -80,9 +80,11 @@ class AccountGroupsController < ApplicationController
           flash[:notice] = 'AccountGroup was successfully updated.'
           format.html { redirect_to account_groups_path }
           format.xml  { head :ok }
+          format.json { render :json => @account_group }
         else
           format.html { render :action => "edit" }
           format.xml  { render :xml => @account_group.errors, :status => :unprocessable_entity }
+          format.json { render :json => @account_group }
         end
       end
     end
