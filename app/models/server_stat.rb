@@ -31,6 +31,16 @@ class ServerStat < ActiveRecord::Base
         %w(cluster_id server_id instance_vm_type_id instance_count)
     end
 
+    def self.mycount(date)
+      taken_at = "#{date}15".to_date
+      month_start = taken_at.beginning_of_month
+      month_end = taken_at.end_of_month
+      ServerStat.count(
+        :all,
+        :conditions => ["taken_at between :start and :end", { :start => month_start, :end => month_end}]
+      )
+    end
+
     def self.fix(date,reduce)
       taken_at = "#{date}15".to_date
       month_start = taken_at.beginning_of_month

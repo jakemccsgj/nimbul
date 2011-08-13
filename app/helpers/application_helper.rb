@@ -744,4 +744,8 @@ module ApplicationHelper
     def close_redbox_link(text, redbox)
         link_to_function text, "$('#{redbox}').hide(); $('#{redbox}').innerHTML = '';"
     end
+
+    def to_month_day(date)
+        date.strftime('%b %d, %Y')
+    end
 end

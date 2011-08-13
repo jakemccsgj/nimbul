@@ -23,7 +23,7 @@ Last Update: <%= time_ago_in_words @server_profile_revision.updated_at %>
 <br />
 
     <h1><%= f.label :image_id, 'Server Image' %>: 
-    <%= f.collection_select :image_id, @server_images, :image_id, :name, :prompt => "Choose One" %></h1>
+    <%= f.collection_select :server_image_id, @server_images, :id, :name, :prompt => "Choose One" %></h1>
 
 <br />
 

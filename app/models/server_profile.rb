@@ -10,8 +10,8 @@ class ServerProfile < BaseModel
 
     validates_presence_of :name
 
-	attr_accessor :should_destroy
-	attr_accessor :status_message
+    attr_accessor :should_destroy
+    attr_accessor :status_message
 
     def should_destroy?
         should_destroy.to_i == 1
@@ -29,5 +29,4 @@ class ServerProfile < BaseModel
     def self.search_fields
         %w(name description)
     end
-
 end

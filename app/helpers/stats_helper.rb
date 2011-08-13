@@ -20,4 +20,28 @@ module StatsHelper
 
     javascript_tag(remote_function(:url => url, :method => :get) )
   end
+
+  def time_period_link(text, param, update)
+    action = :index
+    params[:action] = action
+    params.merge!({:sort => key, :page => nil, :refresh => nil})
+    url = {
+      :action => action,
+      :params => params,
+    }
+    href =  url_for(
+      :action => action,
+      :params => params
+    )
+    options = {
+      :url => url,
+      :update => update,
+      :method => :get,
+    }
+    html_options = {
+      :title => 'Include',
+      :href => href,
+    }
+    link_to_remote(text, options, html_options)
+  end
 end

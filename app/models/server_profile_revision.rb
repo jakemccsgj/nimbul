@@ -2,12 +2,13 @@ class ServerProfileRevision < BaseModel
   belongs_to :server_profile
   belongs_to :creator, :class_name => 'User'
   belongs_to :instance_vm_type
+  belongs_to :server_image
   
   has_many :servers
   has_many :server_profile_revision_parameters, :order => "position"
   
   validates_presence_of :revision, :creator_id, :commit_message
-  validates_presence_of :image_id, :instance_vm_type_id
+  validates_presence_of :server_image_id, :instance_vm_type_id
   
   after_save :save_server_profile_revision_parameters
   
@@ -17,20 +18,16 @@ class ServerProfileRevision < BaseModel
     should_destroy.to_i == 1
   end
   
-  # prevent the destruction if there are related servers
-  def destroy
-    unless servers.empty?
-      status_message = 'There are Servers associated with this Profile Revision'
-      return false
-    end
-    super
-  end
-  
-    attr_accessor :status_message
+  attr_accessor :status_message
 
   def instance_type
     return nil if self.instance_vm_type.nil?
     return self.instance_vm_type.api_name
+  end
+
+  def image_id
+    return nil if server_image.nil?
+    return server_image.image_id
   end
 
   def is_head?
@@ -52,29 +49,28 @@ class ServerProfileRevision < BaseModel
     end
   end
 
-    def save_server_profile_revision_parameters
-        server_profile_revision_parameters.each do |c|
-            if c.should_destroy?
-                c.destroy
-            else
-                c.save(false)
-            end
-        end
+  def save_server_profile_revision_parameters
+    server_profile_revision_parameters.each do |c|
+      if c.should_destroy?
+        c.destroy
+      else
+        c.save(false)
+      end
     end
+  end
 
-    #
-    # sort, search and paginate parameters
-    #
-    def self.per_page
-        10
-    end
+  #
+  # sort, search and paginate parameters
+  #
+  def self.per_page
+    10
+  end
 
-    def self.sort_fields
-        %w(name image_id)
-    end
+  def self.sort_fields
+    %w(name server_image_id)
+  end
 
-    def self.search_fields
-        %w(name image_id)
-    end
-
+  def self.search_fields
+    %w(name server_image_id)
+  end
 end

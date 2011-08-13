@@ -6,7 +6,7 @@ class ServerImage < BaseModel
     belongs_to :cpu_profile
     belongs_to :storage_type
 
-    has_many :server_profile_revisions, :primary_key => :image_id, :foreign_key => :image_id
+    has_many :server_profile_revisions, :dependent => :nullify
     has_many :launch_configurations, :dependent => :nullify
 
     set_inheritance_column :server_image_type
@@ -14,26 +14,17 @@ class ServerImage < BaseModel
     validates_presence_of :name
     validates_uniqueness_of :name, :scope => :provider_account_id
     validates_uniqueness_of :image_id, :scope => :provider_account_id, :message => 'There is already an Image with this AMI ID.'
-    validates_uniqueness_of :location, :scope => :provider_account_id, :message => 'There is already an Image with this Manifest Path'
     validates_presence_of :image_id, :if => :image_id_and_location_are_blank, :message => 'You have to specify AMI ID (existing Images) or a Manifest Path (new Images)'
     validates_presence_of :location, :if => :image_id_and_location_are_blank, :message => 'You have to specify AMI ID (existing Images) or a Manifest Path (new Images)'
     
     attr_accessor :should_destroy, :status_message, :destroyed
     
-    before_destroy :ensure_no_usage
     after_destroy :mark_as_destroyed
     
     def image_id_and_location_are_blank
         self.image_id.blank? and self.location.blank?
     end
     
-    def ensure_no_usage
-        unless self.server_profile_revisions.empty?
-            self.errors.add(:name, "#{self.name} - can't destroy, there are server profiles using this server image.")
-            raise ActiveRecord::Rollback
-        end
-    end
-
     def mark_as_destroyed
         self.destroyed = true
     end
@@ -141,23 +132,23 @@ class ServerImage < BaseModel
     end
     
     def allocate!
-        begin
+        #begin
             if self.image_id
                 Ec2Adapter.refresh_server_image(self)
             else
                 Ec2Adapter.register_server_image(self)
             end
             self.save
-        rescue
-            if self.location
-                self.errors.add(:location, "#{$!}")
-            else
-                self.errors.add(:image_id, "#{$!}")
-            end
-            self.status_message = "Failed to add server image: #{$!}"
-            self.destroy
-            return false
-        end
+        #rescue
+        #    if self.location
+        #        self.errors.add(:location, "#{$!}")
+        #    else
+        #        self.errors.add(:image_id, "#{$!}")
+        #    end
+        #    self.status_message = "Failed to add server image: #{$!}"
+        #    self.destroy
+        #    return false
+        #end
         return true
     end
 

@@ -74,10 +74,11 @@
 <h1>
   Spending by Cluster, Server in <%= @parent_type.to_s.titleize %> "<%=h @parent.name %>"
 </h1>
-<%= (@latest_taken_at.nil? ? '' : "Last updated: "+time_and_time_ago(@latest_taken_at)) %>
+From <%= to_month_day(@start_date) %> to <%= to_month_day(@end_date) -%>
+<% unless @latest_taken_at.nil? %>, as of <%= to_month_day(@latest_taken_at) %><% end %>
 <hr/>
 <% if @server_stats.empty? %>
-  The Statistics are collected every <%=time_ago_in_words(Time.now - StatsAdapter.frequency()).sub('about ','') %>. No Statistics have been collected for this Account yet.
+  Data is collected every <%=time_ago_in_words(Time.now - StatsAdapter.frequency()).sub('about ','') %>. No data found.
   <br/>
   <br/>
 <% else %>
@@ -94,13 +95,13 @@
           <%= stats_sort_link "Instance Type", "instance_vm_type_id" %>
         </th>
         <th <%= sort_td_class_helper "instance_count" %>>
-          <%= stats_sort_link "Hours This Month", "instance_count" %>
+          <%= stats_sort_link "Hours This Period", "instance_count" %>
         </th>
         <th <%= sort_td_class_helper "server_cost" %>>
-          <%= stats_sort_link "Server Cost This Month", "server_cost" %>
+          <%= stats_sort_link "Server Cost This Period", "server_cost" %>
         </th>
         <th <%= sort_td_class_helper "cluster_cost" %>>
-          <%= stats_sort_link "Cluster Cost This Month", "cluster_cost" %>
+          <%= stats_sort_link "Cluster Cost This Period", "cluster_cost" %>
         </th>
         <% unless @projection.nil? %>
           <th <%= sort_td_class_helper "projection_cost" %>>

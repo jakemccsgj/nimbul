@@ -39,7 +39,11 @@ class Parent::StatsController < ApplicationController
       running_select[1] = "i.provider_account_id=:provider_account_id"
       running_condition = { :provider_account_id => @parent.id }
     elsif @parent.is_a? Cluster
-      running_select[1] = "i.server_id in (#{@parent.server_ids.join(',')})"
+      if @parent.server_ids.empty?
+        running_select[1] = "i.server_id=0"
+      else
+        running_select[1] = "i.server_id in (#{@parent.server_ids.join(',')})"
+      end
       running_condition = {}
     elsif @parent.is_a? Server
       running_select[1] = "i.server_id=:server_id"
@@ -63,24 +67,48 @@ class Parent::StatsController < ApplicationController
       stats_condition = "cluster_id in (#{@parent.cluster_ids.join(',')})"
     end
 
-    if params[:year].nil? or params[:month].nil?
-      @latest_taken_at = ServerStat.maximum(:taken_at, :conditions => stats_condition)
+    @latest_taken_at = nil
+    @start_date = nil
+    @end_date = nil
 
-      month_start = @latest_taken_at.beginning_of_month unless @latest_taken_at.nil?
-      month_end = @latest_taken_at.end_of_month unless @latest_taken_at.nil?
+    if params[:year].nil?
+      @start_date = Date.current.beginning_of_month
+      @end_date = Date.current.end_of_month
+    elsif params[:month].nil?
+      @start_date = "#{params[:year]}0115".to_date.beginning_of_month
+      @end_date = "#{params[:year]}1215".to_date.end_of_month
+    elsif params[:toyear].nil?
+      @start_date = "#{params[:year]}#{params[:month]}15".to_date.beginning_of_month
+      @end_date = "#{params[:year]}#{params[:month]}15".to_date.end_of_month
+    elsif params[:tomonth].nil?
+      @start_date = "#{params[:year]}#{params[:month]}15".to_date.beginning_of_month 
+      @end_date = "#{params[:toyear]}0115".to_date.beginning_of_month
     else
-      @latest_taken_at = "#{params[:year]}#{params[:month]}15".to_date
-      month_start = @latest_taken_at.beginning_of_month
-      month_end = @latest_taken_at.end_of_month
-      @latest_taken_at = month_end
+      @start_date = "#{params[:year]}#{params[:month]}15".to_date.beginning_of_month
+      @end_date = "#{params[:toyear]}#{params[:tomonth]}15".to_date.end_of_month
     end
+
+    conditions = [
+      "#{stats_condition} and taken_at between :start_date and :end_date",
+      { :start_date => @start_date, :end_date => @end_date}
+    ]
+
+    @latest_taken_at = ServerStat.maximum(
+      :taken_at,
+      :conditions => conditions
+    )
 
     if @latest_taken_at.nil?
       @server_stats = []
     else
-      days_passed = @latest_taken_at - month_start
-      days_left = month_end - @latest_taken_at 
-      @multiplier = (days_passed + days_left) / days_passed
+      @latest_taken_at = @latest_taken_at.to_date
+      if @latest_taken_at >= @end_date
+          @multiplier = 1
+      else
+          days_passed = (@latest_taken_at - @start_date).to_f
+          days_left = (@end_date - @latest_taken_at).to_f
+          @multiplier = (days_passed + days_left) / days_passed
+      end
 
       order = ServerStat.sort_fields[0]
       if !params[:sort].nil? and ServerStat.sort_fields.include?(params[:sort].sub(/_reverse/,''))
@@ -90,7 +118,7 @@ class Parent::StatsController < ApplicationController
       @server_stats = ServerStat.find(
         :all,
         :select => 'cluster_id, server_id, instance_vm_type_id, sum(instance_count) as instance_count',
-        :conditions => ["#{stats_condition} and taken_at between :month_start and :month_end", { :month_start => month_start, :month_end => month_end}],
+        :conditions => conditions,
         :group => 'cluster_id, server_id, instance_vm_type_id',
         :include => [ { :instance_vm_type => :vm_prices }, :cluster, :server],
         :order => order
@@ -100,6 +128,7 @@ class Parent::StatsController < ApplicationController
     cluster_id = nil
     first_ss = nil
     @total = BigDecimal('0.0')
+    @projection = nil
     @server_stats.each do |ss|
        if cluster_id.nil? or cluster_id != ss.cluster_id
            cluster_id = ss.cluster_id
