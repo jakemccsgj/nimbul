@@ -20,7 +20,7 @@ ActionController::Routing::Routes.draw do |map|
       :only => [ :index, :total ]
   end
 
-  map.resources :app, :collection => { :sort => :post } do |app|
+  map.resources :apps, :collection => { :sort => :post } do |app|
     app.resources :stats,
       :controller => 'parent/stats',
       :collection => { :total => :get },

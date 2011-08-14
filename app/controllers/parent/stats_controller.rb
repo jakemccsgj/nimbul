@@ -133,7 +133,7 @@ class Parent::StatsController < ApplicationController
     first_ss = nil
     @total = BigDecimal('0.0')
     @projection = BigDecimal('0.0')
-    @server_stats.sort{|a,b| a.cluster.name <=> b.cluster.name}.each do |ss|
+    @server_stats.each do |ss|
        if cluster_id.nil? or cluster_id != ss.cluster_id
            cluster_id = ss.cluster_id
            first_ss = ss
