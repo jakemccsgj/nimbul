@@ -93,6 +93,9 @@ class Parent::StatsController < ApplicationController
       { :start_date => @start_date, :end_date => @end_date}
     ]
 
+    @bar_start_date = ServerStat.minimum(:taken_at)
+    @bar_end_date = ServerStat.maximum(:taken_at)
+
     @latest_taken_at = ServerStat.maximum(
       :taken_at,
       :conditions => conditions

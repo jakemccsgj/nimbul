@@ -13,6 +13,11 @@ ActionController::Routing::Routes.draw do |map|
       :controller => 'parent/stats',
       :collection => { :total => :get },
       :only => [ :index, :total ]
+    account_group.connect 'stats/:year',
+      :year => /\d{4}/,
+      :controller => 'parent/stats',
+      :collection => { :total => :get },
+      :only => [ :index, :total ]
     account_group.connect 'stats/:year/:month',
       :year => /\d{4}/, :month => /\d{2}/,
       :controller => 'parent/stats',
@@ -32,18 +37,6 @@ ActionController::Routing::Routes.draw do |map|
       :only => [ :index, :total ]
     app.connect 'stats/:year/:month',
       :year => /\d{4}/, :month => /\d{2}/,
-      :controller => 'parent/stats',
-      :collection => { :total => :get },
-      :only => [ :index, :total ]
-    app.connect 'stats/:year/:month/:toyear',
-      :year => /\d{4}/, :month => /\d{2}/,
-      :toyear => /\d{4}/,
-      :controller => 'parent/stats',
-      :collection => { :total => :get },
-      :only => [ :index, :total ]
-    app.connect 'stats/:year/:month/:toyear/:tomonth',
-      :year => /\d{4}/, :month => /\d{2}/,
-      :toyear => /\d{4}/, :tomonth => /\d{2}/,
       :controller => 'parent/stats',
       :collection => { :total => :get },
       :only => [ :index, :total ]
@@ -118,6 +111,11 @@ ActionController::Routing::Routes.draw do |map|
         provider_account.resources :dns_leases, :controller => 'provider_account/dns_leases',
             :collection => { :release => :delete, :list => :any  }, :except => [ :destroy, :edit, :new, :update, :create ]
         provider_account.resources :stats,
+            :controller => 'parent/stats',
+            :collection => { :total => :get },
+            :only => [ :index, :total ]
+        provider_account.connect 'stats/:year',
+            :year => /\d{4}/,
             :controller => 'parent/stats',
             :collection => { :total => :get },
             :only => [ :index, :total ]
@@ -270,6 +268,11 @@ ActionController::Routing::Routes.draw do |map|
             :controller => 'parent/stats',
             :collection => { :total => :get },
             :only => [ :index, :total ]
+        cluster.connect 'stats/:year',
+            :year => /\d{4}/,
+            :controller => 'parent/stats',
+            :collection => { :total => :get },
+            :only => [ :index, :total ]
         cluster.connect 'stats/:year/:month',
             :year => /\d{4}/, :month => /\d{2}/,
             :controller => 'parent/stats',
@@ -334,6 +337,11 @@ ActionController::Routing::Routes.draw do |map|
             :only => [ :index, :list, :show ]
         server.resources :security_groups, :controller => 'server/security_groups', :only => [ :destroy ]
         server.resources :stats,
+            :controller => 'parent/stats',
+            :collection => { :total => :get },
+            :only => [ :index, :total ]
+        server.connect 'stats/:year',
+            :year => /\d{4}/,
             :controller => 'parent/stats',
             :collection => { :total => :get },
             :only => [ :index, :total ]

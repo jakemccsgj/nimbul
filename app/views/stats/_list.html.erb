@@ -77,8 +77,10 @@
 From <%= to_month_day(@start_date) %> to <%= to_month_day(@end_date) -%>
 <% unless @latest_taken_at.nil? %>, as of <%= to_month_day(@latest_taken_at) %><% end %>
 <hr/>
+<%= stats_date_bar(@bar_start_date,@bar_end_date) %>
 <% if @server_stats.empty? %>
-  Data is collected every <%=time_ago_in_words(Time.now - StatsAdapter.frequency()).sub('about ','') %>. No data found.
+Data is collected every <%=time_ago_in_words(Time.now - StatsAdapter.frequency()).sub('about ','') %>.
+No data found for the period specified.
   <br/>
   <br/>
 <% else %>
