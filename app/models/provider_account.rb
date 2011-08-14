@@ -39,6 +39,7 @@ class ProviderAccount < BaseModel
     has_many :volumes, :class_name => 'CloudVolume', :dependent => :destroy
     has_many :snapshots, :class_name => 'CloudSnapshot', :dependent => :destroy
     has_many :storage_types, :through => :provider, :order => :name
+    has_many :server_profiles, :order => :name, :dependent => :destroy
 
   # iam service
   #    has_many :iam_resources, :dependent => :destroy

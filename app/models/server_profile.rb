@@ -2,8 +2,6 @@ class ServerProfile < BaseModel
     belongs_to :provider_account
     belongs_to :creator, :class_name => 'User'
 
-    has_and_belongs_to_many :provider_accounts
-
     has_many :server_profile_revisions, :order => :revision, :dependent => :destroy
     has_many :server_profile_user_accesses, :dependent => :destroy
     has_many :users, :through => :server_profile_user_accesses

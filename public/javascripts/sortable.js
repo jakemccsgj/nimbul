@@ -132,10 +132,12 @@ function ts_resortTable(lnk, clid) {
 	newRows.sort(sortfn);
 	if (span.getAttribute("sortdir") == 'down') {
 			ARROW = '&nbsp;&nbsp;<img src="'+ image_path + image_down + '" alt="&darr;"/>';
+DIRECTION='down';
 			newRows.reverse();
 			span.setAttribute('sortdir','up');
 	} else {
 			ARROW = '&nbsp;&nbsp;<img src="'+ image_path + image_up + '" alt="&uarr;"/>';
+DIRECTION='up';
 			span.setAttribute('sortdir','down');
 	} 
     // We appendChild rows that already exist to the tbody, so it moves them rather than creating new ones
@@ -155,11 +157,16 @@ function ts_resortTable(lnk, clid) {
 	for (var ci=0;ci<allspans.length;ci++) {
 		if (allspans[ci].className == 'sortarrow') {
 			if (getParent(allspans[ci],"table") == getParent(lnk,"table")) { // in the same table as us?
-				allspans[ci].innerHTML = '&nbsp;&nbsp;<img src="'+ image_path + image_none + '" alt="&darr;"/>';
+//				allspans[ci].innerHTML = '&nbsp;&nbsp;<img src="'+ image_path + image_none + '" alt="&darr;"/>';
+var cell = allspans[ci].parentNode.parentNode;
+cell.className = cell.className.replace('sortup','').replace('sortdown','');
 			}
 		}
 	}		
-	span.innerHTML = ARROW;
+//	span.innerHTML = ARROW;
+var cell = span.parentNode.parentNode;
+var className = cell.className.replace('sortup','').replace('sortdown',''); 
+cell.className = className+' sort'+DIRECTION;
 	alternate(t);
 }
 

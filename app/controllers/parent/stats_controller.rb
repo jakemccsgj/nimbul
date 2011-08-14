@@ -107,7 +107,11 @@ class Parent::StatsController < ApplicationController
       else
           days_passed = (@latest_taken_at - @start_date).to_f
           days_left = (@end_date - @latest_taken_at).to_f
-          @multiplier = (days_passed + days_left) / days_passed
+          if days_passed == 0
+              @multiplier = 30
+          else
+              @multiplier = (days_passed + days_left) / days_passed
+          end
       end
 
       order = ServerStat.sort_fields[0]
@@ -128,8 +132,8 @@ class Parent::StatsController < ApplicationController
     cluster_id = nil
     first_ss = nil
     @total = BigDecimal('0.0')
-    @projection = nil
-    @server_stats.each do |ss|
+    @projection = BigDecimal('0.0')
+    @server_stats.sort{|a,b| a.cluster.name <=> b.cluster.name}.each do |ss|
        if cluster_id.nil? or cluster_id != ss.cluster_id
            cluster_id = ss.cluster_id
            first_ss = ss
@@ -140,7 +144,7 @@ class Parent::StatsController < ApplicationController
        first_ss.cluster_cost += ss.server_cost unless ss.server_cost.nil?
        @total += ss.server_cost unless ss.server_cost.nil?
     end
-    @projection = @total*@multiplier unless @multiplier.nil? or (@multiplier == 1)
+    @projection = @total*@multiplier unless @multiplier.nil?
   end
 
   def index

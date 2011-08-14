@@ -1050,6 +1050,7 @@ ActiveRecord::Schema.define(:version => 20110811214030) do
     t.integer  "revision",            :default => 0
     t.integer  "creator_id"
     t.text     "commit_message"
+    t.string   "image_id"
     t.string   "ramdisk_id"
     t.string   "kernel_id"
     t.text     "startup_script"
