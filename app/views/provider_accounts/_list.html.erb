@@ -6,7 +6,6 @@
 <table class="sortable" id="provider_accounts_table">
   <thead>
   <tr>
-    <th class="unsortable"><% if @provider_accounts.total_entries > 0 %><%= select_all_check_box 'select_all' %><% end %></th>
     <th>
       Name
     </th>
@@ -23,6 +22,9 @@
     <th>Projection</th>
     <th class="unsortable">
       Last Refreshed
+    </th>
+    <th class="unsortable">
+      Actions
     </th>
   </tr>
   </thead>

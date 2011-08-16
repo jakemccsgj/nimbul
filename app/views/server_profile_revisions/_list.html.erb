@@ -1,0 +1,17 @@
+<% @server_profile_revisions ||= [] %>
+<% unless @server_profile_revisions.empty? %>
+  <b>Server Profiles that use <%=h @parent.name %></b><small><br/></small>
+  <table class="sortable" id="<%= @parent_type %>_<%= @parent.id %>_server_profile_revisions_table">
+    <thead>
+    <tr>
+      <th>Servers</th>
+      <th>Instance Type</th>
+      <th>Last Updated By</th>
+      <!--th>Message</th-->
+      <th class="unsortable">Actions</th>
+    </tr>
+    </thead>
+    <%= render :partial => 'server_profile_revision', :collection => @server_profile_revisions %>
+  </table>
+  <%= javascript_tag('sortables_init();') %>
+<% end %>

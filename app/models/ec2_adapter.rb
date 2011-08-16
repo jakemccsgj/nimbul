@@ -860,7 +860,8 @@ class Ec2Adapter
         if reservation and reservation[:groups]
             security_groups = (account_security_groups.select{ |g| reservation[:groups].include?(g.api_name) })
         end
-        instance.security_groups = ( security_groups || [] )
+        instance.security_groups = []
+        instance.security_groups = security_groups
 
         # get zone information
         unless zone_name.blank?

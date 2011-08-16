@@ -1,0 +1,8 @@
+    <% fields_for "server_image_category", server_image_category do |f| %>
+    <% content_tag_for :tr, server_image_category, :readonly => false, :class => '' do %>
+        <%= f.hidden_field :id, :index => nil %>
+        <td class="handle">[drag]</td>
+        <td><%= link_to_remote h(server_image_category.name), :url => send("edit_#{ @parent_type }_server_image_category_url", @parent, server_image_category), :method => :get %></td>
+        <td><%= remove_provider_account_server_image_category_link('Delete', @parent, server_image_category) %></td>
+    <% end %>
+    <% end %>

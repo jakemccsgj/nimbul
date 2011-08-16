@@ -1,3 +1,7 @@
 <% content_tag_for :tr, server_image, :class => 'selectable server_image_record '+(server_image.state == 'unavailable' ? server_image.state : '') do %>
     <%= render :partial => 'server_images/row', :locals => { :server_image => server_image } %>
 <% end %>
+<tr id="server_image_<%= server_image.id %>_server_profile_revisions_row" class="server_image_server_profile_revisions" style="display: none;">
+    <td colspan="2"><strong><%= h(server_image.name) %></strong></td>
+    <td colspan="7"><div id="server_image_<%= server_image.id %>_server_profile_revisions_index"></div></td>
+</tr>

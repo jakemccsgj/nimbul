@@ -9,6 +9,8 @@ class ServerImage < BaseModel
     has_many :server_profile_revisions, :dependent => :nullify
     has_many :launch_configurations, :dependent => :nullify
 
+    has_and_belongs_to_many :server_image_groups, :uniq => true
+
     set_inheritance_column :server_image_type
 
     validates_presence_of :name
@@ -171,7 +173,7 @@ class ServerImage < BaseModel
     end
 
     def self.sort_fields
-        %w(name image_id location cpu_profile_id state owner_id is_public is_enabled provider_account_id)
+        %w(name image_id storage_type_id location cpu_profile_id state owner_id is_public is_enabled provider_account_id)
     end
 
     def self.search_fields

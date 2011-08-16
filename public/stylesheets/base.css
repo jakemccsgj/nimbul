@@ -6,50 +6,50 @@ version: 3.0.0pr1
 */
 /* base.css, part of YUI's CSS Foundation */
 h1 {
-	font-size:13px;  
+    font-size:13px;  
 }
 h2 {
-	font-size:123.1%; 
+    font-size:123.1%; 
 }
 h3 {
-	font-size:108%;  
+    font-size:108%;  
 }
 h1,h2,h3 {
-	/* top & bottom margin based on font size */
-	margin:1em 0;
+    /* top & bottom margin based on font size */
+    margin:1em 0;
 }
 h1,h2,h3,h4,h5,h6,strong {
-	/*bringing boldness back to headers and the strong element*/
-	font-weight:bold; 
+    /*bringing boldness back to headers and the strong element*/
+    font-weight:bold; 
 }
 abbr,acronym {
-	/*indicating to users that more info is available */
-	border-bottom:1px dotted #000;
-	cursor:help;
+    /*indicating to users that more info is available */
+    border-bottom:1px dotted #000;
+    cursor:help;
 } 
 em {
-	/*bringing italics back to the em element*/
-	font-style:italic;
+    /*bringing italics back to the em element*/
+    font-style:italic;
 }
 blockquote,ul,ol,dl {
-	/*giving blockquotes and lists room to breath*/
-	margin:1em;
+    /*giving blockquotes and lists room to breath*/
+    margin:1em;
 }
 ol,ul,dl {
-	/*bringing lists on to the page with breathing room */
-	margin-left:2em;
+    /*bringing lists on to the page with breathing room */
+    margin-left:2em;
 }
 ol li {
-	/*giving OL's LIs generated numbers*/
-	list-style: decimal outside;	
+    /*giving OL's LIs generated numbers*/
+    list-style: decimal outside;    
 }
 ul li {
-	/*giving UL's LIs generated disc markers*/
-	list-style: disc outside;
+    /*giving UL's LIs generated disc markers*/
+    list-style: disc outside;
 }
 dl dd {
-	/*giving UL's LIs generated numbers*/
-	margin-left:1em;
+    /*giving UL's LIs generated numbers*/
+    margin-left:1em;
 }
 .table {
     display: table;
@@ -63,23 +63,23 @@ dl dd {
     display: table-row;
 }
 th {
-	border:1px solid #DCDCDC;
-	padding:.5em;
-	font-weight:bold;
-	text-align:center;
+    border:1px solid #DCDCDC;
+    padding:.5em;
+    font-weight:bold;
+    text-align:center;
 }
 th.vertical {
-	text-align:right;
-	vertical-align:top;
+    text-align:right;
+    vertical-align:top;
 }
 .th {
     display: table-cell;
     background-color: #E7E7E7;
     color: #777777;
-	border:1px solid #DCDCDC;
-	padding:.5em;
-	font-weight:bold;
-	text-align:center;
+    border:1px solid #DCDCDC;
+    padding:.5em;
+    font-weight:bold;
+    text-align:center;
 }
 td {
     border:1px solid #E7E7E7;
@@ -89,10 +89,16 @@ td {
     line-height: 13px;
 }
 td.noborder {
-	border:0px;
-	padding:.1em;
-	spacing:0px;
-	vertical-align:middle;
+    border:0px;
+    padding:.1em;
+    spacing:0px;
+    vertical-align:middle;
+}
+td.forms {
+    border:0px;
+    padding:0.4em;
+    spacing:0px;
+    vertical-align:top;
 }
 td.dashboard {
     padding:0.4em;
@@ -100,16 +106,16 @@ td.dashboard {
 .td {
     display: table-cell;
     color: #000000;
-	border:1px solid #E7E7E7;
-	padding:.2em;
-	vertical-align:middle;
+    border:1px solid #E7E7E7;
+    padding:.2em;
+    vertical-align:middle;
 }
 caption {
-	margin-bottom:.5em;
-	text-align:center;
+    margin-bottom:.5em;
+    text-align:center;
 }
 p,fieldset,table,pre {
-	margin-bottom:1em;
+    margin-bottom:1em;
 }
 input[type=text],input[type=password]{
     width: 12.25em;

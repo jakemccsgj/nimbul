@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110811214030) do
+ActiveRecord::Schema.define(:version => 20110816052952) do
 
   create_table "access_requests", :force => true do |t|
     t.string   "state"
@@ -986,6 +986,37 @@ ActiveRecord::Schema.define(:version => 20110811214030) do
   add_index "security_groups_users", ["security_group_id"], :name => "index_security_groups_users_on_security_group_id"
   add_index "security_groups_users", ["user_id"], :name => "index_security_groups_users_on_user_id"
 
+  create_table "server_image_categories", :force => true do |t|
+    t.integer  "provider_account_id"
+    t.string   "name"
+    t.integer  "position"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "server_image_categories", ["provider_account_id"], :name => "index_server_image_categories_on_provider_account_id"
+
+  create_table "server_image_groups", :force => true do |t|
+    t.integer  "provider_account_id"
+    t.integer  "server_image_category_id"
+    t.string   "name"
+    t.text     "description"
+    t.integer  "position"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "server_image_groups", ["provider_account_id"], :name => "index_server_image_groups_on_provider_account_id"
+  add_index "server_image_groups", ["server_image_category_id"], :name => "index_server_image_groups_on_server_image_category_id"
+
+  create_table "server_image_groups_server_images", :id => false, :force => true do |t|
+    t.integer "server_image_group_id"
+    t.integer "server_image_id"
+  end
+
+  add_index "server_image_groups_server_images", ["server_image_group_id"], :name => "index_server_image_groups_server_images_on_server_image_group_id"
+  add_index "server_image_groups_server_images", ["server_image_id"], :name => "index_server_image_groups_server_images_on_server_image_id"
+
   create_table "server_images", :force => true do |t|
     t.string   "image_id"
     t.integer  "provider_account_id"
@@ -1050,7 +1081,6 @@ ActiveRecord::Schema.define(:version => 20110811214030) do
     t.integer  "revision",            :default => 0
     t.integer  "creator_id"
     t.text     "commit_message"
-    t.string   "image_id"
     t.string   "ramdisk_id"
     t.string   "kernel_id"
     t.text     "startup_script"

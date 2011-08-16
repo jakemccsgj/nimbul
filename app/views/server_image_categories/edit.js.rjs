@@ -1,0 +1,3 @@
+page[:edit_server_image_category].replace_html :partial => "form", :object => @server_image_category
+page[:add_server_image_category].hide
+page[:edit_server_image_category].appear

@@ -12,7 +12,10 @@
         <% end -%>
     </td>
 <% end -%>
-<td><%=h server_image.image_id %></td>
+<td>
+    <%=h server_image.image_id %>
+    <%= show_hide_server_image_server_profile_revisions_link server_image, 'show', 'hide' -%>
+</td>
 <td><%= edit_in_place(server_image, :name, :class => 'server-image-editable') %></td>
 <td><%= server_image.storage_type.nil? ? '&nbsp;' : h(server_image.storage_type.api_name) %></td>
 <td><%=h server_image.architecture %></td>

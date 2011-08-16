@@ -9,6 +9,29 @@ module ProviderAccountsHelper
         link_to link_text, url, html_options
     end
 
+    def remove_provider_account_link(text, provider_account)
+        url = provider_account_url(provider_account)
+
+        confirm = 'Are you sure?\n\n'
+        confirm += 'All metadata associated this account will be deleted.\n\n'
+        confirm += 'This includes all servers, groups, firewall rules, storage and addresses metadata.\n\n'
+        confirm += 'This action cannot be undone.\n'
+        double_confirm = 'Type yes to confirm that you want to delete the account.'
+        link_text = image_tag("trash.png", :class => 'control-icon', :alt => text)
+
+        options = {
+            :condition => "confirm('#{confirm}') && ('yes' == prompt('#{double_confirm}'))",
+            :url => url,
+            :method => :delete,
+        }
+        html_options = {
+            :title => text,
+            :href => url,
+            :method => :delete,
+        }
+        link_to_remote link_text, options, html_options
+    end
+
     def delete_provider_accounts_submit(text)
         empty_selection_msg = "Please select accounts to delete."
         confirm_msg = 'Are you sure?\n\n'

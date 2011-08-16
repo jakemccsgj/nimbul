@@ -64,5 +64,31 @@ module ServerImagesHelper
         }
         image_submit_tag 'disable.png', html_options
     end
-    
+
+    def show_hide_server_image_server_profile_revisions_link(server_image, show = 'show', hide = 'hide')
+        expand_span_id = "expand_server_image_#{server_image.id}_server_profile_revisions"
+        compress_span_id = "compress_server_image_#{server_image.id}_server_profile_revisions"
+        server_profile_revisions_row_id = "server_image_#{server_image.id}_server_profile_revisions_row"
+
+        html_options = {
+            :class => 'bare-link',
+        }
+
+        link_text = "<small><br/>" + server_image.server_profile_revisions.count.to_s + " total server profiles(#{show})</small>"
+        options = {
+            :url => server_image_server_profile_revisions_path(server_image),
+            :method => :get,
+            :success => "$('#{expand_span_id}').hide(); $('#{compress_span_id}').show(); $('#{server_profile_revisions_row_id}').show();",
+        }
+        show_link = link_to_remote link_text, options, html_options
+
+        link_text = "<small><br/>" + server_image.server_profile_revisions.count.to_s + " total server profiles (#{hide})</small>"
+        js_function1 = "$('#{compress_span_id}').hide(); $('#{expand_span_id}').show(); $('#{server_profile_revisions_row_id}').innerHTML = '';"
+        js_function = "$('#{compress_span_id}').hide(); $('#{expand_span_id}').show(); $('#{server_profile_revisions_row_id}').hide();"
+        hide_link = link_to_function link_text, js_function, html_options
+
+        result = content_tag(:span, show_link, { :id => expand_span_id })
+        result += content_tag(:span, hide_link, { :id => compress_span_id, :style => 'display:none;' })
+        return result
+    end    
 end

@@ -40,6 +40,8 @@ class ProviderAccount < BaseModel
     has_many :snapshots, :class_name => 'CloudSnapshot', :dependent => :destroy
     has_many :storage_types, :through => :provider, :order => :name
     has_many :server_profiles, :order => :name, :dependent => :destroy
+    has_many :server_image_categories, :order => :position, :dependent => :destroy
+    has_many :server_image_groups, :order => 'server_image_category_id, position', :dependent => :destroy
 
   # iam service
   #    has_many :iam_resources, :dependent => :destroy
@@ -75,6 +77,12 @@ class ProviderAccount < BaseModel
 
     def instance_vm_types
         provider.instance_vm_types
+    end
+
+    def can_use_more_of?(provider_account_resource_type)
+        return true if provider_account_resource_type == 'ServerImageCategory'
+        return true if provider_account_resource_type == 'ServerImageGroup'
+        return false
     end
 
   def messaging_valid?

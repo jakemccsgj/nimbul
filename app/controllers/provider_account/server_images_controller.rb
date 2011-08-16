@@ -4,32 +4,32 @@ class ProviderAccount::ServerImagesController < ApplicationController
     require_role  :admin, :unless => "current_user.has_access?(parent)"
 
     def index
-		# commented out refresh from ui for performance reasons
-	    parent.refresh(params[:refresh]) if params[:refresh] and parent.respond_to?('refresh')
-	    
+        # commented out refresh from ui for performance reasons
+        parent.refresh(params[:refresh]) if params[:refresh] and parent.respond_to?('refresh')
+        
         joins = nil
-	    conditions = nil
-	    @server_images  = ServerImage.search_by_parent(parent, params[:search], params[:page], joins, conditions, params[:sort], params[:filter], [:provider_account])
+        conditions = nil
+        @server_images  = ServerImage.search_by_parent(parent, params[:search], params[:page], joins, conditions, params[:sort], params[:filter], [:provider_account, :server_profile_revisions])
 
         @parent_type = parent_type
         @parent = parent
-		@controls_enabled = true
-	    respond_to do |format|
-	        format.html
-	        format.xml  { render :xml => @server_images }
-	        format.js
-	    end
-	end
-	def list
-		index
-	end
+        @controls_enabled = true
+        respond_to do |format|
+            format.html
+            format.xml  { render :xml => @server_images }
+            format.js
+        end
+    end
+    def list
+        index
+    end
 
     def new
         @server_image = ServerImage.new
 
         @parent_type = parent_type
         @parent = parent
-		@controls_enabled = true
+        @controls_enabled = true
         respond_to do |format|
             format.html
             format.xml  { render :xml => @server_image }
@@ -42,7 +42,7 @@ class ProviderAccount::ServerImagesController < ApplicationController
 
         @parent_type = parent_type
         @parent = parent
-		@controls_enabled = true
+        @controls_enabled = true
         respond_to do |format|
             if @server_image.save and @server_image.allocate!
                 flash[:notice] = 'Server image was successfully added.'
@@ -75,23 +75,23 @@ class ProviderAccount::ServerImagesController < ApplicationController
         
         @error_message = ''
         if @server_images.size == 0
-		    @error_message = "No server images to update."
+            @error_message = "No server images to update."
         else
-		    @server_images.each do |a|
-				if params[:command] == 'release'
-					if !a.server_profile_revisions.empty?
-						@error_message += "Couldn't release #{a.name} - it's being used by some server profiles."
-					else
-						a.release!
-					end
+            @server_images.each do |a|
+                if params[:command] == 'release'
+                    if !a.server_profile_revisions.empty?
+                        @error_message += "Couldn't release #{a.name} - it's being used by some server profiles."
+                    else
+                        a.release!
+                    end
                 end
                 a.enable! if params[:command] == 'enable'
                 a.disable! if params[:command] == 'disable'
                 if a.errors
-					@error_message += a.errors.collect{ |attr,msg| attr.humanize+' - '+msg }.join('<br />')
-				end
-		    end
-		    @message = "Server images updated."
+                    @error_message += a.errors.collect{ |attr,msg| attr.humanize+' - '+msg }.join('<br />')
+                end
+            end
+            @message = "Server images updated."
         end
 
         @controls_enabled = true

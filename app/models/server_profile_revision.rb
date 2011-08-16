@@ -4,15 +4,21 @@ class ServerProfileRevision < BaseModel
   belongs_to :instance_vm_type
   belongs_to :server_image
   
-  has_many :servers
+  has_many :servers, :dependent => :nullify
   has_many :server_profile_revision_parameters, :order => "position"
-  
+ 
+  # auditing
+  #has_many :logs, :class_name => 'AuditLog', :dependent => :nullify
+  has_many :audit_logs, :as => :auditable, :dependent => :nullify
+ 
   validates_presence_of :revision, :creator_id, :commit_message
   validates_presence_of :server_image_id, :instance_vm_type_id
   
   after_save :save_server_profile_revision_parameters
   
   attr_accessor :should_destroy
+
+  include TrackChanges # must follow any before filters
 
   def should_destroy?
     should_destroy.to_i == 1
@@ -72,5 +78,17 @@ class ServerProfileRevision < BaseModel
 
   def self.search_fields
     %w(name server_image_id)
+  end
+
+  def self.search_by_server_image(server_image, search, page, extra_joins, extra_conditions, sort=nil, filter=nil, include=nil)
+    joins = [extra_joins].flatten.compact unless extra_joins.blank?
+
+    conditions = [ 'server_image_id = ?', (server_image.is_a?(ServerImage) ? server_image.id : server_image) ]
+    unless extra_conditions.blank?
+      extra_conditions = [ extra_conditions ].flatten
+      conditions[0] << ' AND ' + extra_conditions[0];
+      conditions << extra_conditions[1..-1]
+    end
+    search(search, page, joins, conditions, sort, filter, include)
   end
 end

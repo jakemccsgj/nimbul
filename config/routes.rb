@@ -124,6 +124,8 @@ ActionController::Routing::Routes.draw do |map|
             :controller => 'parent/stats',
             :collection => { :total => :get },
             :only => [ :index, :total ]
+        provider_account.resources :server_image_categories, :collection => { :sort => :post }
+        provider_account.resources :server_image_groups, :collection => { :sort => :post }
 ########
         provider_account.resources :clusters
         provider_account.resources :provider_account_parameters
@@ -208,9 +210,12 @@ ActionController::Routing::Routes.draw do |map|
 
     # server images
     map.resources :server_images,
-           :collection => { :list => :any },
+        :collection => { :list => :any },
         :only => [  :index, :update ] do |server_image|
-        server_image.resources :servers
+        #server_image.resources :servers
+        server_image.resources :server_profile_revisions,
+            :controller => 'parent/server_profile_revisions',
+            :only => [ :index, :destroy ]
     end
 
       # security groups

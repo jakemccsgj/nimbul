@@ -1,0 +1,11 @@
+<% subtitle "New Server Image Group" %>
+
+<h1>
+  <%= link_to 'Admin Controls', admin_controls_path %>
+  / <%= link_to 'Server Image Groups', send("#{ @parent_type }_server_image_groups_path", @parent) %>
+  / New Server Image Group 
+</h1>
+
+<br/>
+
+<%= render :partial => 'form' %>
