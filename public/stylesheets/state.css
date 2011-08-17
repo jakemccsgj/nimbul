@@ -79,6 +79,7 @@ td.terminated	{
 }
 
 td.pending,
+td.starting,
 td.requested,
 td.waiting,
 td.timedout,

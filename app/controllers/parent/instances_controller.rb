@@ -31,24 +31,23 @@ class Parent::InstancesController < ApplicationController
             begin
                 if command == 'stop'
                     instance.stop!
-                    messages << "#{instance.instance_id} stopping"
+                    messages << "#{instance.instance_id} - stopping"
                 end
                 if command == 'start'
                     instance.start!
-                    messages << "#{instance.instance_id} starting"
+                    messages << "#{instance.instance_id} - starting"
                 end
                 if command == 'reboot'
                     instance.reboot!
-                    messages << "#{instance.instance_id} rebooting"
+                    messages << "#{instance.instance_id} - rebooting"
                 end
                 if command == 'terminate'
                     instance.terminate!
-                    messages << "#{instance.instance_id} terminating"
+                    messages << "#{instance.instance_id} - terminating"
                 end
             rescue  Exception => e
                 msg = "#{instance.instance_id} - failed to #{command}: #{e.message}"
                 messages << msg
-                Rails.logger.error msg+"\n\t#{e.backtrace.join("\n\t")}"
                 instance.errors.add(:state, msg)
                 success = false
             end
@@ -94,7 +93,11 @@ class Parent::InstancesController < ApplicationController
                         )
                     end
                 else
-                    @error_message = msg
+                    if msg.is_a? Array
+                        @error_messages = msg
+                    else
+                        @error_message = msg
+                    end
                 end
             end
         end
