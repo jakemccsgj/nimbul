@@ -30,6 +30,16 @@ class S3Adapter
         obj = s3.create_object(bucket, key, opts)
     end
 
+    def self.get_object(account, bucket, key)
+        s3 = get_s3(account)
+        s3.get_object(bucket, key)
+    end
+
+    def self.delete_object(account, bucket, key)
+        s3 = get_s3(account)
+        s3.delete_object(bucket, key)
+    end
+
     def self.grant_read(account, bucket, key='', readers=[])
         s3 = get_s3(account)
         owner_id = s3.get_owner_id

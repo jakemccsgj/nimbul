@@ -959,8 +959,25 @@ class Ec2Adapter
         return image_id
     end
     
-    def self.deregister_server_image(server_image)
-        ec2 = get_ec2(server_image.provider_account)
+    def self.deregister_server_image(server_image, remove_parts=true)
+        account = server_image.provider_account
+
+        # if it's not 'our' image, make it look like we've deregistered it
+        return true if server_image.owner_id != account.account_id
+
+        # remove the parts
+        if remove_parts
+            (bucket, key) = server_image.location.split('/')
+            data = S3Adapter.get_object(account, bucket, key)
+            xml_doc = REXML::Document.new(data[:body])
+            xml_doc.elements.each('//part/filename') do |elem|
+                S3Adapter.delete_object(account, bucket, elem.text)
+            end
+            S3Adapter.delete_object(account, bucket, key)
+        end
+
+        # deregister the image
+        ec2 = get_ec2(account)
         ec2.deregister_image(server_image.image_id)
         return true
     end

@@ -22,7 +22,7 @@ module ServerProfileRevisionsHelper
             html_options = {
                 :title => text,
                 :href => '#',
-                :onclick => 'alert("This Server Profile has Server(s) associated with it.\n\nPlease associate the Server(s) with a another Server Profile before removing this Server Profile."); return false;',
+                :onclick => 'alert("This Server Profile has Server(s) associated with it.\n\nPlease associate the Server(s) with a different Server Profile before removing this Server Profile."); return false;',
             }
         end
 

@@ -22,6 +22,14 @@ class ServerImage < BaseModel
     attr_accessor :should_destroy, :status_message, :destroyed
     
     after_destroy :mark_as_destroyed
+
+    def destroy
+        unless server_profile_revisions.empty?
+            errors.add_to_base "has Server Profile(s) associated with it. Please associate the Server Profile(s) with a different Server Image before removing this Server Image."
+            return false
+        end
+        super
+    end
     
     def image_id_and_location_are_blank
         self.image_id.blank? and self.location.blank?
@@ -156,9 +164,8 @@ class ServerImage < BaseModel
 
     def release!
         begin
-            self.destroy
-            if self.belongs_to_provider_account?(self.provider_account)
-                Ec2Adapter.deregister_image(self)
+            if self.destroy
+              Ec2Adapter.deregister_server_image(self)
             end
         rescue
             self.errors.add(:id, "#{$!}")
