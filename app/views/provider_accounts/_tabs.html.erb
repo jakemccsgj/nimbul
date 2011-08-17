@@ -132,10 +132,12 @@
     </li>
     <li id="auto_scaling_pane" class="pane-unselected"></li>
     <li id="images_pane" class="pane-unselected">
+        <div style="display:none;">
         <h1>Server Image Categories</h1><br/>
         <div id="<%= "provider_account_#{@provider_account.id}_server_image_categories_index" %>"></div>
         <h1>Server Image Groups</h1><br/>
         <div id="<%= "provider_account_#{@provider_account.id}_server_image_groups_index" %>"></div>
+        </div>
         <h1>Server Images</h1><br/>
         <div id="provider_account_<%= @provider_account.id %>_server_images_index"></div>
     </li>

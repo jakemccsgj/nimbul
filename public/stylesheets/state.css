@@ -61,12 +61,9 @@ td.true,
 td.succeeded,
 td.completed,
 td.running,
-td.active {
-    background-color:#C3DDC3;
-}
-
+td.active,
 td.ready {
-    background-color:#99DDDD;
+    background-color:#C3DDC3;
 }
 
 tr.admin {
@@ -87,7 +84,8 @@ td.waiting,
 td.timedout,
 td.rebooting,
 td.disabled,
-td.disabling {
+td.disabling,
+td.stopping {
     background-color: #FFFFCC;
 }
 tr.maintenance {

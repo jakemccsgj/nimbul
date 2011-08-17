@@ -29,6 +29,14 @@ class Parent::InstancesController < ApplicationController
         messages = []
         instances.each do |instance|
             begin
+                if command == 'stop'
+                    instance.stop!
+                    messages << "#{instance.instance_id} stopping"
+                end
+                if command == 'start'
+                    instance.start!
+                    messages << "#{instance.instance_id} starting"
+                end
                 if command == 'reboot'
                     instance.reboot!
                     messages << "#{instance.instance_id} rebooting"

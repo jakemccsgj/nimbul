@@ -1,34 +1,37 @@
 <% unless @parent.is_a?(User) %>
-	<td class="select-handle">
+    <td class="select-handle">
     <%- if instance.terminating? -%>
         &nbsp;
     <%- else -%>
         <%= better_check_box_tag "instance_ids[]", instance.id, false, "#{@parent_type}-#{@parent.id}-instance" %>
     <%- end -%>
-	</td>
+    </td>
 <% end %>
-	<td>
-		<%= link_to instance.instance_id, instance_path(instance) %>
+    <td>
+        <%= link_to instance.instance_id, instance_path(instance) %>
 <%- if (instance.status_message || '').length > 0 %><%= link_to_function(image_tag(
-				'important.png', :width => 16, :height => 16, :align => 'absmiddle',
-				:alt => 'Important Information', :title => 'Important Information: click to read'
-			), 
-			"$('instance_#{instance.id}_status_message').toggle()"
-		)%>
+                'important.png', :width => 16, :height => 16, :align => 'absmiddle',
+                :alt => 'Important Information', :title => 'Important Information: click to read'
+            ), 
+            "$('instance_#{instance.id}_status_message').toggle()"
+        )%>
         <div id="instance_<%= instance.id %>_status_message" style="display:none; postion:fixed;">
-			<%= instance.status_message %>
-		</div>
+            <%= instance.status_message %>
+        </div>
 <%- end %>
-	</td>
+    </td>
+    <td><%= instance.architecture %></td>
+    <td><%= instance.storage_type.nil? ? '&nbsp;' : h(instance.storage_type.api_name) %></td>
+    <td><%=h instance.root_device_name %></td>
     <% unless @parent.is_a?(Server) %>
-    	<td class="nowrap">
-			<% if @parent.is_a?(User) %>
-				<%= link_to instance.provider_account.name, provider_account_path(instance.provider_account_id) -%>
-				<% if instance.server_id %>
-					<br/>&nbsp;&nbsp;<%= link_to instance.server.cluster.name, cluster_path(instance.server.cluster_id) -%>
-					<br/>&nbsp;&nbsp;&nbsp;&nbsp;
-				<% end %>
-			<% end %>
+        <td class="nowrap">
+            <% if @parent.is_a?(User) %>
+                <%= link_to instance.provider_account.name, provider_account_path(instance.provider_account_id) -%>
+                <% if instance.server_id %>
+                    <br/>&nbsp;&nbsp;<%= link_to instance.server.cluster.name, cluster_path(instance.server.cluster_id) -%>
+                    <br/>&nbsp;&nbsp;&nbsp;&nbsp;
+                <% end %>
+            <% end %>
             <% if instance.server_id %>
                 <%= link_to h(instance.server_name), server_path(instance.server_id) %>
             <% else %>
@@ -37,7 +40,7 @@
         </td>
     <% end %>
     <% unless @parent.is_a?(AutoScalingGroup) %>
-    	<td>
+        <td>
             <% if instance.auto_scaling_group_id %>
                 <%= link_to h(instance.auto_scaling_group.name), provider_account_path(instance.provider_account_id, :anchor => :auto_scaling) %>
             <% else %>
@@ -45,7 +48,7 @@
             <% end %>
         </td>
     <% end %>
-	<td>
+    <td>
         <% if instance.user_id %>
             <strong><%= User.find(instance.user_id).login_and_name %></strong>
         <% else %>

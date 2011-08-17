@@ -460,7 +460,7 @@ class Ec2Adapter
         # AWS call fails if we try to batch-refresh with any invalid image_ids included
         # so we refresh them one-by-one
         account_server_images.select{ |i| i.owner_id != account.external_id }.each do |oi|
-            refresh_server_image(oi, account_server_images, account_storage_types)
+            refresh_server_image(oi, account_server_images, account_storage_types, cpu_profiles)
         end
 
         # refresh our images
@@ -481,10 +481,11 @@ class Ec2Adapter
         end
     end
 
-    def self.refresh_server_image(server_image, account_server_images=nil, account_storage_types=nil)
+    def self.refresh_server_image(server_image, account_server_images=nil, account_storage_types=nil, cpu_profiles=nil)
         account = server_image.provider_account
         account_server_images ||= account.server_images
         account_storage_types ||= account.storage_types
+        cpu_profiles ||= CpuProfile.all
 
         ec2 = get_ec2(account)
         opts = { :image_ids => [ server_image.image_id ] }
@@ -552,7 +553,7 @@ class Ec2Adapter
 
     def self.refresh_instances(account)
         account = ProviderAccount.find(account.id,
-          :include => [ { :provider => [:instance_vm_types] }, { :instances => [:security_groups] }, :security_groups])
+          :include => [ { :provider => [:instance_vm_types] }, { :instances => [:security_groups] }, :security_groups, :storage_types])
         ec2 = get_ec2(account)
         # there is a bug in EC2 library that calls reservations "instances"
         reservations = ec2.describe_instances
@@ -560,12 +561,15 @@ class Ec2Adapter
         account_zones = account.zones
         account_security_groups = account.security_groups
         account_instance_vm_types = account.instance_vm_types
+        account_storage_types = account.storage_types
+        cpu_profiles = CpuProfile.all
         
         # mark all the instances that are not in 'requested' state as to be destroyed
         # this will be reverted when we find a corresponding instance on the cloud
         account_instances.each do |i|
             i.should_destroy = 1 unless i.requested?
         end
+        account_storage_types = account.storage_types
         
         reservations.each do |r|
             r[:instances].each do |i|
@@ -747,6 +751,24 @@ class Ec2Adapter
         return true
     end
 
+    def self.stop_instance(instance)
+        return nil if instance.nil?
+        account = instance.provider_account
+        ec2 = get_ec2(account)
+        # returns {:state=>"stopping", :previous_state=>"running", :id=>"i-1392c97a"}
+        result = ec2.stop_instances([instance.instance_id])
+        return true
+    end
+
+    def self.start_instance(instance)
+        return nil if instance.nil?
+        account = instance.provider_account
+        ec2 = get_ec2(account)
+        # returns {:state=>"starting", :previous_state=>"stopped", :id=>"i-1392c97a"}
+        result = ec2.start_instances([instance.instance_id])
+        return true
+    end
+
     def self.reboot_instance(instance)
         return nil if instance.nil?
         account = instance.provider_account
@@ -810,7 +832,7 @@ class Ec2Adapter
     end
 
     # also used by AsAdapter to process info about AS Group's instances
-    def self.parse_instance_info(account, reservation, attributes, account_instances=nil, account_zones=nil, account_security_groups=nil, account_instance_vm_types=nil)
+    def self.parse_instance_info(account, reservation, attributes, account_instances=nil, account_zones=nil, account_security_groups=nil, account_instance_vm_types=nil, cpu_profiles=nil, account_storage_types=nil)
         as_lifecycle_state_to_ec2_state = {}
         as_lifecycle_state_to_ec2_state['Pending'] = 'pending'
         as_lifecycle_state_to_ec2_state['InService'] = 'running'
@@ -821,6 +843,8 @@ class Ec2Adapter
         account_zones ||= account.zones
         account_security_groups ||= account.security_groups
         account_instance_vm_types ||= account.instance_vm_types
+        cpu_profiles ||= CpuProfile.all
+        account_storage_types ||= account.storage_types
         
         # delete :id attribute before building a instance record - :id is a special rails attribute
         attributes[:instance_id] = attributes[:id]
@@ -830,7 +854,28 @@ class Ec2Adapter
         vm_type = account_instance_vm_types.detect{ |t| t.api_name == attributes[:type] }
         attributes[:instance_vm_type_id] = vm_type.id unless vm_type.nil?
         attributes.delete(:type)
-    
+   
+        # map architecture to cpu profile
+        if attributes[:architecture]
+          cpu_profile = cpu_profiles.detect{ |p| p.api_name == attributes[:architecture] }
+          cpu_profile ||= CpuProfile.create( { :api_name => attributes[:architecture], :name => attributes[:architecture] } )
+          attributes[:cpu_profile_id] = cpu_profile.id
+          attributes.delete(:architecture)
+        end
+
+        # map rootDeviceType element to StorageType
+        if attributes[:root_device_type]
+            storage_type = account_storage_types.detect{|t| t.api_name == attributes[:root_device_type]}
+            storage_type ||= StorageType.create({
+              :provider_id => account.provider_id,
+              :api_name => attributes[:root_device_type],
+              :name => attributes[:root_device_type],
+              :desc => 'Created by Ec2Adapter during the Image import',
+            })
+            attributes[:storage_type_id] = storage_type.id
+            attributes.delete(:root_device_type)
+        end
+
         # process ec2 instance info
         if attributes[:lifecycle_state].blank?
             zone_name = attributes[:zone]

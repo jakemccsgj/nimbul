@@ -24,11 +24,14 @@
     <th <%= sort_td_class_helper "name" %>>
       <%= server_images_sort_link "Name", "name" %>
     </th>
+    <th <%= sort_td_class_helper "cpu_profile_id" %>>
+      <%= server_images_sort_link "Arch", "cpu_profile_id" %>
+    </th>
     <th <%= sort_td_class_helper "storage_type_id" %>>
       <%= server_images_sort_link "Storage", "storage_type_id" %>
     </th>
-    <th <%= sort_td_class_helper "cpu_profile_id" %>>
-      <%= server_images_sort_link "Arch", "cpu_profile_id" %>
+    <th <%= sort_td_class_helper "root_device_name" %>>
+      <%= server_images_sort_link "Root Device", "root_device_name" %>
     </th>
     <th <%= sort_td_class_helper "owner_id" %>>
       <%= server_images_sort_link "Owner", "owner_id" %>

@@ -23,6 +23,15 @@
     <th <%= sort_td_class_helper "instance_id" %>>
       <%= instances_sort_link "Instance", "instance_id" %>
     </th>
+    <th <%= sort_td_class_helper "cpu_profile_id" %>>
+      <%= server_images_sort_link "Arch", "cpu_profile_id" %>
+    </th>
+    <th <%= sort_td_class_helper "storage_type_id" %>>
+      <%= server_images_sort_link "Storage", "storage_type_id" %>
+    </th>
+    <th <%= sort_td_class_helper "root_device_name" %>>
+      <%= server_images_sort_link "Root Device", "root_device_name" %>
+    </th>
     <% unless @parent.is_a?(Server) %>
         <th <%= sort_td_class_helper "server_id" %>>
           <%= instances_sort_link "Server", "server_id" %>

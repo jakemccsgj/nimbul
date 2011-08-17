@@ -63,8 +63,10 @@ class ServersController < ApplicationController
     @server_profile = @server_profile_revision.server_profile if @server_profile_revision
     @cluster = @server.cluster
         
+    redirect_url = server_path(@server, :anchor => params[:anchor])
+  
     if params[:cancel_button]
-      redirect_back_or_default(server_path(@server))
+      redirect_to redirect_url
     else
       @provider_account = @cluster.provider_account
       @security_groups = @provider_account.security_groups
@@ -75,36 +77,35 @@ class ServersController < ApplicationController
       unless params[:server].try(:[], :security_group_ids).nil?
         @server.security_groups = (@security_groups & (SecurityGroup.find(params[:server][:security_group_ids])))
       end
-    end
-  
-    redirect_url = server_path(@server, :anchor => params[:anchor])
-  
-    @server.attributes = params[:server]
+
+      @server.attributes = params[:server]
     
-    respond_to do |format|
-      if @server.update_attributes(params[:publisher])
-        flash[:notice] = 'Server was successfully updated.'
-        p = @cluster
-        o = @server
-        AuditLog.create_for_parent(
-          :parent => p,
-          :auditable_id => o.id,
-          :auditable_type => o.class.to_s,
-          :auditable_name => o.name,
-          :author_login => current_user.login,
-          :author_id => current_user.id,
-          :summary => "updated '#{o.name}'",
-          :changes => o.tracked_changes,
-          :force => false
-        )
-        format.html { redirect_to redirect_url }
-        format.xml  { head :ok }
-        format.json { render :json => @server }
-      else
-        format.html { render :action => 'show', :anchor => params[:anchor] }
-        format.xml  { render :xml => @server.errors, :status => :unprocessable_entity }
-        format.json { render :json => @server }
+      respond_to do |format|
+        if @server.update_attributes(params[:publisher])
+          flash[:notice] = 'Server was successfully updated.'
+          p = @cluster
+          o = @server
+          AuditLog.create_for_parent(
+            :parent => p,
+            :auditable_id => o.id,
+            :auditable_type => o.class.to_s,
+            :auditable_name => o.name,
+            :author_login => current_user.login,
+            :author_id => current_user.id,
+            :summary => "updated '#{o.name}'",
+            :changes => o.tracked_changes,
+            :force => false
+          )
+          format.html { redirect_to redirect_url }
+          format.xml  { head :ok }
+          format.json { render :json => @server }
+        else
+          format.html { render :action => 'show', :anchor => params[:anchor] }
+          format.xml  { render :xml => @server.errors, :status => :unprocessable_entity }
+          format.json { render :json => @server }
+        end
       end
+  
     end
   end
 end

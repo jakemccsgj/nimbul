@@ -74,13 +74,20 @@ module ServerImagesHelper
             :class => 'bare-link',
         }
 
-        link_text = "<small><br/>" + server_image.server_profile_revisions.count.to_s + " total server profiles(#{show})</small>"
-        options = {
-            :url => server_image_server_profile_revisions_path(server_image),
-            :method => :get,
-            :success => "$('#{expand_span_id}').hide(); $('#{compress_span_id}').show(); $('#{server_profile_revisions_row_id}').show();",
-        }
-        show_link = link_to_remote link_text, options, html_options
+        count = server_image.server_profile_revisions.count
+        link_text = "<small><br/>" + count.to_s + " total server profiles"
+        if count == 0
+            link_text += "</small>"
+            show_link = link_text
+        else
+            link_text += "(#{show})</small>"
+            options = {
+                :url => server_image_server_profile_revisions_path(server_image),
+                :method => :get,
+                :success => "$('#{expand_span_id}').hide(); $('#{compress_span_id}').show(); $('#{server_profile_revisions_row_id}').show();",
+            }
+            show_link = link_to_remote link_text, options, html_options
+        end
 
         link_text = "<small><br/>" + server_image.server_profile_revisions.count.to_s + " total server profiles (#{hide})</small>"
         js_function1 = "$('#{compress_span_id}').hide(); $('#{expand_span_id}').show(); $('#{server_profile_revisions_row_id}').innerHTML = '';"

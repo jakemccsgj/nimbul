@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110816052952) do
+ActiveRecord::Schema.define(:version => 20110817144437) do
 
   create_table "access_requests", :force => true do |t|
     t.string   "state"
@@ -547,19 +547,29 @@ ActiveRecord::Schema.define(:version => 20110816052952) do
     t.integer  "pending_launch_configuration_id"
     t.integer  "auto_scaling_group_id"
     t.integer  "instance_vm_type_id"
+    t.string   "platform"
+    t.string   "monitoring"
+    t.string   "subnet_id"
+    t.string   "vpc_id"
+    t.integer  "cpu_profile_id"
+    t.integer  "storage_type_id"
+    t.string   "root_device_name"
   end
 
   add_index "instances", ["auto_scaling_group_id"], :name => "index_instances_on_auto_scaling_group_id"
   add_index "instances", ["cluster_id"], :name => "index_instances_on_cluster_id"
+  add_index "instances", ["cpu_profile_id"], :name => "index_instances_on_cpu_profile_id"
   add_index "instances", ["dns_name"], :name => "index_instances_on_dns_name"
   add_index "instances", ["instance_id"], :name => "index_instances_on_instance_id"
   add_index "instances", ["instance_vm_type_id"], :name => "index_instances_on_instance_vm_type_id"
   add_index "instances", ["key_name"], :name => "index_instances_on_key_name"
   add_index "instances", ["provider_account_id"], :name => "index_instances_on_provider_account_id"
   add_index "instances", ["public_ip"], :name => "index_instances_on_public_ip"
+  add_index "instances", ["root_device_name"], :name => "index_instances_on_root_device_name"
   add_index "instances", ["server_id"], :name => "index_instances_on_server_id"
   add_index "instances", ["server_name"], :name => "index_instances_on_server_name"
   add_index "instances", ["state"], :name => "index_instances_on_state"
+  add_index "instances", ["storage_type_id"], :name => "index_instances_on_storage_type_id"
   add_index "instances", ["volume_name"], :name => "index_instances_on_volume_name"
   add_index "instances", ["zone_id"], :name => "index_instances_on_zone_id"
 

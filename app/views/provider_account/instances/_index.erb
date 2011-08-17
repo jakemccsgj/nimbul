@@ -7,6 +7,11 @@
 
 <span class="vr">&nbsp;</span>
 
+<%= stop_instance_image_submit 'Stop', "#{@parent_type}-#{@parent.id}-instance" %>
+<%= start_instance_image_submit 'Start', "#{@parent_type}-#{@parent.id}-instance" %>
+
+<span class="vr">&nbsp;</span>
+
 <%= reboot_instance_image_submit 'Reboot', "#{@parent_type}-#{@parent.id}-instance" %>
 <%= terminate_instance_image_submit 'Terminate', "#{@parent_type}-#{@parent.id}-instance" %>
 <%= hidden_field_tag :instance_command, '', :class => :instance_command %>

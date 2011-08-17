@@ -180,11 +180,11 @@ class ServerImage < BaseModel
     end
 
     def self.sort_fields
-        %w(name image_id storage_type_id location cpu_profile_id state owner_id is_public is_enabled provider_account_id)
+        %w(name image_id storage_type_id location cpu_profile_id state owner_id is_public is_enabled provider_account_id root_device_name)
     end
 
     def self.search_fields
-        %w(name image_id location)
+        %w(name image_id location root_device_name)
     end
 
 end
