@@ -4,7 +4,9 @@
 <td><%= edit_in_place(row, :name, :class => 'address-editable') %></td>
 <% if @parent.is_a?(User) -%>
     <td>
+        <% if row.provider_account.nil? %>&nbsp;<% else %>
         <%= link_to row.provider_account.name, provider_account_path(row.provider_account_id) -%>
+        <% end %>
     </td>
 <% end -%>
 <td><%=h row.cloud_id %></td>
