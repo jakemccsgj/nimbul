@@ -1,3 +1,8 @@
+<%-
+  toggle_id = "instance_#{instance.id}_group_list" 
+  groups = instance.security_groups.collect{ |g| link_to(h(g.name), security_group_path(g)) }
+  use_toggle = !!(groups.size > 1)
+-%>
 <% unless @parent.is_a?(User) %>
     <td class="select-handle">
     <%- if instance.terminating? -%>
@@ -22,7 +27,9 @@
     </td>
     <td><%= instance.architecture %></td>
     <td><%= instance.storage_type.nil? ? '&nbsp;' : h(instance.storage_type.api_name) %></td>
-    <td><%=h instance.root_device_name %></td>
+    <% unless @parent.is_a?(Owner) %>
+        <td><%=h instance.root_device_name %></td>
+    <% end %>
     <% unless @parent.is_a?(Server) %>
         <td class="nowrap">
             <% if @parent.is_a?(User) %>
@@ -39,7 +46,7 @@
             <% end %>
         </td>
     <% end %>
-    <% unless @parent.is_a?(AutoScalingGroup) %>
+    <% unless @parent.is_a?(AutoScalingGroup) or @parent.is_a?(Owner) %>
         <td>
             <% if instance.auto_scaling_group_id %>
                 <%= link_to h(instance.auto_scaling_group.name), provider_account_path(instance.provider_account_id, :anchor => :auto_scaling) %>
@@ -48,16 +55,29 @@
             <% end %>
         </td>
     <% end %>
-    <td>
-        <% if instance.user_id %>
-            <strong><%= User.find(instance.user_id).login_and_name %></strong>
-        <% else %>
-            System
-        <% end %>
-    </td>
+    <% unless @parent.is_a?(Owner) %>
+        <td>
+            <% if instance.user_id %>
+                <strong><%= User.find(instance.user_id).login_and_name %></strong>
+            <% else %>
+                System
+            <% end %>
+        </td>
+    <% end %>
     <td><%= instance.instance_type %></td>
     <td><%= instance.zone %></td>
-    <td class="small"><%= instance.security_groups.collect{ |g| link_to(h(g.name), security_group_path(g)) }.join('<br />') %></td>
+    <td class="small">
+      <%- if use_toggle %>
+        <%= link_to_function("<sub>(#{groups.size} groups)</sub>",
+            "$('#{toggle_id}').toggle()"
+        )%>
+        <div id="<%=toggle_id%>" style="display: none;">
+        <%= groups.join('<br/>') %>
+        </div>
+      <%- else %>
+        <%= groups.join('<br/>') %>
+      <%- end %>
+    </td>
     <td><%= text_field_tag nil, instance.public_dns, { :readonly => true, :length => '20', :onclick => '$(this).focus();$(this).select()' } %></td>
     <td><%= instance.launch_time.nil? ? '' : time_ago_in_words(instance.launch_time) %></td>
     <td class="<%= instance.state %>"><%=h instance.state.gsub('_',' ') %></td>

@@ -256,6 +256,20 @@ class Instance < BaseModel
         find_all_by_server_id(server.id, options)
     end
 
+    def self.search_by_owner(owner, search, page, extra_joins, extra_conditions, sort=nil, filter=nil, include=nil)
+        joins = []
+        joins = joins + extra_joins unless extra_joins.blank?
+
+        conditions = [ 'user_id = ?', (owner.is_a?(Owner) ? owner.id : owner) ]
+        unless extra_conditions.blank?
+            extra_conditions = [ extra_conditions ] if not extra_conditions.is_a? Array
+            conditions[0] << ' AND ' + extra_conditions[0];
+            conditions << extra_conditions[1..-1]
+        end
+  
+        search(search, page, joins, conditions, sort, filter, include)
+    end
+
     def self.search_by_provider_account(provider_account, search, page, extra_joins, extra_conditions, sort=nil, filter=nil, include=nil)
         joins = []
         joins = joins + extra_joins unless extra_joins.blank?

@@ -80,6 +80,10 @@ class User < BaseModel
 		send("has_#{ o.class.to_s.underscore }_access?", o)
 	end
 	
+	def has_owner_access?(u)
+		has_user_access?(u)
+	end
+	
 	def has_site_user_access?(u)
 		has_user_access?(u)
 	end

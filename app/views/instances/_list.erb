@@ -29,22 +29,26 @@
     <th <%= sort_td_class_helper "storage_type_id" %>>
       <%= server_images_sort_link "Storage", "storage_type_id" %>
     </th>
-    <th <%= sort_td_class_helper "root_device_name" %>>
-      <%= server_images_sort_link "Root Device", "root_device_name" %>
-    </th>
+    <% unless @parent.is_a?(Owner) %>
+      <th <%= sort_td_class_helper "root_device_name" %>>
+        <%= server_images_sort_link "Root Device", "root_device_name" %>
+      </th>
+    <% end %>
     <% unless @parent.is_a?(Server) %>
         <th <%= sort_td_class_helper "server_id" %>>
           <%= instances_sort_link "Server", "server_id" %>
         </th>
     <% end %>
-    <% unless @parent.is_a?(AutoScalingGroup) %>
+    <% unless @parent.is_a?(AutoScalingGroup) or @parent.is_a?(Owner) %>
         <th <%= sort_td_class_helper "auto_scaling_group_id" %>>
           <%= instances_sort_link "Scaling Group", "auto_scaling_group_id" %>
         </th>
     <% end %>
-    <th <%= sort_td_class_helper "user_id" %>>
-      <%= instances_sort_link "Owner", "user_id" %>
-    </th>
+    <% unless @parent.is_a?(Owner) %>
+        <th <%= sort_td_class_helper "user_id" %>>
+          <%= instances_sort_link "Owner", "user_id" %>
+        </th>
+    <% end %>
     <th <%= sort_td_class_helper "type" %>>
       <%= instances_sort_link "Type", "type" %>
     </th>

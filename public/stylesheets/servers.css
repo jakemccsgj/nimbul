@@ -7,6 +7,9 @@
     line-height: 11px;
 }
 
+.smaller div table th { font-size: 11px; line-height: 11px; }
+.smaller div table td { font-size: 11px; line-height: 11px; }
+
 tr.server_container_start {
 	border-top: 2px solid grey;
 	border-left: 2px solid gray;
