@@ -7,6 +7,12 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :dashboard, :only => [ :index ]
 
+  map.resources :users, :only => [] do |user|
+    user.resources :instances, :controller => 'parent/instances',
+      :collection => { :list => :any, :control => :any },
+      :only => [ :index, :list ]
+  end
+
   map.resources :account_groups do |account_group|
     account_group.resources :apps, :collection => { :sort => :post }
     account_group.resources :stats,

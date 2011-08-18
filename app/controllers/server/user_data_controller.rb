@@ -31,6 +31,9 @@ class Server::UserDataController < ApplicationController
   end
   
   def self.generate(server, compress = false)
+    if server.startup_script_packager == 'none'
+      return server.startup_script
+    end
     cloudrc_template = File.join(USERDATA_PATH, 'cloudrc.erb')
     loader_template = File.join(USERDATA_PATH, 'loader')
     payload_template = File.join(USERDATA_PATH, 'generate.erb')

@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110817144437) do
+ActiveRecord::Schema.define(:version => 20110817210119) do
 
   create_table "access_requests", :force => true do |t|
     t.string   "state"
@@ -1088,7 +1088,7 @@ ActiveRecord::Schema.define(:version => 20110817144437) do
 
   create_table "server_profile_revisions", :force => true do |t|
     t.integer  "server_profile_id"
-    t.integer  "revision",            :default => 0
+    t.integer  "revision",                :default => 0
     t.integer  "creator_id"
     t.text     "commit_message"
     t.string   "ramdisk_id"
@@ -1098,6 +1098,7 @@ ActiveRecord::Schema.define(:version => 20110817144437) do
     t.datetime "updated_at"
     t.integer  "instance_vm_type_id"
     t.integer  "server_image_id"
+    t.string   "startup_script_packager", :default => "nimbul"
   end
 
   add_index "server_profile_revisions", ["instance_vm_type_id"], :name => "index_server_profile_revisions_on_instance_vm_type_id"

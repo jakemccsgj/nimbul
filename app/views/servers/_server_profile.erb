@@ -60,6 +60,13 @@ Last Update: <%= time_ago_in_words @server_profile_revision.updated_at %>
     <br />
     <%= f.text_area :startup_script, :size => '90x15', :class => :startup_script, :style => 'display:none' %>
 
+    <h1>Server Startup Script - Packaging</h1>
+    <br/>
+    <% STARTUP_SCRIPT_PACKAGERS.each do |p| %>
+       <%= f.radio_button :startup_script_packager, p[:name] %> <b><%= p[:name] %></b>
+       <small><br/><%=h p[:description] %></small>
+       <br/>
+    <% end %>
 <br />
 
     <h1><%= link_to 'Preview', show_server_server_user_data_path(@server),

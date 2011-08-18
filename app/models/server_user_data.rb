@@ -1,12 +1,12 @@
 # Class holding user-data info
 class ServerUserData
-	attr_accessor :server, :startup_scripts, :cloudrc
+    attr_accessor :server, :startup_scripts, :cloudrc
 
-	def initialize(server = nil)
-		@server = server
-		@cloudrc = nil
-		@startup_scripts = nil
-	end
+    def initialize(server = nil)
+        @server = server
+        @cloudrc = nil
+        @startup_scripts = nil
+    end
 
   def parameters
     @server.parameters

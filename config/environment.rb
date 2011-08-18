@@ -160,6 +160,11 @@ Rails::Initializer.run do |config|
 
     PER_TIME_UNITS = [ 'hour', 'day', 'month', '1 year', '3 years' ]
 
+  STARTUP_SCRIPT_PACKAGERS = [
+    { :name => 'nimbul', :description => 'Combines Provider Account, Cluster and Server scripts, minifies and compresses to create the final User Data. The resulting User Data requires an NYTd-built AMI to run successfully.' },
+    { :name => 'none', :description => 'Uses Server Startup Script as User Data. Provider Account and Cluster scripts are ignored. Useful for public AMIs / Windows AMIs.' }
+  ]
+
   INSTANCE_KIND_IO_PERFORMANCES = [ 'Low', 'Moderate', 'High' ]
 
   PKI_CONSOLE_ID = 'console'

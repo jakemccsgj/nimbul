@@ -134,8 +134,13 @@ class Server < BaseModel
         return true
     end
     
+    def startup_script_packager
+        return nil unless server_profile_revision
+        server_profile_revision.startup_script_packager
+    end
+
     def startup_script
-    return '' unless self.server_profile_revision
+        return '' unless self.server_profile_revision
         self.server_profile_revision.startup_script
     end
     
