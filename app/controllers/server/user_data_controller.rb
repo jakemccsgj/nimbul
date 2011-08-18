@@ -32,7 +32,7 @@ class Server::UserDataController < ApplicationController
   
   def self.generate(server, compress = false)
     if server.startup_script_packager == 'none'
-      return server.startup_script
+      return server.startup_script.delete("\C-M")
     end
     cloudrc_template = File.join(USERDATA_PATH, 'cloudrc.erb')
     loader_template = File.join(USERDATA_PATH, 'loader')

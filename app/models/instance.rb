@@ -266,6 +266,8 @@ class Instance < BaseModel
             conditions[0] << ' AND ' + extra_conditions[0];
             conditions << extra_conditions[1..-1]
         end
+
+        sort = table_name()+'.launch_time DESC' if sort.blank?
   
         search(search, page, joins, conditions, sort, filter, include)
     end

@@ -1,10 +1,10 @@
 class Address < BaseModel
-	belongs_to :provider_account
+    belongs_to :provider_account
 
-	validates_presence_of :name
-	validates_uniqueness_of :name, :scope => :provider_account_id
+    validates_presence_of :name
+    validates_uniqueness_of :name, :scope => :provider_account_id
 
-	after_save :update_instances, :update_servers
+    after_save :update_instances, :update_servers
 
     attr_accessor :should_destroy
 
@@ -23,11 +23,11 @@ class Address < BaseModel
     # for better performance, update dependent objects with the new name
     def update_instances
         Instance.update_all( ['public_ip=NULL, dns_name=NULL'], ['provider_account_id=? and public_ip=? and instance_id != ?', provider_account_id, public_ip, instance_id ] )
-    	Instance.update_all( ['public_ip=?, dns_name=?', public_ip, name], ['provider_account_id=? and instance_id=?', provider_account_id, instance_id ] )
+        Instance.update_all( ['public_ip=?, dns_name=?', public_ip, name], ['provider_account_id=? and instance_id=?', provider_account_id, instance_id ] )
     end
 
     def update_servers
-    	Server.update_all( ['dns_name=?', name], ['public_ip=?', public_ip ] )
+        Server.update_all( ['dns_name=?', name], ['public_ip=?', public_ip ] )
     end
 
     # sort, search and paginate parameters
