@@ -1,4 +1,0 @@
-<%= collection_select(:server_profile_revision, :instance_vm_type_id, @instance_vm_types, :id, :api_name,
- {:prompt   => "select a vm type"},
- {:onchange => "#{remote_function(:url  => {:action => "update_server_images"}, :with => "'instance_vm_type_id='+value")}"})
-%>

@@ -15,13 +15,16 @@ Last Update: <%= time_ago_in_words @server_profile_revision.updated_at %>
       <tr>
         <td><%= f.label :instance_vm_type_id, 'Instance Type' %></td>
         <td>
-          <%= render :partial => 'instance_vm_types', :object => @instance_vm_types %>
+          <%= collection_select(:server_profile_revision, :instance_vm_type_id, @instance_vm_types, :id, :api_name,
+            {:prompt   => "select a vm type"},
+            {:onchange => "#{remote_function(:url  => {:action => "update_server_images"}, :with => "'instance_vm_type_id='+value")}"})
+          -%><span id="instance_vm_type_info"><%= render :partial => 'instance_vm_type' %></span>
         </td>
       </tr>
       <tr>
         <td><%= f.label :server_image_id, 'Server Image' %></td> 
         <td id="server_images">
-          <%= render :partial => 'server_images', :object => @server_images %>
+          <%= render :partial => 'server_images' %>
         </td>
       </tr>
       <tr>

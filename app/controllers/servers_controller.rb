@@ -15,8 +15,8 @@ class ServersController < ApplicationController
     if @server_profile_revision.instance_vm_type_id.nil?
        @server_images = []
     else
-       instance_vm_type = InstanceVmType.find(@server_profile_revision.instance_vm_type_id, :include => [:cpu_profiles, :storage_types])
-       @server_images = ServerImage.find_all_by_provider_account_id_and_cpu_profile_id_and_storage_type_id(@cluster.provider_account_id, instance_vm_type.cpu_profile_ids, instance_vm_type.storage_type_ids)
+       @instance_vm_type = InstanceVmType.find(@server_profile_revision.instance_vm_type_id, :include => [:cpu_profiles, :storage_types])
+       @server_images = ServerImage.find_all_by_provider_account_id_and_cpu_profile_id_and_storage_type_id(@cluster.provider_account_id, @instance_vm_type.cpu_profile_ids, @instance_vm_type.storage_type_ids)
     end
   end
   
@@ -120,12 +120,14 @@ class ServersController < ApplicationController
     # updates server_images based on instance_vm_type selected
     @server = Server.find(params[:id], :include => [ :cluster, :server_profile_revision ])
     @server_profile_revision = @server.server_profile_revision
-    cluster = @server.cluster    
-    instance_vm_type = InstanceVmType.find(params[:instance_vm_type_id],:include => [:cpu_profiles, :storage_types])
-    server_images = ServerImage.find_all_by_provider_account_id_and_cpu_profile_id_and_storage_type_id(cluster.provider_account_id, instance_vm_type.cpu_profile_ids, instance_vm_type.storage_type_ids)
+    @cluster = @server.cluster
+    @instance_vm_types = @cluster.instance_vm_types
+    @instance_vm_type = InstanceVmType.find(params[:instance_vm_type_id],:include => [:cpu_profiles, :storage_types])
+    @server_images = ServerImage.find_all_by_provider_account_id_and_cpu_profile_id_and_storage_type_id(@cluster.provider_account_id, @instance_vm_type.cpu_profile_ids, @instance_vm_type.storage_type_ids)
 
     render :update do |page|
-      page.replace_html 'server_images', :partial => 'server_images', :object => server_images
+      page.replace_html 'instance_vm_type_info', :partial => 'instance_vm_type'
+      page.replace_html 'server_images', :partial => 'server_images'
     end
   end
 end
