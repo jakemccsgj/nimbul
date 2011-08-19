@@ -2,10 +2,13 @@
 <div id="instances">
 
 <%= show_all_link 'Show all' %>
-<%= filter_by_user_id_link 'Started by me', current_user.id.to_s %>
+<% unless @parent.is_a?(Owner) %>
+  <%= filter_by_user_id_link 'Started by me', current_user.id.to_s %>
+<% end %>
 <%= filter_by_state_link 'Running', 'running' %>
-<%= filter_by_state_link 'Terminated', 'terminated' %>
+<%= filter_by_state_link 'Stopped', 'stopped' %>
 <%= filter_by_state_link 'Pending', 'pending' %>
+<%= filter_by_state_link 'Terminated', 'terminated' %>
 <br/>
 <br/>
 <%= will_paginate_remote @instances, nil %>

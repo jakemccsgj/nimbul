@@ -17,6 +17,7 @@ class ServersController < ApplicationController
     else
        @instance_vm_type = InstanceVmType.find(@server_profile_revision.instance_vm_type_id, :include => [:cpu_profiles, :storage_types])
        @server_images = ServerImage.find_all_by_provider_account_id_and_cpu_profile_id_and_storage_type_id(@cluster.provider_account_id, @instance_vm_type.cpu_profile_ids, @instance_vm_type.storage_type_ids)
+       @server_image = ServerImage.find(@server_profile_revision.server_image_id, :include => [:cpu_profile, :storage_type]) unless @server_profile_revision.server_image_id.blank?
     end
   end
   
@@ -124,10 +125,21 @@ class ServersController < ApplicationController
     @instance_vm_types = @cluster.instance_vm_types
     @instance_vm_type = InstanceVmType.find(params[:instance_vm_type_id],:include => [:cpu_profiles, :storage_types])
     @server_images = ServerImage.find_all_by_provider_account_id_and_cpu_profile_id_and_storage_type_id(@cluster.provider_account_id, @instance_vm_type.cpu_profile_ids, @instance_vm_type.storage_type_ids)
+    @server_image = ServerImage.find(@server_profile_revision.server_image_id, :include => [:cpu_profile, :storage_type]) unless @server_profile_revision.server_image_id.blank?
+    @server_image = nil unless @server_images.include?(@server_image)
 
     render :update do |page|
       page.replace_html 'instance_vm_type_info', :partial => 'instance_vm_type'
       page.replace_html 'server_images', :partial => 'server_images'
     end
+  end
+
+  def update_server_image_info
+    # updates server image info based on server_image selected
+    @server_image = ServerImage.find(params[:server_image_id], :include => [ :cpu_profile, :storage_type])
+
+    render :update do |page|
+      page.replace_html 'server_image_info', :partial => 'server_image_info'
+    end 
   end
 end

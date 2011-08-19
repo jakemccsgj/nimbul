@@ -325,7 +325,7 @@ ActionController::Routing::Routes.draw do |map|
     # servers
     map.resources :servers,
         :collection => { :list => :any },
-        :member => { :update_server_images => :post } do |server|
+        :member => { :update_server_images => :post, :update_server_image_info => :post } do |server|
         server.resources :instances, :controller => 'parent/instances',
             :collection => { :list => :any, :control => :any },
             :only => [ :index ]

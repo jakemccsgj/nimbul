@@ -1,2 +1,4 @@
-<%= collection_select(:server_profile_revision, :server_image_id, @server_images, :id, :name, {:prompt   => "select a server image"}) %>
-
+<%= collection_select(:server_profile_revision, :server_image_id, @server_images, :id, :name,
+  {:prompt   => "select a server image"},
+  {:onchange => "#{remote_function(:url  => {:action => "update_server_image_info"}, :with => "'server_image_id='+value")}"})
+-%><span id="server_image_info"><%= render :partial => 'server_image_info' %></span>
