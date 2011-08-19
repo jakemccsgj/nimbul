@@ -10,7 +10,7 @@ class Cluster < BaseModel
   
   has_and_belongs_to_many :users
   has_and_belongs_to_many :cloud_resources, :order => 'update_time DESC'
-  has_and_belongs_to_many :instance_vm_types, :order => 'position', :uniq => true
+  has_and_belongs_to_many :instance_vm_types, :order => 'instance_vm_types.position', :include => [:cpu_profiles, :storage_types], :uniq => true
   
   has_many :cluster_parameters, :dependent => :destroy
   has_many :servers, :dependent => :destroy

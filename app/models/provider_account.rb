@@ -17,7 +17,7 @@ class ProviderAccount < BaseModel
     has_many :zones, :through => :regions, :order => :name
 
     has_many :instances, :dependent => :destroy
-    has_many :server_images, :dependent => :destroy
+    has_many :server_images, :order => :name, :dependent => :destroy
     has_many :key_pairs, :dependent => :destroy
     has_many :security_groups, :dependent => :destroy
     has_many :firewall_rules, :dependent => :destroy

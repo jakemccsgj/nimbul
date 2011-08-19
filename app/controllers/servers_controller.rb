@@ -8,9 +8,11 @@ class ServersController < ApplicationController
   def prepare_resources
     @server = Server.find(params[:id], :include => [ :server_profile_revision, :security_groups ])
     @cluster = Cluster.find(@server.cluster_id, :include => [ :cluster_parameters ])
+    @provider_account = ProviderAccount.find(@cluster.provider_account_id, :include => [ :volumes, :snapshots, :clusters, :provider_account_parameters, :server_images ])
+    @instance_vm_types = @cluster.instance_vm_types
+    @server_images = @provider_account.server_images.collect{|si| si.is_enabled?}.compact
     @server_profile_revision = @server.server_profile_revision
     @server_profile = @server_profile_revision.server_profile if @server_profile_revision
-    @provider_account = ProviderAccount.find(@cluster.provider_account_id, :include => [ :volumes, :snapshots, :clusters, :provider_account_parameters ])
   end
   
   def index
@@ -106,6 +108,18 @@ class ServersController < ApplicationController
         end
       end
   
+    end
+  end
+
+  def update_server_images
+    # updates server_images based on instance_vm_type selected
+    server = Server.find(params[:id], :include => :cluster)
+    cluster = server.cluster    
+    instance_vm_type = InstanceVmType.find(params[:instance_vm_type_id],:include => [:cpu_profiles, :storage_types])
+    server_images = ServerImage.find_all_by_provider_account_id_and_cpu_profile_id_and_storage_type_id(cluster.provider_account_id, instance_vm_type.cpu_profile_ids, instance_vm_type.storage_type_ids)
+
+    render :update do |page|
+      page.replace_html 'server_images', :partial => 'server_images', :object => server_images
     end
   end
 end

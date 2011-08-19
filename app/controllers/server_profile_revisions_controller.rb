@@ -138,7 +138,7 @@ class ServerProfileRevisionsController < ApplicationController
         end
     end
     
-      def auto_complete_for_user_id
-      super
-      end
+    def auto_complete_for_user_id
+        super
+    end
 end

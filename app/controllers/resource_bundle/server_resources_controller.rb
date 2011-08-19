@@ -2,57 +2,57 @@ class ResourceBundle::ServerResourcesController < ApplicationController
     before_filter :login_required
     require_role  :admin, :unless => "current_user.has_resource_bundle_access?(ResourceBundle.find(params[:resource_bundle_id])) "
 
-	def prepare_resources
-		@zones = []
-		@addresses = []
-		@volumes = []
-		@snapshots = []
-		@resource_bundle.server.available_resources(@resource_bundle.zone_id) do |z,a,v,s|
-			@zones = z
-			@addresses = a
-			@volumes = v
-			@snapshots = s
-		end	
+    def prepare_resources
+        @zones = []
+        @addresses = []
+        @volumes = []
+        @snapshots = []
+        @resource_bundle.server.available_resources(@resource_bundle.zone_id) do |z,a,v,s|
+            @zones = z
+            @addresses = a
+            @volumes = v
+            @snapshots = s
+        end    
 
-		if @server_resource.is_a?(ServerAddress)
-			if @addresses.empty?
-				@error_message = "All available addresses have been allocated.<br/>Request additional addresses from the Account Administrator."
-			end
+        if @server_resource.is_a?(ServerAddress)
+            if @addresses.empty?
+                @error_message = "All available addresses have been allocated.<br/>Request additional addresses from the Account Administrator."
+            end
         else
-			@volume_classes = []
-			@volume_resources = []
-	        @mount_type = params[:mount_type]
-	        mount_types = SERVER_VOLUME_MOUNT_TYPES.collect{|t| t if (@mount_type.blank? || @mount_type == t.value)}.compact
-			CloudResource.classes_and_resources([@volumes, @snapshots], mount_types) do |c, r|
-				@volume_classes = c
-				@volume_resources = r
-			end
-			if @volume_resources.empty?
-				@error_message = "All available storage has been allocated.<br/>Consider placing your Launch Configuration in a different zone or request additional storage from the Account Administrator."
-			end
-		end
-	end
+            @volume_classes = []
+            @volume_resources = []
+            @mount_type = params[:mount_type]
+            mount_types = SERVER_VOLUME_MOUNT_TYPES.collect{|t| t if (@mount_type.blank? || @mount_type == t.value)}.compact
+            CloudResource.classes_and_resources([@volumes, @snapshots], mount_types) do |c, r|
+                @volume_classes = c
+                @volume_resources = r
+            end
+            if @volume_resources.empty?
+                @error_message = "All available storage has been allocated.<br/>Consider placing your Launch Configuration in a different zone or request additional storage from the Account Administrator."
+            end
+        end
+    end
 
-	def new
+    def new
         @resource_bundle = ResourceBundle.find(params[:resource_bundle_id])
         @class_type = params[:class_type] unless params[:class_type].blank?
         @server_resource = ServerResource.factory(@class_type)
 
-		self.prepare_resources
+        self.prepare_resources
 
         respond_to do |format|
-			if @error_message.blank?
-				format.html
-				format.xml  { render :xml => @server_resource }
-				format.js
-			else
+            if @error_message.blank?
+                format.html
+                format.xml  { render :xml => @server_resource }
+                format.js
+            else
                 flash[:error] = @error_message
                 format.html { redirect_to @resource_bundle, :anchor => params[:anchor] }
-				format.xml  { render :xml => @resource_bundle.errors, :status => :unprocessable_entity }
-				format.js
-			end
+                format.xml  { render :xml => @resource_bundle.errors, :status => :unprocessable_entity }
+                format.js
+            end
         end
-    end		
+    end        
 
     def create
         @resource_bundle = ResourceBundle.find(params[:resource_bundle_id])
@@ -70,40 +70,40 @@ class ResourceBundle::ServerResourcesController < ApplicationController
         if mount_type.blank?
             @error_message = "Please specify mount type."
         else
-	        mount_type = mount_type.constantize
-	        mount_type.can_mount?(@resource_bundle, @cloud_resource) do |can_mount, msg|
-				@error_message = msg unless can_mount
-	        end
+            mount_type = mount_type.constantize
+            mount_type.can_mount?(@resource_bundle, @cloud_resource) do |can_mount, msg|
+                @error_message = msg unless can_mount
+            end
         end
 
-		# construct the server resource based on this cloud resource
+        # construct the server resource based on this cloud resource
         if @error_message.blank?
-			if current_user.has_cloud_resource_access?(@cloud_resource)
-				@server_resource = case server_resource_params[:class_type]
-					when 'ServerAddress' then @resource_bundle.addresses.build(server_resource_params)
-					when 'ServerVolume' then @resource_bundle.volumes.build(server_resource_params)
-				end
-			else
-			    @error_message = "You don't have permission to mount resource '#{@cloud_resource.name}'"
-			end
-		end
+            if current_user.has_cloud_resource_access?(@cloud_resource)
+                @server_resource = case server_resource_params[:class_type]
+                    when 'ServerAddress' then @resource_bundle.addresses.build(server_resource_params)
+                    when 'ServerVolume' then @resource_bundle.volumes.build(server_resource_params)
+                end
+            else
+                @error_message = "You don't have permission to mount resource '#{@cloud_resource.name}'"
+            end
+        end
 
-		self.prepare_resources
+        self.prepare_resources
 
         respond_to do |format|
-			if @error_message.blank? and @server_resource.save
-				@message = "Added resource '#{@cloud_resource.name}' the Resource Bundle"
-				flash[:notice] = @message
+            if @error_message.blank? and @server_resource.save
+                @message = "Added resource '#{@cloud_resource.name}' the Resource Bundle"
+                flash[:notice] = @message
                 format.html { redirect_to @resource_bundle, :anchor => params[:anchor] }
                 format.xml  { head :ok }
                 format.js
-			else
-				@error_message ||= @server_resource.errors.collect{ |attr,msg| attr.humanize + ' - ' + msg}.join('<br/>')
+            else
+                @error_message ||= @server_resource.errors.collect{ |attr,msg| attr.humanize + ' - ' + msg}.join('<br/>')
                 flash[:error] = @error_message
                 format.html { redirect_to @resource_bundle, :anchor => params[:anchor] }
-				format.xml  { render :xml => @server_resource.errors, :status => :unprocessable_entity }
-				format.js
-			end
+                format.xml  { render :xml => @server_resource.errors, :status => :unprocessable_entity }
+                format.js
+            end
         end
     end
     
@@ -122,22 +122,22 @@ class ResourceBundle::ServerResourcesController < ApplicationController
         params[:server_resource] ||= params[:server_address] || params[:server_volume]
         
         respond_to do |format|
-			if @server_resource.errors.empty? and @server_resource.update_attributes(params[:server_resource])
-				@message = "Updated server resource."
-				flash[:notice] = @message
+            if @server_resource.errors.empty? and @server_resource.update_attributes(params[:server_resource])
+                @message = "Updated server resource."
+                flash[:notice] = @message
                 format.html { redirect_to @resource_bundle, :anchor => params[:anchor] }
                 format.xml  { head :ok }
                 format.js
-				format.json { render :json => @server_resource }
-			else
-				@error_message ||= @server_resource.errors.collect{ |attr,msg| attr.humanize + ' - ' + msg}.join('<br/>')
+                format.json { render :json => @server_resource }
+            else
+                @error_message ||= @server_resource.errors.collect{ |attr,msg| attr.humanize + ' - ' + msg}.join('<br/>')
                 @server_resource.status_message = @server_resource.errors.collect{|attr,msg| "#{attr.humanize} - #{msg}"}.join('\n')
-				flash[:error] = @error_message
+                flash[:error] = @error_message
                 format.html { redirect_to @resource_bundle, :anchor => params[:anchor] }
-				format.xml  { render :xml => @server_resource.errors, :status => :unprocessable_entity }
-				format.js
-				format.json { render :json => @server_resource, :status => :unprocessable_entity }
-			end
+                format.xml  { render :xml => @server_resource.errors, :status => :unprocessable_entity }
+                format.js
+                format.json { render :json => @server_resource, :status => :unprocessable_entity }
+            end
         end
     end
 
@@ -146,18 +146,18 @@ class ResourceBundle::ServerResourcesController < ApplicationController
         @server_resource = @resource_bundle.server_resources.find(params[:id])
         
         respond_to do |format|
-			if @server_resource.destroy
-				flash[:notice] = "Removed '#{@server_resource.cloud_resource.name}'."
+            if @server_resource.destroy
+                flash[:notice] = "Removed '#{@server_resource.cloud_resource.name}'."
                 format.html { redirect_to @resource_bundle, :anchor => params[:anchor] }
                 format.xml  { head :ok }
                 format.js
-			else
-				@error_message = @server_resource.errors.collect{ |attr,msg| attr.humanize + ' - ' + msg}.join('<br/>')
-				flash[:error] = @error_message
+            else
+                @error_message = @server_resource.errors.collect{ |attr,msg| attr.humanize + ' - ' + msg}.join('<br/>')
+                flash[:error] = @error_message
                 format.html { redirect_to @resource_bundle, :anchor => params[:anchor] }
- 				format.xml  { render :xml => @resource_bundle.errors, :status => :unprocessable_entity }
-				format.js
-			end
+                 format.xml  { render :xml => @resource_bundle.errors, :status => :unprocessable_entity }
+                format.js
+            end
         end
     end
     
