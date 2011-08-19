@@ -1,5 +1,4 @@
 <%
-    @server_images = @provider_account.server_images.collect{|a| a if a.is_enabled?}.compact.sort{ |a,b| a.name.downcase <=> b.name.downcase }
     @key_pairs = @provider_account.key_pairs.sort{ |a,b| a.name.downcase <=> b.name.downcase }
     @volumes = @provider_account.volumes.collect{|a| a if a.is_enabled?}.compact.sort{ |a,b| a.name.downcase <=> b.name.downcase }
     @addresses = @provider_account.addresses.collect{|a| a if a.is_enabled?}.compact.sort{ |a,b| a.name.downcase <=> b.name.downcase }
