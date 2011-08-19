@@ -1,0 +1,8 @@
+<% unless @server_image.nil? -%>
+    Platform: <%= @server_image.cpu_profile.api_name %>
+    Storage: <%= @server_image.storage_type.api_name %>
+    API Name: <%= @server_image.image_id %>
+    <% unless @server_image.description.blank? %>
+        Description: <%=h @server_image.description %>
+    <% end %>
+<% end -%>
