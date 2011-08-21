@@ -1,6 +1,10 @@
 <div id="users">
+<%= show_all_link 'Show all' %>
+<%= filter_by_enabled_link 'Enabled', '1' %>
+<%= filter_by_enabled_link 'Disabled', '0' %>
+<br/>
+<br/>
 <%= will_paginate_remote @users, 'users' %>
-
 <table>
 	<tr>
     <th <%= sort_td_class_helper "login" %>>

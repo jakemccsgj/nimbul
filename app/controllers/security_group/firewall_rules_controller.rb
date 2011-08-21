@@ -15,24 +15,37 @@ class SecurityGroup::FirewallRulesController < ApplicationController
             begin
                 Ec2Adapter.add_security_group_firewall_rule(@security_group, @firewall_rule)
                 @message = "Added '#{@firewall_rule.name}' to #{@security_group.name}"
+                p = @security_group
+                o = @firewall_rule
+                AuditLog.create_for_parent(
+                    :parent => p,
+                    :auditable_id => o.id,
+                    :auditable_type => o.class.to_s,
+                    :auditable_name => o.name,
+                    :author_login => current_user.login,
+                    :author_id => current_user.id,
+                    :summary => "added firewall rule '#{o.name}' to security group '#{p.name}'",
+                    :changes => o.tracked_changes,
+                    :force => true
+                )
             rescue
                 @error_message = "Failed to add '#{@firewall_rule.name}': #{$!}"
             end
         end
 
         respond_to do |format|
-			if @error_message.blank?
-				flash[:notice] = @message
+            if @error_message.blank?
+                flash[:notice] = @message
                 format.html { redirect_to @security_group }
                 format.xml  { head :ok }
                 format.js
-			else
+            else
                 flash[:error] = @error_message
                 format.html { redirect_to @security_group }
-				format.xml  { render :xml => @security_group.errors, :status => :unprocessable_entity }
-				format.js
-			end
-	    end
+                format.xml  { render :xml => @security_group.errors, :status => :unprocessable_entity }
+                format.js
+            end
+        end
     end
 
     def destroy
@@ -54,17 +67,30 @@ class SecurityGroup::FirewallRulesController < ApplicationController
         end
 
         respond_to do |format|
-			if @error_message.blank?
-				flash[:notice] = @message
+            if @error_message.blank?
+                p = @security_group
+                o = @firewall_rule
+                AuditLog.create_for_parent(
+                    :parent => p,
+                    :auditable_id => nil,
+                    :auditable_type => o.class.to_s,
+                    :auditable_name => o.name,
+                    :author_login => current_user.login,
+                    :author_id => current_user.id,
+                    :summary => "removed firewall rule '#{o.name}' from security group '#{p.name}'",
+                    :changes => o.tracked_changes,
+                    :force => true
+                )
+                flash[:notice] = @message
                 format.html { redirect_to @security_group }
                 format.xml  { head :ok }
                 format.js
-			else
+            else
                 flash[:error] = @error_message
                 format.html { redirect_to @security_group }
-				format.xml  { render :xml => @security_group.errors, :status => :unprocessable_entity }
-				format.js
-			end
+                format.xml  { render :xml => @security_group.errors, :status => :unprocessable_entity }
+                format.js
+            end
         end
     end
 

@@ -430,12 +430,13 @@ ActionController::Routing::Routes.draw do |map|
         admin.resources :invites
         admin.resources :mailings
         admin.resources :states
-        admin.resources :users do |users|
+        admin.resources :users,
+            :collection => { :list => :any } do |users|
             users.resources :roles
             users.resources :provider_accounts
         end
     end
-    map.list_users    '/admin/users/list', :controller => 'admin/users', :action => 'list'
+    #map.list_users    '/admin/users/list', :controller => 'admin/users', :action => 'list'
     map.activate_admin_user '/admin/user/:id/activate', :controller => 'admin/users', :action => 'update'
     map.enable_admin_user '/admin/user/:id/enable', :controller => 'admin/states', :action => 'update'
     map.disable_admin_user '/admin/user/:id/disable', :controller => 'admin/states', :action => 'destroy'

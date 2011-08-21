@@ -9,13 +9,13 @@
   <%= link_to 'Pending Beta Users', admin_invite_actions_path %></p>
 <% end %>
 
-Search: <%= text_field_tag("search", params['search'], :size => 10, :title => 'Search by '+User.search_fields.collect{|f| f.titleize}.join(', ') ) %>
-<%= observe_field 'search',
-    :frequency => 2,
-    :update => 'users',
-    :url => { :action => :list },
-    :with => 'search' %>
-	
+<%= will_paginate_search_field "search", nil, nil, :list %>
+<%= refresh_image 'Refresh', 'users', nil, :list, nil %>
+
+<span class="vr">&nbsp;</span>
+
+<b>Total: <span id="users_total"><%= @users.total_entries %></span></b>
+
 <hr/>
 
 <%= render :partial => "shared/users_list", :object => @users %>

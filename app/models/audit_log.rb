@@ -19,71 +19,71 @@ class AuditLog < BaseModel
     end
     private :skip_unchanged
     
-	def self.search_by_author(author, options={})
-		extra_joins = options[:joins]
-		extra_conditions = options[:conditions]
-		order = options[:order]
-		joins = []
-		joins = joins + extra_joins unless extra_joins.blank?
+    def self.search_by_author(author, options={})
+        extra_joins = options[:joins]
+        extra_conditions = options[:conditions]
+        order = options[:order]
+        joins = []
+        joins = joins + extra_joins unless extra_joins.blank?
 
-		conditions = ['('+table_name()+'.author_id = ? OR '+table_name()+'.author_login = ?)', author.id, author.login]
-		unless extra_conditions.blank?
-			extra_conditions = [ extra_conditions ] if not extra_conditions.is_a? Array
-			conditions[0] << ' AND ' + extra_conditions[0]
-			conditions << extra_conditions[1..-1]
-		end
+        conditions = ['('+table_name()+'.author_id = ? OR '+table_name()+'.author_login = ?)', author.id, author.login]
+        unless extra_conditions.blank?
+            extra_conditions = [ extra_conditions ] if not extra_conditions.is_a? Array
+            conditions[0] << ' AND ' + extra_conditions[0]
+            conditions << extra_conditions[1..-1]
+        end
     
-		order = table_name()+'.created_at DESC' if order.blank?
+        order = table_name()+'.created_at DESC' if order.blank?
 
-		options.merge!({
-			:joins => joins,
-			:conditions => conditions,
-			:order => order,
-		})
+        options.merge!({
+            :joins => joins,
+            :conditions => conditions,
+            :order => order,
+        })
 
-		search(options[:search], options[:page], options[:joins], options[:conditions], options[:order], options[:filter], options[:include])
-	end
-	
-	# by default - find all logs concerning provider accounts and clusters visible to the user
-	def self.options_for_find_by_user(user, options={})
-		extra_joins = options[:joins]
-		extra_conditions = options[:conditions]
-		order = options[:order]
-		joins = []
-		joins = joins + extra_joins unless extra_joins.blank?
-
-		conditions = ['1=0']
-		if user.has_role?("admin")
-			conditions = []
-		else
-			local_conditions = ['1=0']
-			unless user.provider_accounts.empty?
-				local_conditions << table_name()+".provider_account_id IN (#{user.provider_accounts.collect{|a| a.id}.join(',')})"
-			end
-			unless user.clusters.empty?
-				local_conditions << table_name()+".cluster_id IN (#{user.clusters.collect{|a| a.id}.join(',')})"
-			end
-			conditions[0] = "(#{local_conditions.join(' OR ')})"
-		end
+        search(options[:search], options[:page], options[:joins], options[:conditions], options[:order], options[:filter], options[:include])
+    end
     
-		unless extra_conditions.blank?
-			extra_conditions = [ extra_conditions ] if not extra_conditions.is_a? Array
-			conditions[0] << ' AND ' + extra_conditions[0]
-			conditions << extra_conditions[1..-1]
-		end
+    # by default - find all logs concerning provider accounts and clusters visible to the user
+    def self.options_for_find_by_user(user, options={})
+        extra_joins = options[:joins]
+        extra_conditions = options[:conditions]
+        order = options[:order]
+        joins = []
+        joins = joins + extra_joins unless extra_joins.blank?
+
+        conditions = ['1=0']
+        if user.has_role?("admin")
+            conditions = []
+        else
+            local_conditions = ['1=0']
+            unless user.provider_accounts.empty?
+                local_conditions << table_name()+".provider_account_id IN (#{user.provider_accounts.collect{|a| a.id}.join(',')})"
+            end
+            unless user.clusters.empty?
+                local_conditions << table_name()+".cluster_id IN (#{user.clusters.collect{|a| a.id}.join(',')})"
+            end
+            conditions[0] = "(#{local_conditions.join(' OR ')})"
+        end
     
-		order = table_name()+'.created_at DESC' if order.blank?
+        unless extra_conditions.blank?
+            extra_conditions = [ extra_conditions ] if not extra_conditions.is_a? Array
+            conditions[0] << ' AND ' + extra_conditions[0]
+            conditions << extra_conditions[1..-1]
+        end
+    
+        order = table_name()+'.created_at DESC' if order.blank?
 
-		options.merge!({
-			:joins => joins,
-			:conditions => conditions,
-			:order => order,
-		})
+        options.merge!({
+            :joins => joins,
+            :conditions => conditions,
+            :order => order,
+        })
 
-		return options        
-	end
-	
-	def self.create_for_parent(options)
+        return options        
+    end
+    
+    def self.create_for_parent(options)
         o = options[:parent]
         options.delete(:parent)
         
@@ -107,7 +107,7 @@ class AuditLog < BaseModel
         end
         
         create(options)
-	end
+    end
 
     def self.per_page
         10

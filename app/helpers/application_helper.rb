@@ -514,6 +514,10 @@ module ApplicationHelper
         filter_link(text, 'server_id', value, nil, nil, :list)
     end
 
+    def filter_by_enabled_link(text, value)
+        filter_link(text, 'enabled', value, nil, nil, :list)
+    end
+
     def selectable_check_box_tag(name, value, checked, options = {})
         html_options = options.merge({
             :onclick => "select_parent_element($(this));",
