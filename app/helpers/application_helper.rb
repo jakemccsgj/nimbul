@@ -278,6 +278,30 @@ module ApplicationHelper
         refresh_link link_text, refresh, controller, action, update
     end
 
+    def periodically_call_remote_with_checkbox(options)
+        js_tag = ''
+        control_tag = ''
+        condition = nil
+
+        unless options[:id].blank?
+            id = options[:id].to_s.sub(/\s+/,'')
+            name = options[:name].to_s || id
+            autorefresh_var = "autorefresh_#{id}" 
+            id = "autorefresh_checkbox_#{id}"
+            js_tag = javascript_tag "var #{autorefresh_var} = true;"
+            control_tag = check_box_tag id, '1', 1, :onclick => "#{autorefresh_var} = !#{autorefresh_var};"
+            control_tag += '&nbsp;'
+            control_tag += label_tag autorefresh_var, name
+            condition = "#{autorefresh_var} == true"
+            options[:condition] = condition
+        end
+        options.delete(:id)
+        options.delete(:name)
+
+        pcr_tag = periodically_call_remote(options)
+        return (js_tag + control_tag + pcr_tag)
+    end
+
     def refresh_checkbox(text, refresh, controller, action, update = refresh, frequency = 10)
         params[:action] = action
         url = {
