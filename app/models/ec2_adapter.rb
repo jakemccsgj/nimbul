@@ -817,8 +817,8 @@ class Ec2Adapter
         # amongst zones find zones with unused reserved instances
         free_zone_ids = []
         zone_ids.each do |zone_id|
-            reserved = ReservedInstance.sum(:count, :conditions => ['provider_account_id=? AND zone_id=? AND instance_type=? AND state=?', provider_account.id, zone_id, server.instance_type, 'active'])
-            running = Instance.count(:all, :conditions => ['provider_account_id=? AND zone_id=? AND instance_type=? AND (state=? OR state=?)', provider_account.id, zone_id, server.instance_type, 'running', 'pending'])
+            reserved = ReservedInstance.sum(:count, :conditions => ['provider_account_id=? AND zone_id=? AND instance_vm_type_id in (select id from instance_vm_types where api_name = ?) AND state=?', provider_account.id, zone_id, server.instance_type, 'active'])
+            running = Instance.count(:all, :conditions => ['provider_account_id=? AND zone_id=? AND instance_vm_type_id in (select id from instance_vm_types where api_name = ?) AND (state=? OR state=?)', provider_account.id, zone_id, server.instance_type, 'running', 'pending'])
             free_zone_ids << zone_id if reserved > running
         end
         
