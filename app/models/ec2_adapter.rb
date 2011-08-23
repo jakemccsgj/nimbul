@@ -355,6 +355,8 @@ class Ec2Adapter
 
         # process ip-based rule 
         ip_grants.each do |grant|
+          # TODO move to AWS Ruby lib to get support for all the latest protocols
+          grant[:protocol] = 'all' if grant[:protocol] == '-1'
           fr = account_firewall_rules.detect{ |r| r.protocol == grant[:protocol] and r.from_port == grant[:from_port] and r.to_port == grant[:to_port] and r.ip_range == grant[:ip_range]}
           if fr.nil?
             fr = account.firewall_rules.build({

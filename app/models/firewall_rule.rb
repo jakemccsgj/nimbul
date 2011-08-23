@@ -18,9 +18,9 @@ class FirewallRule < BaseModel
         :with => /\A(?:25[0-5]|(?:2[0-4]|1\d|[1-9])?\d)(?:\.(?:25[0-5]|(?:2[0-4]|1\d|[1-9])?\d)){3}\/(?:3[0-2]|(?:2[0-9]|1\d|[0-9])?)\z/,
         :if => :should_validate_ip_range?,
         :message => "IP Range should be in a form of X.X.X.X/X, e.g. 192.168.50.44/32"
-    validates_inclusion_of :protocol, :in => %w( tcp udp icmp ),
+    validates_inclusion_of :protocol, :in => %w( all tcp udp icmp ),
         :if => :should_validate_ip_range?,
-        :message => "{{value}} is not one of TCP, UDP or ICMP"
+        :message => "{{value}} is not one of ALL, TCP, UDP or ICMP"
     validates_numericality_of :from_port,
         :only_integer => true,
         :greater_than_or_equal_to => 0,
