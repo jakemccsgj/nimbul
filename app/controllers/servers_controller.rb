@@ -16,7 +16,7 @@ class ServersController < ApplicationController
        @server_images = []
     else
        @instance_vm_type = InstanceVmType.find(@server_profile_revision.instance_vm_type_id, :include => [:cpu_profiles, :storage_types])
-       @server_images = ServerImage.find_all_by_provider_account_id_and_cpu_profile_id_and_storage_type_id(@cluster.provider_account_id, @instance_vm_type.cpu_profile_ids, @instance_vm_type.storage_type_ids)
+       @server_images = ServerImage.find_all_by_provider_account_id_and_cpu_profile_id_and_storage_type_id(@cluster.provider_account_id, @instance_vm_type.cpu_profile_ids, @instance_vm_type.storage_type_ids, :order => :name)
        @server_image = ServerImage.find(@server_profile_revision.server_image_id, :include => [:cpu_profile, :storage_type]) unless @server_profile_revision.server_image_id.blank?
     end
   end
@@ -124,7 +124,7 @@ class ServersController < ApplicationController
     @cluster = @server.cluster
     @instance_vm_types = @cluster.instance_vm_types
     @instance_vm_type = InstanceVmType.find(params[:instance_vm_type_id],:include => [:cpu_profiles, :storage_types])
-    @server_images = ServerImage.find_all_by_provider_account_id_and_cpu_profile_id_and_storage_type_id(@cluster.provider_account_id, @instance_vm_type.cpu_profile_ids, @instance_vm_type.storage_type_ids)
+    @server_images = ServerImage.find_all_by_provider_account_id_and_cpu_profile_id_and_storage_type_id(@cluster.provider_account_id, @instance_vm_type.cpu_profile_ids, @instance_vm_type.storage_type_ids, :order => :name)
     @server_image = ServerImage.find(@server_profile_revision.server_image_id, :include => [:cpu_profile, :storage_type]) unless @server_profile_revision.server_image_id.blank?
     @server_image = nil unless @server_images.include?(@server_image)
 
