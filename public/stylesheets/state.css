@@ -73,7 +73,6 @@ tr.admin {
 
 td.false,
 td.failure,
-td.stopped,
 td.terminated	{
     background-color: #FFCCCC;
 }
@@ -86,6 +85,7 @@ td.timedout,
 td.rebooting,
 td.disabled,
 td.disabling,
+td.stopped,
 td.stopping {
     background-color: #FFFFCC;
 }

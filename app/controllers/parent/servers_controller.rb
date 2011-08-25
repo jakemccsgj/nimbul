@@ -222,16 +222,18 @@ class Parent::ServersController < ApplicationController
         }
         redirect_url = send("#{ parent_type }_url", parent, options)
 
+        @messages = []
         @error_messages = []
         # prepare parameters
         count = 1
         if !params[:instance_command].blank?
             instances = Instance.find(params[:instance_ids], :include => [ :server, :provider_account ] )
             @instances = instances.select{ |i| current_user.has_instance_access?(i) }
-            Parent::InstancesController.control_instances(@instances, params[:instance_command]) do |success, instances, msg|
+            Parent::InstancesController.control_instances(@instances, params[:instance_command]) do |success, instances, messages|
                 @instances = instances
-                if success
-                    @message = msg
+                @success = success
+                if @success
+                    @messages = messages
                     @instances.each do |i|
                         p = i.server.nil? ? parent : i.server
                         o = i
@@ -248,7 +250,7 @@ class Parent::ServersController < ApplicationController
                         )
                     end
                 else
-                    @error_messages << msg
+                    @error_messages = messages
                 end
             end
         else
@@ -297,14 +299,14 @@ class Parent::ServersController < ApplicationController
         @controls_enabled = true
         respond_to do |format|
             if @error_messages.empty?
-                flash[:notice] = @message
+                flash[:notice] = @messages.join('<br/>')
                 format.html { redirect_to redirect_url }
                 format.xml  { head :ok }
                 format.js
             else
                 flash[:error] = @error_messages.join('<br/>')
                 format.html { redirect_to redirect_url }
-                format.xml  { render :xml => @error_message, :status => :unprocessable_entity }
+                format.xml  { render :xml => @error_messages, :status => :unprocessable_entity }
                 format.js
             end
         end

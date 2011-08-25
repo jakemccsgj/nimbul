@@ -27,31 +27,33 @@ class Parent::InstancesController < ApplicationController
     def self.control_instances(instances, command)
         success = true
         messages = []
+        error_messages = []
         instances.each do |instance|
             begin
                 if command == 'stop'
                     instance.stop!
-                    messages << "#{instance.instance_id} - stopping"
                 end
                 if command == 'start'
                     instance.start!
-                    messages << "#{instance.instance_id} - starting"
                 end
                 if command == 'reboot'
                     instance.reboot!
-                    messages << "#{instance.instance_id} - rebooting"
                 end
                 if command == 'terminate'
                     instance.terminate!
-                    messages << "#{instance.instance_id} - terminating"
+                end
+                if instance.errors.empty?
+                    messages << "#{instance.instance_id} - #{command} successful"
+                else
+                    error_messages << instance.errors.collect{ |e| "#{instance.instance_id} - #{e[0].humanize}, #{e[1]}" }
+                    success = false
                 end
             rescue  Exception => e
-                msg = "#{instance.instance_id} - failed to #{command}: #{e.message}"
-                messages << msg
-                instance.errors.add(:state, msg)
+                error_messages << "#{instance.instance_id} - failed to #{command}: #{e.message}"
                 success = false
             end
         end
+        messages << error_messages
         yield success, instances, messages
     end
     
@@ -60,6 +62,8 @@ class Parent::InstancesController < ApplicationController
         conditions = nil
         instances  = Instance.find(params[:instance_ids], :include => [ :zone, :server, :user, :security_groups, :provider_account ])
         @instances = instances.select{ |i| current_user.has_access?(i) }
+        @messages = []
+        @error_messages = []
         
         options = {
             :search => params[:search],
@@ -73,10 +77,11 @@ class Parent::InstancesController < ApplicationController
         if @instances.size == 0
             @error_message = "No instances are specified."
         else
-            self.class.control_instances(@instances, params[:instance_command]) do |success, instances, msg|
+            self.class.control_instances(@instances, params[:instance_command]) do |success, instances, messages|
                 @instances = instances
+                @success = success
                 if success
-                    @message = msg
+                    @messages = messages
                     @instances.each do |i|
                         p = i.server.nil? ? parent : i.server
                         o = i
@@ -93,11 +98,7 @@ class Parent::InstancesController < ApplicationController
                         )
                     end
                 else
-                    if msg.is_a? Array
-                        @error_messages = msg
-                    else
-                        @error_message = msg
-                    end
+                    @error_messages = messages
                 end
             end
         end
@@ -105,12 +106,12 @@ class Parent::InstancesController < ApplicationController
         @controls_enabled = true
         respond_to do |format|
             if @error_message.blank?
-                flash[:notice] = @message
+                flash[:notice] = @messages.join('<br/>')
                 format.html { redirect_to redirect_url }
                 format.xml  { head :ok }
                 format.js
             else
-                flash[:error] = @error_message
+                flash[:error] = @error_messages.join('<br/>')
                 format.html { redirect_to redirect_url }
                 format.xml  { render :xml => @error_message, :status => :unprocessable_entity }
                 format.js

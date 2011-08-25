@@ -55,6 +55,60 @@ module InstancesHelper
         image_submit_tag 'stop.png', html_options
     end
     
+    def stop_instance_link(text, instance)
+        title = "Stop the instance"
+        if instance.running? or instance.rebooting? or instance.requested?
+            link_text = image_tag("media-playback-pause.png", :class => 'control-icon', :alt => text)
+            if instance.is_locked?
+                link_to_function link_text, 'alert("The instance is Locked.\n\nUnlock to stop.");', :title => title
+            else
+                url = stop_instance_url(instance)
+                confirm_msg = "Are you sure you want to stop this instance?\n\nAll non-persistent data on this instance will be preserved."
+                options = {
+                    :url => url,
+                    :confirm => confirm_msg,
+                    :method => :post,
+                }
+                html_options = {
+                    :title => title,
+                    :href => url,
+                    :method => :post,
+                }
+                link_to_remote link_text, options, html_options
+            end
+        else
+            image_tag("media-playback-pause.png",
+                :class => 'control-icon-disabled',
+                :alt => text+" [disabled]",
+                :title => title+" [disabled]"
+            ) 
+        end
+    end
+
+    def start_instance_link(text, instance)
+        title = "Start the instance"
+        if instance.stopped?
+            link_text = image_tag("media-playback-start.png", :class => 'control-icon', :alt => text)
+            url = start_instance_url(instance)
+            options = {
+                :url => url,
+                :method => :post,
+            }
+            html_options = {
+                :title => title,
+                :href => url,
+                :method => :post,
+            }
+            link_to_remote link_text, options, html_options
+        else
+            image_tag("media-playback-start.png",
+                :class => 'control-icon-disabled',
+                :alt => text+" [disabled]",
+                :title => title+" [disabled]"
+            ) 
+        end
+    end
+
     def reboot_instance_link(text, instance)
         title = "Reboot the instance"
         if instance.running?
@@ -87,7 +141,7 @@ module InstancesHelper
     
     def terminate_instance_link(text, instance)
         title = "Terminate the instance"
-        if instance.running? or instance.rebooting? or instance.requested?
+        if instance.running? or instance.rebooting? or instance.requested? or instance.stopped?
             link_text = image_tag("stop.png", :class => 'control-icon', :alt => text)
             if instance.is_locked?
                 link_to_function link_text, 'alert("The instance is Locked.\n\nUnlock to terminate.");', :title => title

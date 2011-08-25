@@ -28,6 +28,11 @@
 </td>
 <td class="<%= h instance.state %>"><%= h instance.state %></td>
 <td>
+    <%= stop_instance_link 'Stop', instance %>
+    <%= start_instance_link 'Start', instance %>
+
+    <span class="vr">&nbsp;</span>
+
     <%= reboot_instance_link 'Reboot', instance %>
     <%= terminate_instance_link 'Terminate', instance %>
     <%= instance_console_link 'Console Output', instance %>

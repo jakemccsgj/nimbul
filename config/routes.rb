@@ -155,7 +155,7 @@ ActionController::Routing::Routes.draw do |map|
     # instances
     map.resources :instances,
         :collection => { :list => :any },
-        :member => { :reboot => :put, :terminate => :post },
+        :member => { :reboot => :put, :terminate => :post, :stop => :post, :start => :post },
         :only => [ :index, :show, :edit, :update ] do |instance|
             instance.resource :servers,
                 :controller => 'parent/servers',

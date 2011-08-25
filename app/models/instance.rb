@@ -67,35 +67,39 @@ class Instance < BaseModel
     aasm_initial_state :unknown
     aasm_state :unknown
     aasm_state :requested
-    aasm_state :pending, :enter => :initiate_start
+    aasm_state :pending
     aasm_state :running
-    aasm_state :rebooting, :enter => :initiate_reboot
-    aasm_state :shutting_down, :enter => :initiate_termination
+    aasm_state :rebooting
+    aasm_state :shutting_down
     aasm_state :terminated
-    aasm_state :stopping, :enter => :initiate_stop
+    aasm_state :stopping
     aasm_state :stopped
-    aasm_state :starting, :enter => :initiate_start
+    aasm_state :starting
 
     aasm_event :stop do
-        transitions  :from => [ :requested, :pending, :running, :rebooting, :shutting_down ], :to => :stopping
+        transitions :to => :stopping, :from => [ :requested, :pending, :running, :rebooting, :shutting_down ], :guard => :initiate_stop
     end
 
     aasm_event :start do
-        transitions  :from => [ :stopped ], :to => :starting
+        transitions :to => :starting, :from => [ :stopped ], :guard => :initiate_start
     end
 
     aasm_event :reboot do
-        transitions  :from => [ :running ], :to => :rebooting
+        transitions :to => :rebooting, :from => [ :running ], :guard => :initiate_reboot
     end
 
     aasm_event :terminate do
-        transitions  :from => [ :requested, :pending, :running, :rebooting, :shutting_down ], :to => :shutting_down
+        transitions :to => :shutting_down, :from => [ :requested, :pending, :running, :rebooting, :shutting_down, :stopped ], :guard => :initiate_termination
     end
 
     include TrackChanges # must follow any before filters
 
+    def is_unlocked?
+        !is_locked?
+    end
+
     def dns_assignable?() dns_active? and running? and is_ready?; end
-    def dns_releasable?() terminating? or dns_inactive?; end
+    def dns_releasable?() terminating? or dns_inactive? or stopped?; end
 
     def dns_active?() !!dns_active; end
     def dns_inactive?() not dns_active?; end
@@ -131,8 +135,8 @@ class Instance < BaseModel
     end
 
     def initiate_stop
-        if self.is_locked?
-            self.errors.add(:is_locked, "Instance '#{self.instance_id}' is locked; unlock to stop.")
+        if is_locked?
+            errors.add(:is_locked, "unlock to stop.")
             return false
         end
         Ec2Adapter.stop_instance(self)
@@ -145,44 +149,28 @@ class Instance < BaseModel
     end
 
     def initiate_reboot
-        if self.is_locked?
-            self.errors.add(:is_locked, "Instance '#{self.instance_id}' is locked; unlock to reboot.")
-            raise ActiveRecord::Rollback, "Instance '#{self.instance_id}' is locked; unlock to reboot."
-        else
-            begin
-                Ec2Adapter.reboot_instance(self)
-            rescue
-                msg = "Couldn't reboot instance '#{self.instance_id}': #{$!}."
-                self.state = msg
-                self.errors.add(:state, msg)
-                logger.error msg
-                raise ActiveRecord::Rollback
-            end
+        if is_locked?
+            errors.add(:is_locked, "unlock to reboot.")
+            return false
         end
+        Ec2Adapter.reboot_instance(self)
+        return true
     end
 
     def initiate_termination
-        if self.is_locked?
-            self.errors.add(:is_locked, "Instance '#{self.instance_id}' is locked; unlock to terminate.")
-            raise ActiveRecord::Rollback, "Instance '#{self.instance_id}' is locked; unlock to terminate."
-        else
-            begin
-                self.release_dns_leases
-                self.release_launch_configuration
-                results = Ec2Adapter.terminate_instance(self)
-                results.each do |result|
-                    result[:state].gsub!('-','_')
-                    i = Instance.find_by_provider_account_id_and_instance_id(self.provider_account_id, result[:id])
-                    i.update_attribute(:state, result[:state])
-                end
-            rescue
-                msg = "Couldn't reboot instance '#{self.instance_id}': #{$!}."            
-                self.errors.add(:state, msg)
-                self.state = msg
-                logger.error msg
-                raise ActiveRecord::Rollback
-            end
+        if is_locked?
+            errors.add(:is_locked, "unlock to terminate.")
+            return false
         end
+        release_dns_leases
+        release_launch_configuration
+        results = Ec2Adapter.terminate_instance(self)
+        results.each do |result|
+            result[:state].gsub!('-','_')
+            i = Instance.find_by_provider_account_id_and_instance_id(self.provider_account_id, result[:id])
+            i.update_attribute(:state, result[:state])
+        end
+        return true
     end
     
     def unlock!
