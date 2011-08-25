@@ -1,6 +1,10 @@
 <% unless @server_image.nil? -%>
-    Platform: <%= @server_image.cpu_profile.api_name %>
-    Storage: <%= @server_image.storage_type.api_name %>
+    <% unless @server_image.cpu_profile.nil? %>
+        Platform: <%= @server_image.cpu_profile.api_name %>
+    <% end %>
+    <% unless @server_image.storage_type.nil? %>
+        Storage: <%= @server_image.storage_type.api_name %>
+    <% end %>
     API Name: <%= @server_image.image_id %>
     <% unless @server_image.description.blank? %>
         Description: <%=h @server_image.description %>
