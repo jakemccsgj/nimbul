@@ -37,7 +37,7 @@ class Server < BaseModel
     validates_uniqueness_of :name, :scope => :cluster_id, :message => 'there is already a Server with this name in the Cluster'
 
     after_save :save_server_user_accesses, :update_instances
-    before_destroy :ensure_no_usage, :update_instances
+    before_destroy :update_instances
 
     attr_accessor :should_destroy, :status_message
 
@@ -57,13 +57,6 @@ class Server < BaseModel
     
     def has_resource_bundles?
         !resource_bundles.empty?
-    end
-    
-    def ensure_no_usage
-        unless self.instances.empty?
-            self.errors.add(:id, "#{self.name} - can't delete, there are instances associated with this server. Terminate all associated instances first.")
-            raise ActiveRecord::Rollback
-        end
     end
     
     # get count of available resource bundles, fill out with default rb if necessary

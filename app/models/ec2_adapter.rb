@@ -499,6 +499,8 @@ class Ec2Adapter
                 i[:name] = server_image.name if i[:name].blank?
                 server_image = parse_server_image_info(account, i, account_server_images, account_storage_types)
                 server_image.save
+            else
+                server_image.update_attribute(:state, 'unavailable')
             end
         rescue Exception => e
             server_image.description = "Failed to refresh from Provider: #{e.message}"
