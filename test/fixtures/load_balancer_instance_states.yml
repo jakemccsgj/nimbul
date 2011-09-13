@@ -1,0 +1,15 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  load_balancer_id: 1
+  instance_id: 1
+  state: MyString
+  reason_code: MyString
+  description: MyString
+
+two:
+  load_balancer_id: 1
+  instance_id: 1
+  state: MyString
+  reason_code: MyString
+  description: MyString

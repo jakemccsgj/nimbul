@@ -1,0 +1,32 @@
+<h1>Editing load_balancer_policy</h1>
+
+<% form_for(@load_balancer_policy) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    <%= f.label :load_balancer_id %><br />
+    <%= f.text_field :load_balancer_id %>
+  </p>
+  <p>
+    <%= f.label :type %><br />
+    <%= f.text_field :type %>
+  </p>
+  <p>
+    <%= f.label :policy_name %><br />
+    <%= f.text_field :policy_name %>
+  </p>
+  <p>
+    <%= f.label :cookie_name %><br />
+    <%= f.text_field :cookie_name %>
+  </p>
+  <p>
+    <%= f.label :cookie_expiration_period %><br />
+    <%= f.text_field :cookie_expiration_period %>
+  </p>
+  <p>
+    <%= f.submit "Update" %>
+  </p>
+<% end %>
+
+<%= link_to 'Show', @load_balancer_policy %> |
+<%= link_to 'Back', load_balancer_policies_path %>

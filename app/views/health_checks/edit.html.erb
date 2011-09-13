@@ -1,0 +1,44 @@
+<h1>Editing health_check</h1>
+
+<% form_for(@health_check) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    <%= f.label :load_balancer_id %><br />
+    <%= f.text_field :load_balancer_id %>
+  </p>
+  <p>
+    <%= f.label :healthy_threshold %><br />
+    <%= f.text_field :healthy_threshold %>
+  </p>
+  <p>
+    <%= f.label :interval %><br />
+    <%= f.text_field :interval %>
+  </p>
+  <p>
+    <%= f.label :target_protocol %><br />
+    <%= f.text_field :target_protocol %>
+  </p>
+  <p>
+    <%= f.label :target_port %><br />
+    <%= f.text_field :target_port %>
+  </p>
+  <p>
+    <%= f.label :target_path %><br />
+    <%= f.text_field :target_path %>
+  </p>
+  <p>
+    <%= f.label :timeout %><br />
+    <%= f.text_field :timeout %>
+  </p>
+  <p>
+    <%= f.label :unhealthy_threshold %><br />
+    <%= f.text_field :unhealthy_threshold %>
+  </p>
+  <p>
+    <%= f.submit "Update" %>
+  </p>
+<% end %>
+
+<%= link_to 'Show', @health_check %> |
+<%= link_to 'Back', health_checks_path %>

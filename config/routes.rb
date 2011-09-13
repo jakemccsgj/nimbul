@@ -13,6 +13,12 @@ ActionController::Routing::Routes.draw do |map|
       :only => [ :index, :list ]
   end
 
+  map.resources :load_balancers, :only => [] do |load_balancer|
+    load_balancer.resources :instances, :controller => 'parent/instances',
+      :collection => { :list => :any, :control => :any },
+      :only => [ :index, :list ]
+  end
+
   map.resources :account_groups do |account_group|
     account_group.resources :apps, :collection => { :sort => :post }
     account_group.resources :stats,
@@ -81,6 +87,7 @@ ActionController::Routing::Routes.draw do |map|
             :only => [ :new, :create ]
         provider_account.resources :auto_scaling_groups, :controller => 'provider_account/auto_scaling_groups',
             :collection => { :list => :any }
+        provider_account.resources :load_balancers
         provider_account.resources :server_images, :controller => 'provider_account/server_images',
             :collection => { :list => :any, :control => :any },
             :only => [ :index, :list, :new, :create ]

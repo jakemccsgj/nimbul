@@ -130,12 +130,12 @@ class AsAdapter
         options[:launch_configuration_name] = g.launch_configuration.launch_configuration_name
         options[:availability_zones] = g.zones.collect{ |z| z.name }
         begin
-        as.create_auto_scaling_group(options)
-        return true
+            as.create_auto_scaling_group(options)
+            return true
         rescue
             g.status_message = "#{$!}"
         end        
-    return false
+        return false
     end
 
     def self.update_auto_scaling_group(g)
@@ -302,7 +302,7 @@ class AsAdapter
         # zones
         zone_names = attributes['availability_zones'] || []
         attributes.delete('availability_zones')
-        zones = (Zone.find_all_by_provider_account_id_and_name(account.id, zone_names))
+        zones = account.zones.collect{|z| z if zone_names.include?(z.name)}.compact
 
         # balancers
         balancer_names = attributes['load_balancer_names'] || []
@@ -382,12 +382,18 @@ class AsAdapter
         zone_names = attributes['availability_zones'] || []
         attributes.delete('availability_zones')
 
-        listener_parsers = attributes['listeners'] || []
-        attributes.delete('listeners')
-
-        # TODO we don't import health checks yet
         health_check_parser = attributes['health_check']
         attributes.delete('health_check')
+
+        listener_parsers = attributes['listener_descriptions'] || []
+        attributes.delete('listener_descriptions')
+
+        instance_parsers = attributes['instances']
+        attributes.delete('instances')
+
+        # TODO add support for policies
+        policy_parser = attributes['policies']
+        attributes.delete('policies')
 
         if load_balancer.nil?
             load_balancer = account.load_balancers.build(attributes)
@@ -396,16 +402,33 @@ class AsAdapter
         end
 
         # get zones
-        zones = (Zone.find_all_by_provider_account_id_and_name(account.id, zone_names))
-        load_balancer.zones = ( zones || [] )
+        load_balancer.zones = account.zones.collect{|z| z if zone_names.include?(z.name)}.compact
+
+        # get health check
+        unless health_check_parser.nil?
+            h = health_check_parser.to_hash
+            target = h['target']
+            h.delete('target')
+            m = /(.*):(\d+)\/?(.*)/.match(target)
+            h[:target_protocol] = m.captures[0]
+            h[:target_port] = m.captures[1]
+            h[:target_path] = m.captures[2] unless m.captures[2].blank?
+            check = HealthCheck.find_by_load_balancer_id_and_target_protocol_and_target_port(load_balancer.id, h[:target_protocol], h[:target_port])
+            check = load_balancer.health_checks.build(h) if check.nil?
+        end
 
         # get listeners
         listener_parsers.each do |l|
             l = l.to_hash
+            l = l['listener'].to_hash
             listener = nil
             listener = LoadBalancerListener.find_by_load_balancer_id_and_load_balancer_port_and_instance_port_and_protocol(load_balancer.id, l['load_balancer_port'].to_i, l['instance_port'].to_i, l['protocol']) unless load_balancer.id.nil?
             listener = load_balancer.load_balancer_listeners.build(l) if listener.nil?
         end
+
+        # get instances
+        instance_ids = instance_parsers.collect{|ip| (ip.to_hash)['instance_id']}
+        load_balancer.instances = ( Instance.find_all_by_provider_account_id_and_instance_id(account.id, instance_ids) )
 
         return load_balancer
     end
