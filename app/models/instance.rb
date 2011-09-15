@@ -16,7 +16,8 @@ class Instance < BaseModel
   belongs_to :storage_type
 
   has_and_belongs_to_many :security_groups, :uniq => true
-  has_and_belongs_to_many :load_balancers, :uniq => true
+  has_many :load_balancer_instance_states, :dependent => :destroy
+  has_many :load_balancers, :through => :load_balancer_instance_states, :uniq => true
 
   has_many :operations, :dependent => :destroy
 
@@ -247,10 +248,10 @@ class Instance < BaseModel
 
     def self.search_by_load_balancer(load_balancer, search, page, extra_joins, extra_conditions, sort=nil, filter=nil, include=nil)
         joins = [
-            'INNER JOIN instances_load_balancers ON instances_load_balancers.instance_id = instances.id',
+            'INNER JOIN load_balancer_instance_states ON load_balancer_instance_states.instance_id = instances.id',
         ] + [extra_joins].flatten.compact
 
-        conditions = [ 'instances_load_balancers.load_balancer_id = ?', (load_balancer.is_a?(LoadBalancer) ? load_balancer.id : load_balancer) ]
+        conditions = [ 'load_balancer_instance_states.load_balancer_id = ?', (load_balancer.is_a?(LoadBalancer) ? load_balancer.id : load_balancer) ]
         unless extra_conditions.blank?
             extra_conditions = [ extra_conditions ].flatten
             conditions[0] << ' AND ' + extra_conditions[0];

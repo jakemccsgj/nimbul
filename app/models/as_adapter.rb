@@ -427,7 +427,9 @@ class AsAdapter
         end
 
         # get instances
-        instance_ids = instance_parsers.collect{|ip| (ip.to_hash)['instance_id']}
+        unless instance_parsers.empty?
+            instance_states = elb.describe_instance_states(options)
+        end
         load_balancer.instances = ( Instance.find_all_by_provider_account_id_and_instance_id(account.id, instance_ids) )
 
         return load_balancer

@@ -1,7 +1,9 @@
 class LoadBalancer < BaseModel
     belongs_to :provider_account
     has_and_belongs_to_many :zones, :order => :name, :uniq => true
-    has_and_belongs_to_many :instances, :uniq => true
+
+    has_many :load_balancer_instance_states, :dependent => :destroy
+    has_many :instances, :through => :load_balancer_instance_states, :uniq => true
 
     has_many :health_checks, :dependent => :destroy
     has_many :load_balancer_listeners, :dependent => :destroy
