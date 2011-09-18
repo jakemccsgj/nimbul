@@ -407,12 +407,7 @@ class AsAdapter
         # get health check
         unless health_check_parser.nil?
             h = health_check_parser.to_hash
-            target = h['target']
-            h.delete('target')
-            m = /(.*):(\d+)\/?(.*)/.match(target)
-            h[:target_protocol] = m.captures[0]
-            h[:target_port] = m.captures[1]
-            h[:target_path] = m.captures[2] unless m.captures[2].blank?
+            h = HealthCheck.parse(h)
             check = HealthCheck.find_by_load_balancer_id_and_target_protocol_and_target_port(load_balancer.id, h[:target_protocol], h[:target_port])
             check = load_balancer.health_checks.build(h) if check.nil?
         end
@@ -426,11 +421,24 @@ class AsAdapter
             listener = load_balancer.load_balancer_listeners.build(l) if listener.nil?
         end
 
-        # get instances
+        # get instance states
         unless instance_parsers.empty?
-            instance_states = elb.describe_instance_states(options)
+            elb = get_elb(account)
+            instance_states = elb.describe_instance_states({:load_balancer_name => load_balancer.load_balancer_name})
+            instance_states.each do |i|
+                i = i.to_hash
+                instance = Instance.find_by_provider_account_id_and_instance_id(account.id, i['instance_id'])
+                unless instance.nil?
+                    i['instance_id'] = instance.id
+                    load_balancer_instance_state = load_balancer.load_balancer_instance_states.detect{|lbis| lbis.instance_id == i['instance_id']}
+                    if load_balancer_instance_state.nil?
+                        load_balancer_instance_state = load_balancer.load_balancer_instance_states.build(i)
+                    else
+                        load_balancer_instance_state.attributes = i
+                    end
+                end
+            end
         end
-        load_balancer.instances = ( Instance.find_all_by_provider_account_id_and_instance_id(account.id, instance_ids) )
 
         return load_balancer
     end

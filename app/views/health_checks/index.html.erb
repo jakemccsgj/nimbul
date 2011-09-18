@@ -1,34 +1,6 @@
-<h1>Listing health_checks</h1>
+<% subtitle 'Available Prices' %>
 
-<table>
-  <tr>
-    <th>Load balancer</th>
-    <th>Healthy threshold</th>
-    <th>Interval</th>
-    <th>Target protocol</th>
-    <th>Target port</th>
-    <th>Target path</th>
-    <th>Timeout</th>
-    <th>Unhealthy threshold</th>
-  </tr>
+<h1><%= link_to 'Admin Controls', admin_controls_path %> / Available Prices</h1>
+<br/>
 
-<% for health_check in @health_checks %>
-  <tr>
-    <td><%=h health_check.load_balancer_id %></td>
-    <td><%=h health_check.healthy_threshold %></td>
-    <td><%=h health_check.interval %></td>
-    <td><%=h health_check.target_protocol %></td>
-    <td><%=h health_check.target_port %></td>
-    <td><%=h health_check.target_path %></td>
-    <td><%=h health_check.timeout %></td>
-    <td><%=h health_check.unhealthy_threshold %></td>
-    <td><%= link_to 'Show', health_check %></td>
-    <td><%= link_to 'Edit', edit_health_check_path(health_check) %></td>
-    <td><%= link_to 'Destroy', health_check, :confirm => 'Are you sure?', :method => :delete %></td>
-  </tr>
-<% end %>
-</table>
-
-<br />
-
-<%= link_to 'New health_check', new_health_check_path %>
+<%= render :partial => 'index' %>

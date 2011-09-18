@@ -31,7 +31,7 @@ class ProviderAccount < BaseModel
     has_many :dns_hostnames, :dependent => :destroy
     has_many :auto_scaling_groups, :dependent => :destroy
     has_many :auto_scaling_triggers, :dependent => :destroy
-    has_many :load_balancers, :include => [:load_balancer_listeners, :health_checks, :zones, :instances], :dependent => :destroy
+    has_many :load_balancers, :include => [:load_balancer_listeners, :health_checks, :zones, :load_balancer_instance_states, :instances], :dependent => :destroy
     has_many :reserved_instances, :dependent => :destroy
     
     has_many :cloud_resources, :dependent => :destroy

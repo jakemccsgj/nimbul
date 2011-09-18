@@ -10,7 +10,7 @@ class LoadBalancer < BaseModel
 
     validates_presence_of :load_balancer_name
 
-    after_update :save_load_balancer_listeners, :save_health_checks, :save_instances
+    after_update :save_load_balancer_listeners, :save_health_checks, :save_load_balancer_instance_states
 
     attr_accessor :should_destroy
 
@@ -38,8 +38,8 @@ class LoadBalancer < BaseModel
         end
     end
 
-    def save_instances
-        instances.each do |i|
+    def save_load_balancer_instance_states
+        load_balancer_instance_states.each do |i|
             if i.should_destroy?
                 i.destroy
             else
@@ -48,4 +48,10 @@ class LoadBalancer < BaseModel
         end
     end
 
+    def can_use_more_of?(load_balancer_resource_type)
+        if load_balancer_resource_type == 'HealthCheck'
+            return (health_checks.count == 0)
+        end
+        return false
+    end
 end

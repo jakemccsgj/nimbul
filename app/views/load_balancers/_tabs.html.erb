@@ -37,7 +37,11 @@
         <span id="load_balancer_<%= @load_balancer.id %>_instances_index" class="smaller"></span>
     </li>
     <li id="lb_health_checks_pane" class="pane-unselected">
+Your load balancer will automatically perform health checks on your EC2 instances and only route traffic to instances that pass the health check. If an instance fails the health check, it is automatically removed from the load balancer.
+        <br/><br/>
+        <span id="load_balancer_<%= @load_balancer.id %>_health_checks_index" class="smaller"></span>
     </li>
 </ul>
 </div>
 <%= javascript_tag(remote_function(:url => load_balancer_instances_url(@load_balancer.id), :method => :get) ) %>
+<%= javascript_tag(remote_function(:url => load_balancer_health_checks_url(@load_balancer.id), :method => :get) ) %>
