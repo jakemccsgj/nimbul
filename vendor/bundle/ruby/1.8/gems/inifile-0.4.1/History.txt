@@ -1,0 +1,25 @@
+== 0.4.1 / 2011-02-22
+
+Bug Fixes
+  - Empty quotes [Steffen Beyer]
+
+== 0.4.0 / 2011-02-15
+
+Enhancements
+  - Added multiline support [André Gawron]
+  - Added file encoding support [Gilles Devaux]
+
+== 0.3.0 / 2009-12-10
+
+* 1 minor enhancement
+  - Added a []= operator to the inifile for setting entire sections
+
+== 0.2.0 / 2009-10-27
+
+* 1 minor enhancement
+  - Using Mr Bones for rake tasks and gem management
+
+== 0.1.0 / 2006-11-26
+
+* 1 major enhancement
+  * Birthday!
