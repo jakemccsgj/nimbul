@@ -14,6 +14,7 @@ class Cluster < BaseModel
   
   has_many :cluster_parameters, :dependent => :destroy
   has_many :servers, :dependent => :destroy
+  has_many :instances, :through => :servers
 
   # auditing
   has_many :logs, :class_name => 'AuditLog', :dependent => :nullify
@@ -155,9 +156,9 @@ class Cluster < BaseModel
       return parameter.value
   end
 
-  def instances
-      Instance.find_all_by_server_id(servers.collect{ |s| s.id })
-  end
+  #def instances
+  #    Instance.find_all_by_server_id(servers.collect{ |s| s.id })
+  #end
 
   # sort, search and paginate parameters
   def self.per_page

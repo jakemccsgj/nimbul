@@ -12,7 +12,7 @@ class ClustersController < ApplicationController
       current_user,
       :include => [
         :provider_account,
-        { :servers => :instances }
+        :instances
       ]
     )
 
