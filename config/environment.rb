@@ -1,7 +1,4 @@
 # Be sure to restart your server when you modify this file
-#require 'rubygems'
-#require 'bundler/setup'
-#Bundler.require(:default)
 
 # for more info, see: http://ozmm.org/posts/try.html
 #
@@ -94,9 +91,6 @@ Rails::Initializer.run do |config|
   StartupScript = Struct.new(:name,:body)
 
   #Constant values
-  # <NOTE>: We don't support micro until we support EBS-based root devices because micros are only supported using those
-  # EC2_INSTANCE_TYPES = [ 't1.micro', 'm1.small', 'm1.large', 'm1.xlarge', 'c1.medium', 'c1.xlarge' ]
-  #EC2_INSTANCE_TYPES = [ 'm1.small', 'm1.large', 'm1.xlarge', 'c1.medium', 'c1.xlarge' ]
   EC2_SERVER_USERS                        = [ 'root', 'dev', 'logpoll' ]
   PUBLISH_EVERY_VALUES                    = [ 0, 10, 20, 30, 60, 120, 300, 600, 1800, 3600 ]
   IN_MESSAGE_STATES                       = [ 'new', 'processed' ]
