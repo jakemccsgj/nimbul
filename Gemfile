@@ -1,8 +1,11 @@
 source :gemcutter
+source :rubyforge
 
+gem 'aws'
 gem 'rails', '~> 2.3.0'
 gem 'Ruby-MemCache', :require => 'memcache'
-gem 'SysVIPC'
+gem 'ruby-openid'
+gem 'sysvipc'
 gem 'aasm'
 gem 'carrot'
 gem 'chronic'
@@ -11,7 +14,6 @@ gem 'fastthread'
 gem 'mysql'
 gem 'net-sftp', :require => 'net/sftp'
 gem 'net-ssh', :require => 'net/ssh'
-gem 'ruby-openid'
 gem 'rufus-scheduler'
 gem 'work_queue'
 git 'https://github.com/nimbul/cloudmaster.git' do

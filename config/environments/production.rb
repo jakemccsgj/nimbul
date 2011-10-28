@@ -6,7 +6,7 @@ config.cache_classes = true
 
 # Use a different logger for distributed setups
 # config.logger = SyslogLogger.new
-config.log_level = :warn
+config.log_level = :info
 
 # Full error reports are disabled and caching is turned on
 config.action_controller.consider_all_requests_local = false
@@ -24,7 +24,7 @@ config.action_controller.perform_caching             = true
 
 unless ENV['DAEMON_SCRIPTLET']
   config.after_initialize do
-    require 'application' unless Object.const_defined?(:ApplicationController)
+    #require 'application' unless Object.const_defined?(:ApplicationController)
     LoggedExceptionsController.class_eval(<<-EOS, __FILE__, __LINE__)
       # set the same session key as the app
       session :session_key => '#{APP_CONFIG['settings']['session_key']}'
