@@ -1,157 +1,157 @@
-
-SHELL = /bin/sh
-
-#### Start of system configuration section. ####
-
-srcdir = .
-topdir = /Users/chris/.rvm/rubies/ruby-1.8.7-p352/lib/ruby/1.8/x86_64-darwin11.2.0
-hdrdir = $(topdir)
-VPATH = $(srcdir):$(topdir):$(hdrdir)
-exec_prefix = $(prefix)
-prefix = $(DESTDIR)/Users/chris/.rvm/rubies/ruby-1.8.7-p352
-sharedstatedir = $(prefix)/com
-mandir = $(datarootdir)/man
-psdir = $(docdir)
-oldincludedir = $(DESTDIR)/usr/include
-localedir = $(datarootdir)/locale
-bindir = $(exec_prefix)/bin
-libexecdir = $(exec_prefix)/libexec
-sitedir = $(libdir)/ruby/site_ruby
-htmldir = $(docdir)
-vendorarchdir = $(vendorlibdir)/$(sitearch)
-includedir = $(prefix)/include
-infodir = $(datarootdir)/info
-vendorlibdir = $(vendordir)/$(ruby_version)
-sysconfdir = $(prefix)/etc
-libdir = $(exec_prefix)/lib
-sbindir = $(exec_prefix)/sbin
-rubylibdir = $(libdir)/ruby/$(ruby_version)
-docdir = $(datarootdir)/doc/$(PACKAGE)
-dvidir = $(docdir)
-vendordir = $(libdir)/ruby/vendor_ruby
-datarootdir = $(prefix)/share
-pdfdir = $(docdir)
-archdir = $(rubylibdir)/$(arch)
-sitearchdir = $(sitelibdir)/$(sitearch)
-datadir = $(datarootdir)
-localstatedir = $(prefix)/var
-sitelibdir = $(sitedir)/$(ruby_version)
-
-CC = /usr/bin/gcc-4.2
-LIBRUBY = $(LIBRUBY_SO)
-LIBRUBY_A = lib$(RUBY_SO_NAME)-static.a
-LIBRUBYARG_SHARED = -l$(RUBY_SO_NAME)
-LIBRUBYARG_STATIC = -l$(RUBY_SO_NAME)-static
-
-RUBY_EXTCONF_H = 
-CFLAGS   =  -fno-common -arch x86_64 -g -Os -pipe -no-cpp-precomp  -fno-common -pipe -fno-common $(cflags) 
-INCFLAGS = -I. -I$(topdir) -I$(hdrdir) -I$(srcdir)
-DEFS     = 
-CPPFLAGS =  -Qunused-arguments -D_XOPEN_SOURCE -D_DARWIN_C_SOURCE $(DEFS) $(cppflags)
-CXXFLAGS = $(CFLAGS) 
-ldflags  = -L. -arch x86_64 -bind_at_load
-dldflags = 
-archflag = 
-DLDFLAGS = $(ldflags) $(dldflags) $(archflag)
-LDSHARED = cc -arch x86_64 -dynamiclib -undefined suppress -flat_namespace
+PACKAGE_VERSION = 
+INSTALL_SCRIPT = /usr/bin/install -c
+DEFS = 
+GREP = /bin/grep
+sharedstatedir = /usr/local/rvm/rubies/ree-1.8.7-2011.03/com
+COMMON_LIBS = 
+EXPORT_PREFIX = 
 AR = ar
-EXEEXT = 
-
+target_alias = 
+PACKAGE_STRING = 
+host_os = linux-gnu
+RDOCTARGET = 
+MANTYPE = doc
+build = x86_64-unknown-linux-gnu
+AS = as
+PACKAGE_URL = 
+DLDFLAGS = 
+build_os = linux-gnu
+PATH_SEPARATOR = :
+PACKAGE_NAME = 
+LIBRUBYARG = -lruby-static
 RUBY_INSTALL_NAME = ruby
-RUBY_SO_NAME = ruby
-arch = x86_64-darwin11.2.0
-sitearch = x86_64-darwin11.2.0
-ruby_version = 1.8
-ruby = /Users/chris/.rvm/rubies/ruby-1.8.7-p352/bin/ruby
-RUBY = $(ruby)
-RM = rm -f
-MAKEDIRS = mkdir -p
-INSTALL = /usr/bin/install -c
-INSTALL_PROG = $(INSTALL) -m 0755
-INSTALL_DATA = $(INSTALL) -m 644
-COPY = cp
-
-#### End of system configuration section. ####
-
-preload = 
-
-libpath = . $(libdir)
-LIBPATH =  -L. -L$(libdir)
-DEFFILE = 
-
-CLEANFILES = mkmf.log
-DISTCLEANFILES = 
-
-extout = 
-extout_prefix = 
-target_prefix = 
-LOCAL_LIBS = 
-LIBS = $(LIBRUBYARG_SHARED)  -ldl -lobjc  
-SRCS = fastthread.c
-OBJS = fastthread.o
-TARGET = fastthread
-DLLIB = $(TARGET).bundle
+LN_S = ln -s
 EXTSTATIC = 
-STATIC_LIB = 
+EXEEXT = 
+mandir = /usr/local/rvm/rubies/ree-1.8.7-2011.03/share/man
+YACC = bison -y
+LIBPATHENV = LD_LIBRARY_PATH
+oldincludedir = /usr/include
+psdir = /usr/local/rvm/rubies/ree-1.8.7-2011.03/share/doc/$(PACKAGE)
+sitearch = x86_64-linux
+DLEXT2 = 
+LIBS = -lrt -ldl -lcrypt -lm 
+bindir = /usr/local/rvm/rubies/ree-1.8.7-2011.03/bin
+localedir = /usr/local/rvm/rubies/ree-1.8.7-2011.03/share/locale
+rubyw_install_name = 
+RUBY_SO_NAME = ruby
+OBJDUMP = 
+ECHO_C = 
+optflags = 
+arch = x86_64-linux
+NROFF = /usr/bin/nroff
+libexecdir = /usr/local/rvm/rubies/ree-1.8.7-2011.03/libexec
+CC = gcc
+cflags =  
+OUTFLAG = -o 
+STATIC = 
+PREP = miniruby
+build_vendor = unknown
+debugflags = 
+htmldir = /usr/local/rvm/rubies/ree-1.8.7-2011.03/share/doc/$(PACKAGE)
+sitedir = /usr/local/rvm/rubies/ree-1.8.7-2011.03/lib/ruby/site_ruby
+YFLAGS = 
+MAKEFILES = Makefile
+STRIP = strip -S -x
+MINOR = 8
+LIBRUBYARG_SHARED = -Wl,-R -Wl,/usr/local/rvm/rubies/ree-1.8.7-2011.03/lib -L/usr/local/rvm/rubies/ree-1.8.7-2011.03/lib 
+MAKEDIRS = mkdir -p
+LIBRUBY_LDSHARED = gcc -shared
+LDFLAGS = -L.  -rdynamic -Wl,-export-dynamic
+vendorarchdir = /usr/local/rvm/rubies/ree-1.8.7-2011.03/lib/ruby/vendor_ruby/1.8/x86_64-linux
+includedir = /usr/local/rvm/rubies/ree-1.8.7-2011.03/include
+infodir = /usr/local/rvm/rubies/ree-1.8.7-2011.03/share/info
+NM = 
+target = x86_64-unknown-linux-gnu
+ENABLE_SHARED = no
+DLLWRAP = 
+vendorlibdir = /usr/local/rvm/rubies/ree-1.8.7-2011.03/lib/ruby/vendor_ruby/1.8
+CFLAGS = -g -O2   
+host = x86_64-unknown-linux-gnu
+INSTALL_DATA = /usr/bin/install -c -m 644
+INSTALL_PROGRAM = /usr/bin/install -c
+DLEXT = so
+PACKAGE_BUGREPORT = 
+exec_prefix = /usr/local/rvm/rubies/ree-1.8.7-2011.03
+sysconfdir = /usr/local/rvm/rubies/ree-1.8.7-2011.03/etc
+TEENY = 7
+CPP = gcc -E
+ALLOCA = 
+LIBEXT = a
+libdir = /usr/local/rvm/rubies/ree-1.8.7-2011.03/lib
+LIBRUBY = libruby-static.a
+build_alias = 
+prefix = /usr/local/rvm/rubies/ree-1.8.7-2011.03
+target_vendor = unknown
+target_cpu = x86_64
+ECHO_N = -n
+rubylibdir = /usr/local/rvm/rubies/ree-1.8.7-2011.03/lib/ruby/1.8
+sbindir = /usr/local/rvm/rubies/ree-1.8.7-2011.03/sbin
+docdir = /usr/local/rvm/rubies/ree-1.8.7-2011.03/share/doc/$(PACKAGE)
+dvidir = /usr/local/rvm/rubies/ree-1.8.7-2011.03/share/doc/$(PACKAGE)
+host_vendor = unknown
+TRY_LINK = 
+SOLIBS = 
+configure_args =  '--prefix=/usr/local/rvm/rubies/ree-1.8.7-2011.03' '--enable-mbari-api' 'CFLAGS=-g -O2 '
+vendordir = /usr/local/rvm/rubies/ree-1.8.7-2011.03/lib/ruby/vendor_ruby
+target_os = linux
+GNU_LD = yes
+CP = cp
+EXTOUT = .ext
+MAINLIBS = 
+SET_MAKE = 
+datarootdir = /usr/local/rvm/rubies/ree-1.8.7-2011.03/share
+pdfdir = /usr/local/rvm/rubies/ree-1.8.7-2011.03/share/doc/$(PACKAGE)
+LIBRUBYARG_STATIC = -lruby-static
+RUBYW_INSTALL_NAME = 
+PATCHLEVEL = 334
+WINDRES = 
+archdir = /usr/local/rvm/rubies/ree-1.8.7-2011.03/lib/ruby/1.8/x86_64-linux
+ruby_version = 1.8
+LINK_SO = 
+ECHO_T = 
+RPATHFLAG =  -Wl,-R%1$-s
+SHELL = /bin/sh
+LDSHARED = gcc -shared
+RANLIB = ranlib
+DLDLIBS =  -lc
+build_cpu = x86_64
+host_alias = 
+ASFLAGS = 
+INSTALL = /usr/bin/install -c
+sitearchdir = /usr/local/rvm/rubies/ree-1.8.7-2011.03/lib/ruby/site_ruby/1.8/x86_64-linux
+ARCHFILE = 
+LIBRUBY_DLDFLAGS = 
+OBJEXT = o
+datadir = /usr/local/rvm/rubies/ree-1.8.7-2011.03/share
+DESTDIR = 
+LIBRUBY_ALIASES = libruby.so
+CCDLFLAGS =  -fPIC
+RM = rm -f
+host_cpu = x86_64
+setup = Setup
+CPPOUTFILE = -o conftest.i
+topdir = /usr/local/rvm/rubies/ree-1.8.7-2011.03/lib/ruby/1.8/x86_64-linux
+localstatedir = /usr/local/rvm/rubies/ree-1.8.7-2011.03/var
+LIBPATHFLAG =  -L%1$-s
+cppflags = 
+sitelibdir = /usr/local/rvm/rubies/ree-1.8.7-2011.03/lib/ruby/site_ruby/1.8
+ruby_install_name = ruby
+CPPFLAGS =   
+MAJOR = 1
+EGREP = /bin/grep -E
+LIBRUBY_SO = libruby.so.1.8.7
+PACKAGE_TARNAME = 
+LIBRUBY_A = libruby-static.a
+COMMON_MACROS = 
+ARCH_FLAG = 
+COMMON_HEADERS = 
 
-BINDIR        = $(bindir)
-RUBYCOMMONDIR = $(sitedir)$(target_prefix)
-RUBYLIBDIR = /Users/chris/Documents/Infrastructure/src/nimbul/vendor/bundle/ruby/1.8/gems/fastthread-1.0.7/lib$(target_prefix)
-RUBYARCHDIR = /Users/chris/Documents/Infrastructure/src/nimbul/vendor/bundle/ruby/1.8/gems/fastthread-1.0.7/lib$(target_prefix)
+RUBYARCHDIR = /opt/nyt/nimbul/vendor/bundle/ruby/1.8/gems/fastthread-1.0.7/lib$(target_prefix)
 
-TARGET_SO     = $(DLLIB)
-CLEANLIBS     = $(TARGET).bundle $(TARGET).il? $(TARGET).tds $(TARGET).map
-CLEANOBJS     = *.o *.a *.s[ol] *.pdb *.exp *.bak
+default:
 
-all:		$(DLLIB)
-static:		$(STATIC_LIB)
+install:
+	mkdir -p $(RUBYARCHDIR)
+	touch $(RUBYARCHDIR)/fastthread.rb
 
-clean:
-		@-$(RM) $(CLEANLIBS) $(CLEANOBJS) $(CLEANFILES)
-
-distclean:	clean
-		@-$(RM) Makefile $(RUBY_EXTCONF_H) conftest.* mkmf.log
-		@-$(RM) core ruby$(EXEEXT) *~ $(DISTCLEANFILES)
-
-realclean:	distclean
-install: install-so install-rb
-
-install-so: $(RUBYARCHDIR)
-install-so: $(RUBYARCHDIR)/$(DLLIB)
-$(RUBYARCHDIR)/$(DLLIB): $(DLLIB)
-	$(INSTALL_PROG) $(DLLIB) $(RUBYARCHDIR)
-install-rb: pre-install-rb install-rb-default
-install-rb-default: pre-install-rb-default
-pre-install-rb: Makefile
-pre-install-rb-default: Makefile
-$(RUBYARCHDIR):
-	$(MAKEDIRS) $@
-
-site-install: site-install-so site-install-rb
-site-install-so: install-so
-site-install-rb: install-rb
-
-.SUFFIXES: .c .m .cc .cxx .cpp .C .o
-
-.cc.o:
-	$(CXX) $(INCFLAGS) $(CPPFLAGS) $(CXXFLAGS) -c $<
-
-.cxx.o:
-	$(CXX) $(INCFLAGS) $(CPPFLAGS) $(CXXFLAGS) -c $<
-
-.cpp.o:
-	$(CXX) $(INCFLAGS) $(CPPFLAGS) $(CXXFLAGS) -c $<
-
-.C.o:
-	$(CXX) $(INCFLAGS) $(CPPFLAGS) $(CXXFLAGS) -c $<
-
-.c.o:
-	$(CC) $(INCFLAGS) $(CPPFLAGS) $(CFLAGS) -c $<
-
-$(DLLIB): $(OBJS) Makefile
-	@-$(RM) $@
-	$(LDSHARED) -o $@ $(OBJS) $(LIBPATH) $(DLDFLAGS) $(LOCAL_LIBS) $(LIBS)
-
-
-
-$(OBJS): ruby.h defines.h

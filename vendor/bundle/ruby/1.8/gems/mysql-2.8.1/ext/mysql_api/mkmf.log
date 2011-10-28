@@ -1,6 +1,6 @@
 have_func: checking for mysql_ssl_set()... -------------------- yes
 
-"/usr/bin/gcc-4.2 -o conftest -I. -I/Users/chris/.rvm/rubies/ruby-1.8.7-p352/lib/ruby/1.8/x86_64-darwin11.2.0 -I. -Qunused-arguments -D_XOPEN_SOURCE -D_DARWIN_C_SOURCE  -Qunused-arguments -I/usr/local/mysql/include  -g -Os -arch x86_64 -fno-common   -D_P1003_1B_VISIBLE -DSIGNAL_WITH_VIO_CLOSE -DSIGNALS_DONT_BREAK_READ -DIGNORE_SIGHUP_SIGQUIT  -DDONT_DECLARE_CXA_PURE_VIRTUAL -arch x86_64 -g -Os -pipe -no-cpp-precomp  -fno-common -pipe -fno-common   conftest.c  -L. -L/Users/chris/.rvm/rubies/ruby-1.8.7-p352/lib -L. -arch x86_64 -bind_at_load    -L/usr/local/mysql/lib -lmysqlclient -lz -lm     -lmygcc  -lruby-static -L/usr/local/mysql/lib -lmysqlclient -lz -lm     -lmygcc  -ldl -lobjc  "
+"gcc -o conftest -I/opt/local/include -I. -I/usr/local/rvm/rubies/ree-1.8.7-2011.03/lib/ruby/1.8/x86_64-linux -I.    -I/usr/include/mysql  -g -pipe -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -g -O2    conftest.c  -L. -L/usr/local/rvm/rubies/ree-1.8.7-2011.03/lib -Wl,-R/usr/local/rvm/rubies/ree-1.8.7-2011.03/lib -L.  -rdynamic -Wl,-export-dynamic    -rdynamic -L/usr/lib64/mysql -lmysqlclient -lz -lcrypt -lnsl -lm  -lruby-static -rdynamic -L/usr/lib64/mysql -lmysqlclient -lz -lcrypt -lnsl -lm  -L/opt/local/lib -lrt -ldl -lcrypt -lm   -lc"
 conftest.c: In function ‘t’:
 conftest.c:3: error: ‘mysql_ssl_set’ undeclared (first use in this function)
 conftest.c:3: error: (Each undeclared identifier is reported only once
@@ -12,7 +12,7 @@ checked program was:
 3: int t() { void ((*volatile p)()); p = (void ((*)()))mysql_ssl_set; return 0; }
 /* end */
 
-"/usr/bin/gcc-4.2 -o conftest -I. -I/Users/chris/.rvm/rubies/ruby-1.8.7-p352/lib/ruby/1.8/x86_64-darwin11.2.0 -I. -Qunused-arguments -D_XOPEN_SOURCE -D_DARWIN_C_SOURCE  -Qunused-arguments -I/usr/local/mysql/include  -g -Os -arch x86_64 -fno-common   -D_P1003_1B_VISIBLE -DSIGNAL_WITH_VIO_CLOSE -DSIGNALS_DONT_BREAK_READ -DIGNORE_SIGHUP_SIGQUIT  -DDONT_DECLARE_CXA_PURE_VIRTUAL -arch x86_64 -g -Os -pipe -no-cpp-precomp  -fno-common -pipe -fno-common   conftest.c  -L. -L/Users/chris/.rvm/rubies/ruby-1.8.7-p352/lib -L. -arch x86_64 -bind_at_load    -L/usr/local/mysql/lib -lmysqlclient -lz -lm     -lmygcc  -lruby-static -L/usr/local/mysql/lib -lmysqlclient -lz -lm     -lmygcc  -ldl -lobjc  "
+"gcc -o conftest -I/opt/local/include -I. -I/usr/local/rvm/rubies/ree-1.8.7-2011.03/lib/ruby/1.8/x86_64-linux -I.    -I/usr/include/mysql  -g -pipe -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -g -O2    conftest.c  -L. -L/usr/local/rvm/rubies/ree-1.8.7-2011.03/lib -Wl,-R/usr/local/rvm/rubies/ree-1.8.7-2011.03/lib -L.  -rdynamic -Wl,-export-dynamic    -rdynamic -L/usr/lib64/mysql -lmysqlclient -lz -lcrypt -lnsl -lm  -lruby-static -rdynamic -L/usr/lib64/mysql -lmysqlclient -lz -lcrypt -lnsl -lm  -L/opt/local/lib -lrt -ldl -lcrypt -lm   -lc"
 checked program was:
 /* begin */
 1: /*top*/
@@ -24,7 +24,7 @@ checked program was:
 
 have_func: checking for rb_str_set_len()... -------------------- yes
 
-"/usr/bin/gcc-4.2 -o conftest -I. -I/Users/chris/.rvm/rubies/ruby-1.8.7-p352/lib/ruby/1.8/x86_64-darwin11.2.0 -I. -Qunused-arguments -D_XOPEN_SOURCE -D_DARWIN_C_SOURCE  -Qunused-arguments -I/usr/local/mysql/include  -g -Os -arch x86_64 -fno-common   -D_P1003_1B_VISIBLE -DSIGNAL_WITH_VIO_CLOSE -DSIGNALS_DONT_BREAK_READ -DIGNORE_SIGHUP_SIGQUIT  -DDONT_DECLARE_CXA_PURE_VIRTUAL -arch x86_64 -g -Os -pipe -no-cpp-precomp  -fno-common -pipe -fno-common   conftest.c  -L. -L/Users/chris/.rvm/rubies/ruby-1.8.7-p352/lib -L. -arch x86_64 -bind_at_load    -L/usr/local/mysql/lib -lmysqlclient -lz -lm     -lmygcc  -lruby-static -L/usr/local/mysql/lib -lmysqlclient -lz -lm     -lmygcc  -ldl -lobjc  "
+"gcc -o conftest -I/opt/local/include -I. -I/usr/local/rvm/rubies/ree-1.8.7-2011.03/lib/ruby/1.8/x86_64-linux -I.    -I/usr/include/mysql  -g -pipe -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -g -O2    conftest.c  -L. -L/usr/local/rvm/rubies/ree-1.8.7-2011.03/lib -Wl,-R/usr/local/rvm/rubies/ree-1.8.7-2011.03/lib -L.  -rdynamic -Wl,-export-dynamic    -rdynamic -L/usr/lib64/mysql -lmysqlclient -lz -lcrypt -lnsl -lm  -lruby-static -rdynamic -L/usr/lib64/mysql -lmysqlclient -lz -lcrypt -lnsl -lm  -L/opt/local/lib -lrt -ldl -lcrypt -lm   -lc"
 conftest.c: In function ‘t’:
 conftest.c:3: error: ‘rb_str_set_len’ undeclared (first use in this function)
 conftest.c:3: error: (Each undeclared identifier is reported only once
@@ -36,7 +36,7 @@ checked program was:
 3: int t() { void ((*volatile p)()); p = (void ((*)()))rb_str_set_len; return 0; }
 /* end */
 
-"/usr/bin/gcc-4.2 -o conftest -I. -I/Users/chris/.rvm/rubies/ruby-1.8.7-p352/lib/ruby/1.8/x86_64-darwin11.2.0 -I. -Qunused-arguments -D_XOPEN_SOURCE -D_DARWIN_C_SOURCE  -Qunused-arguments -I/usr/local/mysql/include  -g -Os -arch x86_64 -fno-common   -D_P1003_1B_VISIBLE -DSIGNAL_WITH_VIO_CLOSE -DSIGNALS_DONT_BREAK_READ -DIGNORE_SIGHUP_SIGQUIT  -DDONT_DECLARE_CXA_PURE_VIRTUAL -arch x86_64 -g -Os -pipe -no-cpp-precomp  -fno-common -pipe -fno-common   conftest.c  -L. -L/Users/chris/.rvm/rubies/ruby-1.8.7-p352/lib -L. -arch x86_64 -bind_at_load    -L/usr/local/mysql/lib -lmysqlclient -lz -lm     -lmygcc  -lruby-static -L/usr/local/mysql/lib -lmysqlclient -lz -lm     -lmygcc  -ldl -lobjc  "
+"gcc -o conftest -I/opt/local/include -I. -I/usr/local/rvm/rubies/ree-1.8.7-2011.03/lib/ruby/1.8/x86_64-linux -I.    -I/usr/include/mysql  -g -pipe -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -g -O2    conftest.c  -L. -L/usr/local/rvm/rubies/ree-1.8.7-2011.03/lib -Wl,-R/usr/local/rvm/rubies/ree-1.8.7-2011.03/lib -L.  -rdynamic -Wl,-export-dynamic    -rdynamic -L/usr/lib64/mysql -lmysqlclient -lz -lcrypt -lnsl -lm  -lruby-static -rdynamic -L/usr/lib64/mysql -lmysqlclient -lz -lcrypt -lnsl -lm  -L/opt/local/lib -lrt -ldl -lcrypt -lm   -lc"
 checked program was:
 /* begin */
 1: /*top*/
@@ -48,7 +48,7 @@ checked program was:
 
 have_func: checking for rb_thread_start_timer()... -------------------- yes
 
-"/usr/bin/gcc-4.2 -o conftest -I. -I/Users/chris/.rvm/rubies/ruby-1.8.7-p352/lib/ruby/1.8/x86_64-darwin11.2.0 -I. -Qunused-arguments -D_XOPEN_SOURCE -D_DARWIN_C_SOURCE  -Qunused-arguments -I/usr/local/mysql/include  -g -Os -arch x86_64 -fno-common   -D_P1003_1B_VISIBLE -DSIGNAL_WITH_VIO_CLOSE -DSIGNALS_DONT_BREAK_READ -DIGNORE_SIGHUP_SIGQUIT  -DDONT_DECLARE_CXA_PURE_VIRTUAL -arch x86_64 -g -Os -pipe -no-cpp-precomp  -fno-common -pipe -fno-common   conftest.c  -L. -L/Users/chris/.rvm/rubies/ruby-1.8.7-p352/lib -L. -arch x86_64 -bind_at_load    -L/usr/local/mysql/lib -lmysqlclient -lz -lm     -lmygcc  -lruby-static -L/usr/local/mysql/lib -lmysqlclient -lz -lm     -lmygcc  -ldl -lobjc  "
+"gcc -o conftest -I/opt/local/include -I. -I/usr/local/rvm/rubies/ree-1.8.7-2011.03/lib/ruby/1.8/x86_64-linux -I.    -I/usr/include/mysql  -g -pipe -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -g -O2    conftest.c  -L. -L/usr/local/rvm/rubies/ree-1.8.7-2011.03/lib -Wl,-R/usr/local/rvm/rubies/ree-1.8.7-2011.03/lib -L.  -rdynamic -Wl,-export-dynamic    -rdynamic -L/usr/lib64/mysql -lmysqlclient -lz -lcrypt -lnsl -lm  -lruby-static -rdynamic -L/usr/lib64/mysql -lmysqlclient -lz -lcrypt -lnsl -lm  -L/opt/local/lib -lrt -ldl -lcrypt -lm   -lc"
 conftest.c: In function ‘t’:
 conftest.c:3: error: ‘rb_thread_start_timer’ undeclared (first use in this function)
 conftest.c:3: error: (Each undeclared identifier is reported only once
@@ -60,7 +60,7 @@ checked program was:
 3: int t() { void ((*volatile p)()); p = (void ((*)()))rb_thread_start_timer; return 0; }
 /* end */
 
-"/usr/bin/gcc-4.2 -o conftest -I. -I/Users/chris/.rvm/rubies/ruby-1.8.7-p352/lib/ruby/1.8/x86_64-darwin11.2.0 -I. -Qunused-arguments -D_XOPEN_SOURCE -D_DARWIN_C_SOURCE  -Qunused-arguments -I/usr/local/mysql/include  -g -Os -arch x86_64 -fno-common   -D_P1003_1B_VISIBLE -DSIGNAL_WITH_VIO_CLOSE -DSIGNALS_DONT_BREAK_READ -DIGNORE_SIGHUP_SIGQUIT  -DDONT_DECLARE_CXA_PURE_VIRTUAL -arch x86_64 -g -Os -pipe -no-cpp-precomp  -fno-common -pipe -fno-common   conftest.c  -L. -L/Users/chris/.rvm/rubies/ruby-1.8.7-p352/lib -L. -arch x86_64 -bind_at_load    -L/usr/local/mysql/lib -lmysqlclient -lz -lm     -lmygcc  -lruby-static -L/usr/local/mysql/lib -lmysqlclient -lz -lm     -lmygcc  -ldl -lobjc  "
+"gcc -o conftest -I/opt/local/include -I. -I/usr/local/rvm/rubies/ree-1.8.7-2011.03/lib/ruby/1.8/x86_64-linux -I.    -I/usr/include/mysql  -g -pipe -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -g -O2    conftest.c  -L. -L/usr/local/rvm/rubies/ree-1.8.7-2011.03/lib -Wl,-R/usr/local/rvm/rubies/ree-1.8.7-2011.03/lib -L.  -rdynamic -Wl,-export-dynamic    -rdynamic -L/usr/lib64/mysql -lmysqlclient -lz -lcrypt -lnsl -lm  -lruby-static -rdynamic -L/usr/lib64/mysql -lmysqlclient -lz -lcrypt -lnsl -lm  -L/opt/local/lib -lrt -ldl -lcrypt -lm   -lc"
 checked program was:
 /* begin */
 1: /*top*/
@@ -72,7 +72,7 @@ checked program was:
 
 have_header: checking for mysql.h... -------------------- yes
 
-"/usr/bin/gcc-4.2 -E -I. -I/Users/chris/.rvm/rubies/ruby-1.8.7-p352/lib/ruby/1.8/x86_64-darwin11.2.0 -I. -Qunused-arguments -D_XOPEN_SOURCE -D_DARWIN_C_SOURCE  -Qunused-arguments -I/usr/local/mysql/include  -g -Os -arch x86_64 -fno-common   -D_P1003_1B_VISIBLE -DSIGNAL_WITH_VIO_CLOSE -DSIGNALS_DONT_BREAK_READ -DIGNORE_SIGHUP_SIGQUIT  -DDONT_DECLARE_CXA_PURE_VIRTUAL -arch x86_64 -g -Os -pipe -no-cpp-precomp  -fno-common -pipe -fno-common    conftest.c -o conftest.i"
+"gcc -E -I/opt/local/include -I. -I/usr/local/rvm/rubies/ree-1.8.7-2011.03/lib/ruby/1.8/x86_64-linux -I.    -I/usr/include/mysql  -g -pipe -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -g -O2     conftest.c -o conftest.i"
 checked program was:
 /* begin */
 1: #include <mysql.h>

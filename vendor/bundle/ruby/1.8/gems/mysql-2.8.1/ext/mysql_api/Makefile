@@ -4,11 +4,11 @@ SHELL = /bin/sh
 #### Start of system configuration section. ####
 
 srcdir = .
-topdir = /Users/chris/.rvm/rubies/ruby-1.8.7-p352/lib/ruby/1.8/x86_64-darwin11.2.0
+topdir = /usr/local/rvm/rubies/ree-1.8.7-2011.03/lib/ruby/1.8/x86_64-linux
 hdrdir = $(topdir)
 VPATH = $(srcdir):$(topdir):$(hdrdir)
 exec_prefix = $(prefix)
-prefix = $(DESTDIR)/Users/chris/.rvm/rubies/ruby-1.8.7-p352
+prefix = $(DESTDIR)/usr/local/rvm/rubies/ree-1.8.7-2011.03
 sharedstatedir = $(prefix)/com
 mandir = $(datarootdir)/man
 psdir = $(docdir)
@@ -37,32 +37,32 @@ datadir = $(datarootdir)
 localstatedir = $(prefix)/var
 sitelibdir = $(sitedir)/$(ruby_version)
 
-CC = /usr/bin/gcc-4.2
-LIBRUBY = $(LIBRUBY_SO)
+CC = gcc
+LIBRUBY = $(LIBRUBY_A)
 LIBRUBY_A = lib$(RUBY_SO_NAME)-static.a
-LIBRUBYARG_SHARED = -l$(RUBY_SO_NAME)
+LIBRUBYARG_SHARED = -Wl,-R -Wl,$(libdir) -L$(libdir) 
 LIBRUBYARG_STATIC = -l$(RUBY_SO_NAME)-static
 
 RUBY_EXTCONF_H = 
-CFLAGS   =  -fno-common -arch x86_64 -g -Os -pipe -no-cpp-precomp  -fno-common -pipe -fno-common $(cflags) 
-INCFLAGS = -I. -I. -I/Users/chris/.rvm/rubies/ruby-1.8.7-p352/lib/ruby/1.8/x86_64-darwin11.2.0 -I.
+CFLAGS   =  -fPIC -g -O2  $(cflags) 
+INCFLAGS = $(PREINCFLAGS) -I. -I/opt/local/include -I. -I/usr/local/rvm/rubies/ree-1.8.7-2011.03/lib/ruby/1.8/x86_64-linux -I.
 DEFS     = 
-CPPFLAGS = -DHAVE_MYSQL_SSL_SET -DHAVE_RB_STR_SET_LEN -DHAVE_RB_THREAD_START_TIMER -DHAVE_MYSQL_H -Qunused-arguments -D_XOPEN_SOURCE -D_DARWIN_C_SOURCE  -Qunused-arguments -I/usr/local/mysql/include  -g -Os -arch x86_64 -fno-common   -D_P1003_1B_VISIBLE -DSIGNAL_WITH_VIO_CLOSE -DSIGNALS_DONT_BREAK_READ -DIGNORE_SIGHUP_SIGQUIT  -DDONT_DECLARE_CXA_PURE_VIRTUAL
+CPPFLAGS = -DHAVE_MYSQL_SSL_SET -DHAVE_RB_STR_SET_LEN -DHAVE_RB_THREAD_START_TIMER -DHAVE_MYSQL_H    -I/usr/include/mysql  -g -pipe -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic
 CXXFLAGS = $(CFLAGS) 
-ldflags  = -L. -arch x86_64 -bind_at_load
+ldflags  = -L.  -rdynamic -Wl,-export-dynamic
 dldflags = 
 archflag = 
 DLDFLAGS = $(ldflags) $(dldflags) $(archflag)
-LDSHARED = cc -arch x86_64 -dynamiclib -undefined suppress -flat_namespace
+LDSHARED = $(CC) -shared
 AR = ar
 EXEEXT = 
 
 RUBY_INSTALL_NAME = ruby
 RUBY_SO_NAME = ruby
-arch = x86_64-darwin11.2.0
-sitearch = x86_64-darwin11.2.0
+arch = x86_64-linux
+sitearch = x86_64-linux
 ruby_version = 1.8
-ruby = /Users/chris/.rvm/rubies/ruby-1.8.7-p352/bin/ruby
+ruby = /usr/local/rvm/rubies/ree-1.8.7-2011.03/bin/ruby
 RUBY = $(ruby)
 RM = rm -f
 MAKEDIRS = mkdir -p
@@ -76,7 +76,7 @@ COPY = cp
 preload = 
 
 libpath = . $(libdir)
-LIBPATH =  -L. -L$(libdir)
+LIBPATH =  -L. -L$(libdir) -Wl,-R$(libdir)
 DEFFILE = 
 
 CLEANFILES = mkmf.log
@@ -86,21 +86,21 @@ extout =
 extout_prefix = 
 target_prefix = 
 LOCAL_LIBS = 
-LIBS = $(LIBRUBYARG_SHARED) -L/usr/local/mysql/lib -lmysqlclient -lz -lm     -lmygcc  -ldl -lobjc  
+LIBS =  -rdynamic -L/usr/lib64/mysql -lmysqlclient -lz -lcrypt -lnsl -lm  -L/opt/local/lib -lrt -ldl -lcrypt -lm   -lc
 SRCS = mysql.c
 OBJS = mysql.o
 TARGET = mysql_api
-DLLIB = $(TARGET).bundle
+DLLIB = $(TARGET).so
 EXTSTATIC = 
 STATIC_LIB = 
 
 BINDIR        = $(bindir)
 RUBYCOMMONDIR = $(sitedir)$(target_prefix)
-RUBYLIBDIR = /Users/chris/Documents/Infrastructure/src/nimbul/vendor/bundle/ruby/1.8/gems/mysql-2.8.1/lib$(target_prefix)
-RUBYARCHDIR = /Users/chris/Documents/Infrastructure/src/nimbul/vendor/bundle/ruby/1.8/gems/mysql-2.8.1/lib$(target_prefix)
+RUBYLIBDIR = /opt/nyt/nimbul/vendor/bundle/ruby/1.8/gems/mysql-2.8.1/lib$(target_prefix)
+RUBYARCHDIR = /opt/nyt/nimbul/vendor/bundle/ruby/1.8/gems/mysql-2.8.1/lib$(target_prefix)
 
 TARGET_SO     = $(DLLIB)
-CLEANLIBS     = $(TARGET).bundle $(TARGET).il? $(TARGET).tds $(TARGET).map
+CLEANLIBS     = $(TARGET).so $(TARGET).il? $(TARGET).tds $(TARGET).map
 CLEANOBJS     = *.o *.a *.s[ol] *.pdb *.exp *.bak
 
 all:		$(DLLIB)
