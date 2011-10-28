@@ -7,10 +7,10 @@
 # $Id$
 # CopyRight: The New York Times
 
-require 'SysVIPC'
+require 'sysvipc'
 require 'singleton'
 
-include SysVIPC
+include SystemVIPC
 
 class TransientKeyStore
   # number of semaphores in set (2 right now, locker and version)
