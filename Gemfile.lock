@@ -113,7 +113,6 @@ GEM
     servolux (0.9.6)
     sys-cpu (0.6.4)
     systemu (2.2.0)
-    sysvipc (0.1.0)
     term-ansicolor (1.0.7)
     tzinfo (0.3.30)
     uuid (2.3.4)
@@ -146,5 +145,4 @@ DEPENDENCIES
   rspec
   ruby-openid
   rufus-scheduler
-  sysvipc
   work_queue
