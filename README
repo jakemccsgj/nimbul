@@ -13,7 +13,7 @@ SET UP
     - bundle exec ./install_SysVIPC.sh
     - rake db:create:all or db:create
     - rake db:migrate
-    - script/server -d
+    - bundle exec script/server -d
 
 CURRENT FEATURES
 
