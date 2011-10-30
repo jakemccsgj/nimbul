@@ -3,16 +3,17 @@
 Full-featured Cloud Manager developed by the Infrastructure and Automation Group of The New York Times Digital
 
 SET UP
-	- git clone git://github.com/nimbul/nimbul.git
-	- cd nimbul
-	- Set up database.yml file
-	- Set up config.yml file (repeat as necessary for test and production environments)
-	- Change the login and password for the admin user in the _set_up_first_admin_user.rb migration
+    - git clone git://github.com/nimbul/nimbul.git
+    - cd nimbul
+    - Set up database.yml file
+    - Set up config.yml file (repeat as necessary for test and production environments)
+    - Change the login and password for the admin user in the _set_up_first_admin_user.rb migration
     - Change the host, user and password for the amqp server in config/broker.yml
-	- ./install.sh
-	- rake db:create:all or db:create
-	- rake db:migrate
-	- ./start
+    - bundle install
+    - bundle exec ./install_SysVIPC.sh
+    - rake db:create:all or db:create
+    - rake db:migrate
+    - script/server -d
 
 CURRENT FEATURES
 
