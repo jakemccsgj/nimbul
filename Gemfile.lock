@@ -24,7 +24,6 @@ GIT
 
 GEM
   remote: http://rubygems.org/
-  remote: http://rubygems.org/
   specs:
     Ruby-MemCache (0.0.1)
       io-reactor (> 0.0.0)
@@ -51,12 +50,12 @@ GEM
       xml-simple
     bert (1.1.2)
     builder (3.0.0)
-    carrot (1.1.0)
+    carrot (1.2.0)
     chronic (0.6.4)
-    cucumber (1.1.0)
+    cucumber (1.1.1)
       builder (>= 2.1.2)
       diff-lcs (>= 1.1.2)
-      gherkin (~> 2.5.0)
+      gherkin (~> 2.6.0)
       json (>= 1.4.6)
       term-ansicolor (>= 1.0.6)
     daemons (1.1.4)
@@ -73,8 +72,9 @@ GEM
       uuid (>= 2.3.0)
       work_queue (>= 1.0.0)
     eventmachine (0.12.10)
+    facter (1.6.2)
     fastthread (1.0.7)
-    gherkin (2.5.3)
+    gherkin (2.6.1)
       json (>= 1.4.6)
     http_connection (1.4.1)
     i18n (0.6.0)
@@ -98,17 +98,17 @@ GEM
       activeresource (= 2.3.14)
       activesupport (= 2.3.14)
       rake (>= 0.8.3)
-    rake (0.9.2)
+    rake (0.9.2.2)
     rspec (2.7.0)
       rspec-core (~> 2.7.0)
       rspec-expectations (~> 2.7.0)
       rspec-mocks (~> 2.7.0)
-    rspec-core (2.7.0)
+    rspec-core (2.7.1)
     rspec-expectations (2.7.0)
       diff-lcs (~> 1.1.2)
     rspec-mocks (2.7.0)
     ruby-openid (2.1.8)
-    rufus-scheduler (2.0.11)
+    rufus-scheduler (2.0.12)
       tzinfo (>= 0.3.23)
     servolux (0.9.6)
     sys-cpu (0.6.4)
@@ -118,7 +118,7 @@ GEM
     uuid (2.3.4)
       macaddr (~> 1.0)
     uuidtools (2.1.2)
-    work_queue (2.0.0)
+    work_queue (1.0.0)
     xml-simple (1.1.1)
 
 PLATFORMS
@@ -135,6 +135,7 @@ DEPENDENCIES
   cloudmaster!
   cucumber
   emissary
+  facter
   fastthread
   formtastic!
   mysql
@@ -145,4 +146,4 @@ DEPENDENCIES
   rspec
   ruby-openid
   rufus-scheduler
-  work_queue
+  work_queue (~> 1.0.0)
