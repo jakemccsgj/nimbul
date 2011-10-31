@@ -406,7 +406,7 @@ class ProviderAccount < BaseModel
 
     # sort, search and paginate parameters
     def self.per_page
-        10
+        30
     end
 
     def self.sort_fields
