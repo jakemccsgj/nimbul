@@ -1,5 +1,10 @@
 <h1>Sign Up for a <%= APP_CONFIG['settings']['name'] %> User Account</h1>
 
+<p>
+  LDAP users should
+    <%= link_to "sign up here", (beta_ldap_signup_path(params[:invitation_token]) || ldap_signup_path) %>.
+</p>
+
 <br />
 
 <% @user.password = @user.password_confirmation = nil %>
