@@ -26,7 +26,7 @@ To add a new Service Override, click here:
   <% @service_overrides.each do |service_override|  %>
     <% if not service_override.provider.nil? %>
     <tr>
-      <td><%=h service_override.type.name.titleize%></td>
+      <td><%=h (service_override.type.nil? ? '' : service_override.type.name.titleize ) %></td>
       <td><%=h service_override.provider.name %></td>
       <td><%=h "#{service_override.target_type}: #{service_override.target.name}" %></td>
       <td><%=h service_override.overridable ? 'Yes' : 'No' %></td>
