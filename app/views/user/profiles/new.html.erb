@@ -1,12 +1,5 @@
 <h1>Sign Up for a <%= APP_CONFIG['settings']['name'] %> User Account</h1>
 
-<!--
-<p>
-  New OpenID users should
-  <%= link_to "log in here", (beta_openid_signup_path(params[:invitation_token]) || openid_signup_path) %>.
-</p>
--->
-
 <p>
   LDAP users should
     <%= link_to "sign up here", (beta_ldap_signup_path(params[:invitation_token]) || ldap_signup_path) %>.
