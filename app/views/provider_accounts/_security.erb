@@ -2,7 +2,6 @@
     :url => provider_account_path(@provider_account),
     :html => { :method => 'put' } do |f| %>
     <%= hidden_field_tag :anchor, :security %>
-    <%= f.error_messages %>
     <h1>Default Security Group</h1>
     If specified, this group will be added to each instance started under this account.<br />
     This group is used to grant <%= APP_CONFIG['settings']['name'] %> access to the instances it manages.<br />

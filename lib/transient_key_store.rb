@@ -156,7 +156,7 @@ class TransientKeyStore
       @semaphore.apply([SemaphoreOperation.new(SEMSET_LOCKER_IDX, -1)])
       @locked = true
     rescue Exception => e
-      # oddly, I can't catch Errno::EINVAL or SystemVIPC::Error
+      # oddly, I can't catch Errno::EINVAL or SysVIPC::Error
       # (maybe due to some rails issue) so we have to kludge it
 
       # raise up if it's not a system vipc type of error
@@ -174,7 +174,7 @@ class TransientKeyStore
       @semaphore.apply([SemaphoreOperation.new(SEMSET_LOCKER_IDX, 1)]);
       @locked = false
     rescue Exception => e
-      # oddly, I can't catch Errno::EINVAL or SystemVIPC::Error
+      # oddly, I can't catch Errno::EINVAL or SysVIPC::Error
       # (maybe due to some rails issue) so we have to kludge it
 
       # raise up if it's not a system vipc type of error
@@ -233,7 +233,7 @@ private
       # increment our semaphore counter representing the current version
       increment_version
     rescue Exception => e
-      # oddly, I can't catch Errno::EINVAL or SystemVIPC::Error
+      # oddly, I can't catch Errno::EINVAL or SysVIPC::Error
       # (maybe due to some rails issue) so we have to kludge it
 
       # raise up if it's not a system vipc type of error

@@ -26,7 +26,7 @@ To add a new Service Provider, click here:
   <% for service_provider in @service_providers %>
     <tr>
       <td><%=h service_provider.name %></td>
-      <td><%=h service_provider.service_type.name %></td>
+      <td><%=h (service_provider.service_type.nil? ? '' : service_provider.service_type.name) %></td>
       <td><%=h service_provider.server.name %></td>
       <td><%=h service_provider.description %></td>
       <td>

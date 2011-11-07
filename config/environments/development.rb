@@ -15,21 +15,3 @@ config.action_controller.perform_caching             = false
 
 # Disable delivery errors, bad email addresses will be ignored
 config.action_mailer.raise_delivery_errors = false
-#
-#config.after_initialize do
-#	require 'application' unless Object.const_defined?(:ApplicationController)
-#	LoggedExceptionsController.class_eval do
-#		# set the same session key as the app
-#		session :session_key => APP_CONFIG['settings']['session_key']
-#      
-#		# include any custom auth modules you need
-#		include AuthenticatedSystem
-#		include RoleRequirementSystem
-#      
-#		before_filter :login_required
-#		require_role  :admin
-#      
-#		# optional, sets the application name for the rss feeds
-#		self.application_name = APP_CONFIG['settings']['name']
-#	end
-#end

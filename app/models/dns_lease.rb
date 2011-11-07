@@ -5,7 +5,7 @@ class DnsLease < BaseModel
 	
 	belongs_to :instance
 	belongs_to :dns_hostname_assignment, :include => { :server => { :cluster => :provider_account } }
-	has_one :server, :through => :dns_hostname_assignment, :include => { :cluster => :provider_account } 
+    delegate :server, :to => :dns_hostname_assignment
 	
 	validates_presence_of :dns_hostname_assignment_id, :idx
 	validates_numericality_of :instance_id, :allow_nil => true
