@@ -1137,7 +1137,7 @@ ActiveRecord::Schema.define(:version => 20110913041746) do
     t.text     "commit_message"
     t.string   "ramdisk_id"
     t.string   "kernel_id"
-    t.text     "startup_script"
+    t.binary   "startup_script"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "instance_vm_type_id"

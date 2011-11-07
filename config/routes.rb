@@ -18,6 +18,7 @@ ActionController::Routing::Routes.draw do |map|
       :collection => { :list => :any, :control => :any },
       :only => [ :index, :list ]
     load_balancer.resources :health_checks, :except => [], :member => { :update_target_path => :post }
+    load_balancer.resources :load_balancer_listeners, :except => [], :member => { :update_target_path => :post }
   end
 
   map.resources :account_groups do |account_group|

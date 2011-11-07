@@ -1,47 +1,22 @@
-<h1>Load Balancer: <%=h @load_balancer.load_balancer_name %></h1>
-<ul class="tabselector" id="lb_tabcontrol">
-    <li class="tab-selected" id="lb_general_info_tab">
-        <%= link_to_function(
-            'General Info',
-            "tabselect($('lb_general_info_tab'), $('lb_tabcontrol'));
-            paneselect($('lb_general_info_pane'), $('lb_panecontrol'));
-            return true;",
-            :href => '#lb_general_info'
-        ) %>
-    </li>
-    <li class="tab-unselected" id="lb_instances_tab">
-        <%= link_to_function(
-            'Instances',
-            "tabselect($('lb_instances_tab'), $('lb_tabcontrol'));
-            paneselect($('lb_instances_pane'), $('lb_panecontrol'));
-            return true;",
-            :href => '#lb_instances'
-        ) %>
-    </li>
-    <li class="tab-unselected" id="lb_health_checks_tab">
-        <%= link_to_function(
-            'Health Checks',
-            "tabselect($('lb_health_checks_tab'), $('lb_tabcontrol'));
-            paneselect($('lb_health_checks_pane'), $('lb_panecontrol'));
-            return true;",
-            :href => '#lb_health_checks'
-        ) %>
-    </li>
-</ul>
-<div class="pane-content">
-<ul class="panes" id="lb_panecontrol">
-    <li id="lb_general_info_pane" class="pane-selected">
-        <%= render :partial => 'form' %>
-    </li>
-    <li id="lb_instances_pane" class="pane-unselected">
-        <span id="load_balancer_<%= @load_balancer.id %>_instances_index" class="smaller"></span>
-    </li>
-    <li id="lb_health_checks_pane" class="pane-unselected">
+<h1>
+  Load Balancer:
+  <%=h @load_balancer.load_balancer_name %>
+  ( <%=h @load_balancer.d_n_s_name %> )
+</h1>
+<hr/>
+
+<h1>Listeners</h1><br/>
+<span id="load_balancer_<%= @load_balancer.id %>_load_balancer_listeners_index" class="smaller"></span>
+
+<h1>Health Checks</h1><br/>
 Your load balancer will automatically perform health checks on your EC2 instances and only route traffic to instances that pass the health check. If an instance fails the health check, it is automatically removed from the load balancer.
-        <br/><br/>
-        <span id="load_balancer_<%= @load_balancer.id %>_health_checks_index" class="smaller"></span>
-    </li>
-</ul>
-</div>
-<%= javascript_tag(remote_function(:url => load_balancer_instances_url(@load_balancer.id), :method => :get) ) %>
+<br/><br/>
+<span id="load_balancer_<%= @load_balancer.id %>_health_checks_index" class="smaller"></span>
+
+<br/>
+<h1>Instances</h1>
+<span id="load_balancer_<%= @load_balancer.id %>_instances_index" class="smaller"></span>
+
+<%= javascript_tag(remote_function(:url => load_balancer_load_balancer_listeners_url(@load_balancer.id), :method => :get) ) %>
 <%= javascript_tag(remote_function(:url => load_balancer_health_checks_url(@load_balancer.id), :method => :get) ) %>
+<%= javascript_tag(remote_function(:url => load_balancer_instances_url(@load_balancer.id), :method => :get) ) %>

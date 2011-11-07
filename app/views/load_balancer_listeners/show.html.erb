@@ -1,0 +1,43 @@
+<p>
+  <b>Load balancer:</b>
+  <%=h @load_balancer_listener.load_balancer_id %>
+</p>
+
+<p>
+  <b>Healthy threshold:</b>
+  <%=h @load_balancer_listener.healthy_threshold %>
+</p>
+
+<p>
+  <b>Interval:</b>
+  <%=h @load_balancer_listener.interval %>
+</p>
+
+<p>
+  <b>Target protocol:</b>
+  <%=h @load_balancer_listener.target_protocol %>
+</p>
+
+<p>
+  <b>Target port:</b>
+  <%=h @load_balancer_listener.target_port %>
+</p>
+
+<p>
+  <b>Target path:</b>
+  <%=h @load_balancer_listener.target_path %>
+</p>
+
+<p>
+  <b>Timeout:</b>
+  <%=h @load_balancer_listener.timeout %>
+</p>
+
+<p>
+  <b>Unhealthy threshold:</b>
+  <%=h @load_balancer_listener.unhealthy_threshold %>
+</p>
+
+
+<%= link_to 'Edit', edit_load_balancer_listener_path(@load_balancer_listener) %> |
+<%= link_to 'Back', load_balancer_listeners_path %>
