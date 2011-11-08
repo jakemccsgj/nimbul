@@ -1,0 +1,7 @@
+if @error_messages.empty?
+    page["storage_type_#{@storage_type.id}"].remove
+    page["add_storage_type"].appear if @parent.can_use_more_of?('StorageType')
+else
+    page['error_redbox'].replace_html :partial => 'shared/error_redbox'
+    page['error_redbox'].appear
+end

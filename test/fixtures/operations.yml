@@ -1,0 +1,15 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  instance_id: 1
+  type: Operation
+  name: name1
+  args:
+  state: proceed
+
+two:
+  instance_id: 1
+  type: Operation
+  name: name2
+  args:
+  state: proceed

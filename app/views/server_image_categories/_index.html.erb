@@ -1,0 +1,23 @@
+<table>
+<tr>
+<td class="forms">
+  <table>
+  <tr>
+    <th>&nbsp;</th>
+    <th>Name</th>
+    <th>Actions</th>
+  </tr>
+  <tbody id="provider_account_server_image_categories">
+    <%= render :partial => 'list', :locals => { :server_image_categories => @server_image_categories } %>
+  </tbody>
+  </table>
+  <%= sortable_element("provider_account_server_image_categories", :url => send("sort_#{ @parent_type }_server_image_categories_path", @parent), :tag => "tr", :handle => "handle" ) -%>
+</td>
+<td class="forms">
+  <div id="add_server_image_category" <% unless @provider_account.can_use_more_of?('ServerImageCategory') %>style="display:none;"<% end %>>
+    <%= new_provider_account_server_image_category_button 'add', @provider_account %>
+  </div>
+  <div id="edit_server_image_category" style="display:none;overflow:auto;"></div>
+</td>
+</tr>
+</table>

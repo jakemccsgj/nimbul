@@ -1,0 +1,21 @@
+<table>
+  <tr>
+    <th>&nbsp;</th>
+    <th>API Name</th>
+    <th>Name</th>
+    <th>Description</th>
+    <th>Actions</th>
+  </tr>
+  <tbody id="provider_vm_price_types">
+    <%= render :partial => 'list', :locals => { :vm_price_types => @vm_price_types } %>
+  </tbody>
+</table>
+<%= sortable_element("provider_vm_price_types", :url => send("sort_#{ @parent_type }_vm_price_types_path", @parent), :tag => "tr", :handle => "handle" ) %>
+
+<hr>
+
+<div id="add_vm_price_type" <% unless @provider.can_use_more_of?('VmPriceType') %>style="display:none;"<% end %>>
+  <%= new_provider_vm_price_type_button 'add', @provider %>
+</div>
+
+<div id="edit_vm_price_type" style="display:none;overflow:auto;"></div>

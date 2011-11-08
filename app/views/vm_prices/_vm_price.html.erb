@@ -1,0 +1,19 @@
+    <% fields_for "vm_price", vm_price do |f| %>
+    <% content_tag_for :tr, vm_price, :readonly => false, :class => '' do %>
+        <%= f.hidden_field :id, :index => nil %>
+        <td class="handle">[drag]</td>
+        <td><%= (vm_price.vm_price_type.nil? ? '&nbsp;' : h(vm_price.vm_price_type.name)) %></td>
+        <td><%= (vm_price.region.nil? ? '&nbsp;' : h(vm_price.region.name)) %></td>
+        <td><%= (vm_price.instance_vm_type.nil? ? '&nbsp;' : h(vm_price.instance_vm_type.name)) %></td>
+        <td><%= (vm_price.vm_os_type.nil? ? '&nbsp;' : h(vm_price.vm_os_type.name)) %></td>
+        <td>
+          <%=h number_to_currency(vm_price.price,
+              :unit => vm_price.price_unit,
+              :precision => 4
+          )%> per <%=h vm_price.price_period %></td>
+        <td>
+          <%= edit_provider_vm_price_link('Edit', @parent, vm_price) %>
+          <%= remove_provider_vm_price_link('Delete', @parent, vm_price) %>
+        </td>
+    <% end %>
+    <% end %>

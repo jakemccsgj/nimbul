@@ -1,0 +1,23 @@
+<table>
+  <tr>
+    <th>&nbsp;</th>
+    <th>Price Type</th>
+    <th>Region</th>
+    <th>HW Type</th>
+    <th>OS Type</th>
+    <th>Price</th>
+    <th>Action</th>
+  </tr>
+  <tbody id="provider_vm_prices">
+    <%= render :partial => 'list', :locals => { :vm_prices => @vm_prices } %>
+  </tbody>
+</table>
+<%= sortable_element("provider_vm_prices", :url => send("sort_#{ @parent_type }_vm_prices_path", @parent), :tag => "tr", :handle => "handle" ) %>
+
+<hr>
+
+<div id="add_vm_price" <% unless @provider.can_use_more_of?('VmPrice') %>style="display:none;"<% end %>>
+  <%= new_provider_vm_price_button 'add', @provider %>
+</div>
+
+<div id="edit_vm_price" style="display:none;overflow:auto;"></div>

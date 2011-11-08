@@ -1,0 +1,8 @@
+if @error_messages.empty?
+    page["edit_server_image_category"].hide
+    page["add_server_image_category"].appear if @parent.can_use_more_of?('ServerImageCategory')
+    page["server_image_category_#{@server_image_category.id}"].replace_html :partial => "server_image_category", :object => @server_image_category
+else
+    page['error_redbox'].replace_html :partial => 'shared/error_redbox'
+    page['error_redbox'].appear
+end

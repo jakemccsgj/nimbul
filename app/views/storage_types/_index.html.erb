@@ -1,0 +1,21 @@
+<table>
+  <tr>
+    <th>&nbsp;</th>
+    <th>API Name</th>
+    <th>Name</th>
+    <th>Description</th>
+    <th>Actions</th>
+  </tr>
+  <tbody id="provider_storage_types">
+    <%= render :partial => 'list', :locals => { :storage_types => @storage_types } %>
+  </tbody>
+</table>
+<%= sortable_element("provider_storage_types", :url => send("sort_#{ @parent_type }_storage_types_path", @parent), :tag => "tr", :handle => "handle" ) %>
+
+<hr>
+
+<div id="add_storage_type" <% unless @provider.can_use_more_of?('StorageType') %>style="display:none;"<% end %>>
+  <%= new_provider_storage_type_button 'add', @provider %>
+</div>
+
+<div id="edit_storage_type" style="display:none;overflow:auto;"></div>

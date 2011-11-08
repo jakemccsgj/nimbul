@@ -1,0 +1,21 @@
+<table>
+  <tr>
+    <th>Ping Target</th>
+    <th>Timeout</th>
+    <th>Interval</th>
+    <th>Unhealthy Threshold</th>
+    <th>Healthy Threshold</th>
+    <th>Action</th>
+  </tr>
+  <tbody id="load_balancer_load_balancer_listeners">
+    <%= render :partial => 'list', :locals => { :load_balancer_listeners => @load_balancer_listeners } %>
+  </tbody>
+</table>
+
+<hr>
+
+<div id="add_load_balancer_listener" <% unless @load_balancer.can_use_more_of?('HealthCheck') %>style="display:none;"<% end %>>
+  <%= new_load_balancer_load_balancer_listener_button 'add', @load_balancer %>
+</div>
+
+<div id="edit_load_balancer_listener" style="display:none;overflow:auto;"></div>

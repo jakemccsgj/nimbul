@@ -1,0 +1,2 @@
+page["users_total"].replace_html "#{@users.total_entries}"
+page["users"].replace_html :partial => "shared/users_list"

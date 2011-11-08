@@ -1,0 +1,44 @@
+<ul class="tabselector" id="tabcontrol1">
+    <li class="tab-selected" id="settings_tab">
+        <%= link_to_function(
+			'Settings',
+			"tabselect($('settings_tab'));
+			paneselect($('settings_pane'));
+			return true;",
+			:href => '#settings'
+		) %>
+    </li>
+    <li class="tab-unselected" id="apps_tab">
+        <%= link_to_function('Applications',
+			"tabselect($('apps_tab'));
+			paneselect($('apps_pane'));
+			return true;",
+			:href => '#apps'
+		) %>
+    </li>
+</ul>
+<div id="pane-content">
+<ul class="panes" id="panecontrol1">
+  <li id="settings_pane" class="pane-selected">
+    <%= render :partial => 'form' %>
+  </li>
+  <li id="apps_pane" class="pane-unselected">
+    <div id="<%= "account_group_#{@account_group.id}_apps_index" %>"></div>
+  </li>
+</ul>
+</div>
+<%= javascript_tag "
+  var anchor = '';
+  if (location.hash != '') {
+    anchor = location.hash.substring(1, location.hash.length);
+    if (anchor == 'apps') {
+      loadDiv($('account_group_#{@account_group.id}_apps_index'), '" + account_group_apps_url(@account_group) + "');
+    }
+    if ($(anchor+'_pane') != null) {
+      tabselect($(anchor+'_tab'));
+      paneselect($(anchor+'_pane'));
+    }
+  }
+" %>
+
+<%= javascript_tag(remote_function(:url => account_group_apps_url(@account_group), :method => :get) ) %>

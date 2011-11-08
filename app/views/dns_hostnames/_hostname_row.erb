@@ -1,0 +1,69 @@
+<%-
+accrued = hostname.leases[:accrued]
+active  = hostname.leases[:active] 
+instance_total = hostname.instance_totals
+host_servers = hostname.host_servers
+has_active = (active > 0)
+-%>
+
+<td> <%# CONTROLS -%>
+<%# ONLY display delete / unassign controls if there are no leases in-use by the hostname %>
+
+<%- if (accrued > 0) %>
+	<span id="hostname_<%=hostname.id%>_expand_leases">
+		<%= expand_leases_image_link(@model, hostname) %>
+	</span>
+	<span id="hostname_<%=hostname.id%>_compress_leases" style="display:none;">
+		<%= compress_leases_image_link(hostname)  %>
+		<%= refresh_leases_image_link(hostname) %>
+	</span>
+<%- end %>
+<%- if instance_total > active %>
+<span id="hostname_<%=hostname.id%>_acquire_leases">
+	<%= acquire_hostname_leases_image_link(@model, hostname) %>
+</span>
+<%- end %>
+<%- if has_active  %>
+	<span id="hostname_<%=hostname.id%>_release_all_leases">
+		<%= release_leases_image_link( @model, hostname ) %>
+	</span>
+<%- else %>
+	<%# only display delete if there are absolutely NO active leases at all %>
+	<%= delete_dns_hostname_image_link(@model, hostname) unless has_active %>
+
+	<%# only display the unassign control if we're in Server context %>
+	<%= unassign_server_hostname_image_link(@model, hostname) unless not @model.is_a? Server %>
+<%- end %>
+
+</td>
+<td>
+	<%= edit_in_place(hostname, :name, :complete => reload_leases_javascript(hostname, 0) ) %>
+	<%= javascript_tag "Editable.create('dns_hostname_#{hostname.id}_name');" %>
+</td>
+<td class="small">
+	<% host_servers.select{|host| host[:id] == hostname[:id]}.each do |h| %>
+    <%-
+      server = Server.new
+      server[:id]   = Integer(h[:server_id])
+      server[:name] = h[:server_name]
+      active_count  = Integer(h[:lease_count]) 
+    -%>
+		<% content_tag_for :span, server do %>
+			<%=
+				if server != @server
+					%Q|<a href="/servers/#{server[:id]}">#{server[:name]}</a>|
+				else
+					h server.name
+				end
+			%>
+			<%- unless active_count > 0 %>
+				[<%= unassign_server_hostname_link 'X', server, hostname %>]
+			<%- else %>
+				[<span title="LOCKED against assignment removal - '<%= hostname.name %>' has active leases with Server '<%=server.name%>'" class="disabled">X</span>]
+			<%- end %>
+			<br />
+		<% end %>
+	<% end %>
+</td>
+<td><%= active %> <small>(<%= accrued %>)</small>
+</td>

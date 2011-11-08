@@ -1,0 +1,31 @@
+<% unless @parent.is_a?(User) -%>
+    <td class="select-handle">
+        <%= better_check_box_tag "server_image_ids[]", server_image.id, false, :server_image %>
+    </td>
+<% end -%>
+<% if @parent.is_a?(User) -%>
+    <td>
+        <% if server_image.provider_account -%>
+            <%= link_to server_image.provider_account.name, provider_account_path(server_image.provider_account_id) -%>
+        <% else -%>
+            N/A
+        <% end -%>
+    </td>
+<% end -%>
+<td>
+    <%=h server_image.image_id %>
+    <%= show_hide_server_image_server_profile_revisions_link server_image, 'show', 'hide' -%>
+</td>
+<td><%= edit_in_place(server_image, :name, :class => 'server-image-editable') %></td>
+<td><%=h server_image.architecture %></td>
+<td><%= server_image.storage_type.nil? ? '&nbsp;' : h(server_image.storage_type.api_name) %></td>
+<td><%=h server_image.root_device_name %></td>
+<td>
+    <%=h server_image.owner_id %>
+  	    <% if server_image.provider_account and server_image.owner_id == server_image.provider_account.account_id -%>
+  	        - me
+  	    <% end -%>
+</td>
+<td><%= text_field_tag nil, server_image.location, { :readonly => 'readonly', :onclick => '$(this).focus();$(this).select()' } %></td>
+<td><%=h server_image.is_public %></td>
+<td class="<%=h server_image.state %>"><%=h server_image.state %></td>

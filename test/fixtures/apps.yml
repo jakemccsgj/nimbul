@@ -1,0 +1,15 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  account_group_id: 1
+  api_name: MyString
+  name: MyString
+  description: MyText
+  position: 1
+
+two:
+  account_group_id: 1
+  api_name: MyString
+  name: MyString
+  description: MyText
+  position: 1

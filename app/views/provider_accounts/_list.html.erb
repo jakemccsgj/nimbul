@@ -1,0 +1,36 @@
+<%= javascript_tag "$('provider_accounts_total').innerHTML = '#{@provider_accounts.total_entries}';" %>
+<div id="provider_accounts">
+
+<%= will_paginate_remote @provider_accounts, 'provider_accounts' %>
+
+<table class="sortable" id="provider_accounts_table">
+  <thead>
+  <tr>
+    <th>
+      Name
+    </th>
+    <th>
+      Account Group
+    </th>
+    <th>
+      Description
+    </th>
+    <th>
+      Instances
+    </th>
+    <th>Cost This Month</th>
+    <th>Projection</th>
+    <th class="unsortable">
+      Last Refreshed
+    </th>
+    <th class="unsortable">
+      Actions
+    </th>
+  </tr>
+  </thead>
+  <tbody id="provider_account_records">
+    <%= render :partial => "provider_account", :collection => @provider_accounts %>
+  </tbody>
+</table>
+
+</div>

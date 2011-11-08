@@ -1,0 +1,3 @@
+page[:edit_storage_type].replace_html :partial => "form", :object => @storage_type
+page[:add_storage_type].hide
+page[:edit_storage_type].appear

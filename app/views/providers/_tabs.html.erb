@@ -1,0 +1,120 @@
+<ul class="tabselector" id="tabcontrol1">
+    <li class="tab-selected" id="settings_tab">
+        <%= link_to_function(
+			'Settings',
+			"tabselect($('settings_tab'));
+			paneselect($('settings_pane'));
+			return true;",
+			:href => '#settings'
+		) %>
+    </li>
+    <li class="tab-unselected" id="regions_tab">
+        <%= link_to_function('Regions',
+			"tabselect($('regions_tab'));
+			paneselect($('regions_pane'));
+			return true;",
+			:href => '#regions'
+		) %>
+    </li>
+    </li>
+    <li class="tab-unselected" id="storage_types_tab">
+        <%= link_to_function('Storage Types',
+			"tabselect($('storage_types_tab'));
+			paneselect($('storage_types_pane'));
+			return true;",
+			:href => '#storage_types'
+		) %>
+    </li>
+    <li class="tab-unselected" id="vm_os_types_tab">
+        <%= link_to_function('VM OS Types',
+			"tabselect($('vm_os_types_tab'));
+			paneselect($('vm_os_types_pane'));
+			return true;",
+			:href => '#vm_os_types'
+		) %>
+    </li>
+    <li class="tab-unselected" id="instance_vm_types_tab">
+        <%= link_to_function('VM HW Types',
+			"tabselect($('instance_vm_types_tab'));
+			paneselect($('instance_vm_types_pane'));
+			return true;",
+			:href => '#instance_vm_types'
+		) %>
+    </li>
+    <li class="tab-unselected" id="vm_price_types_tab">
+        <%= link_to_function('VM Price Types',
+			"tabselect($('vm_price_types_tab'));
+			paneselect($('vm_price_types_pane'));
+			return true;",
+			:href => '#vm_price_types'
+		) %>
+    </li>
+    <li class="tab-unselected" id="vm_prices_tab">
+        <%= link_to_function('VM Prices',
+			"tabselect($('vm_prices_tab'));
+			paneselect($('vm_prices_pane'));
+			return true;",
+			:href => '#vm_prices'
+		) %>
+    </li>
+</ul>
+<div id="pane-content">
+<ul class="panes" id="panecontrol1">
+  <li id="settings_pane" class="pane-selected">
+    <%= render :partial => 'form' %>
+  </li>
+  <li id="regions_pane" class="pane-unselected">
+    <div id="<%= "provider_#{@provider.id}_regions_index" %>"></div>
+  </li>
+  <li id="storage_types_pane" class="pane-unselected">
+    <div id="<%= "provider_#{@provider.id}_storage_types_index" %>"></div>
+  </li>
+  <li id="vm_os_types_pane" class="pane-unselected">
+    <div id="<%= "provider_#{@provider.id}_vm_os_types_index" %>"></div>
+  </li>
+  <li id="instance_vm_types_pane" class="pane-unselected">
+    <div id="<%= "provider_#{@provider.id}_instance_vm_types_index" %>"></div>
+  </li>
+  <li id="vm_price_types_pane" class="pane-unselected">
+    <div id="<%= "provider_#{@provider.id}_vm_price_types_index" %>"></div>
+  </li>
+  <li id="vm_prices_pane" class="pane-unselected">
+    <div id="<%= "provider_#{@provider.id}_vm_prices_index" %>"></div>
+  </li>
+</ul>
+</div>
+<%= javascript_tag "
+  var anchor = '';
+  if (location.hash != '') {
+    anchor = location.hash.substring(1, location.hash.length);
+    if (anchor == 'regions') {
+      loadDiv($('provider_#{@provider.id}_regions_index'), '" + provider_regions_url(@provider) + "');
+    }
+    if (anchor == 'storage_types') {
+      loadDiv($('provider_#{@provider.id}_storage_types_index'), '" + provider_storage_types_url(@provider) + "');
+    }
+    if (anchor == 'vm_os_types') {
+      loadDiv($('provider_#{@provider.id}_vm_os_types_index'), '" + provider_vm_os_types_url(@provider) + "');
+    }
+    if (anchor == 'instance_vm_types') {
+      loadDiv($('provider_#{@provider.id}_instance_vm_types_index'), '" + provider_instance_vm_types_url(@provider) + "');
+    }
+    if (anchor == 'vm_price_types') {
+      loadDiv($('provider_#{@provider.id}_vm_price_types_index'), '" + provider_vm_price_types_url(@provider) + "');
+    }
+    if (anchor == 'vm_prices') {
+      loadDiv($('provider_#{@provider.id}_vm_prices_index'), '" + provider_vm_prices_url(@provider) + "');
+    }
+    if ($(anchor+'_pane') != null) {
+      tabselect($(anchor+'_tab'));
+      paneselect($(anchor+'_pane'));
+    }
+  }
+" %>
+
+<%= javascript_tag(remote_function(:url => provider_regions_url(@provider), :method => :get) ) %>
+<%= javascript_tag(remote_function(:url => provider_storage_types_url(@provider), :method => :get) ) %>
+<%= javascript_tag(remote_function(:url => provider_vm_os_types_url(@provider), :method => :get) ) %>
+<%= javascript_tag(remote_function(:url => provider_instance_vm_types_url(@provider), :method => :get) ) %>
+<%= javascript_tag(remote_function(:url => provider_vm_price_types_url(@provider), :method => :get) ) %>
+<%= javascript_tag(remote_function(:url => provider_vm_prices_url(@provider), :method => :get) ) %>

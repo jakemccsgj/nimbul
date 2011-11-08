@@ -1,0 +1,1 @@
+page["#{@parent_type}_#{@parent.id}_vm_os_types_index"].replace_html :partial => "vm_os_types/index"

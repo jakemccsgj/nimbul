@@ -1,0 +1,35 @@
+<% subtitle 'CPU Profiles' %>
+
+<h1><%= link_to 'Admin Controls', admin_controls_path %> / CPU Profiles</h1>
+<br/>
+
+<table>
+  <tr>
+    <th>&nbsp;</th>
+    <th>API Name</th>
+    <th>Name</th>
+    <th>Description</th>
+    <th>Actions</th>
+  </tr>
+  <tbody id="cpu_profiles">
+    <% for cpu_profile in @cpu_profiles %>
+      <% fields_for "cpu_profile", cpu_profile do |f| %>
+        <% content_tag_for :tr, cpu_profile, :readonly => false, :class => '' do %>
+          <%= f.hidden_field :id, :index => nil %>
+          <td class="handle">[drag]</td>
+          <td><%= link_to h(cpu_profile.api_name), edit_cpu_profile_path(cpu_profile) %></td>
+          <td><%=h cpu_profile.name %></td>
+          <td><%=h cpu_profile.desc %></td>
+          <td>
+            <%= link_to image_tag('trash.png', { :alt => "Delete", :class => 'control-icon' }), cpu_profile, :confirm => 'Are you sure?', :method => :delete -%>
+          </td>
+        <% end %>
+      <% end %>
+    <% end %>
+  </tbody>
+</table>
+<%= sortable_element("cpu_profiles", :url => sort_cpu_profiles_path, :tag => "tr", :handle => "handle" ) %>
+
+<br />
+
+<%= link_to 'Add CPU Profile', new_cpu_profile_path %>

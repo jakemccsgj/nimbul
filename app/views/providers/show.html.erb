@@ -1,0 +1,9 @@
+<% subtitle "Cloud Providers: #{@provider.name}" %>
+
+<h1>
+  <%= link_to 'Admin Controls', admin_controls_path %>
+  / <%= link_to 'Available Cloud Providers', providers_path %>
+  / <%= edit_in_place(@provider, :name, :class => 'editable provider-1-editable') %>
+</h1>
+
+<%= render :partial => 'tabs' %>

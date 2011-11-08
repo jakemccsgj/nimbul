@@ -1,0 +1,26 @@
+<% remote_form_for :instances,
+    :url => control_load_balancer_instances_path(@load_balancer) do |f| %>
+
+<%= will_paginate_search_field "load_balancer_#{@load_balancer.id}_instance_search", nil, nil, :list %>
+
+<%= refresh_image 'Refresh', 'instances', nil, :list, nil %>
+
+<span class="vr">&nbsp;</span>
+
+<%= stop_instance_image_submit 'Stop', "#{@parent_type}-#{@parent.id}-instance" %>
+<%= start_instance_image_submit 'Start', "#{@parent_type}-#{@parent.id}-instance" %>
+
+<span class="vr">&nbsp;</span>
+
+<%= reboot_instance_image_submit 'Reboot', "#{@parent_type}-#{@parent.id}-instance" %>
+<%= terminate_instance_image_submit 'Terminate', "#{@parent_type}-#{@parent.id}-instance" %>
+<%= hidden_field_tag :instance_command, '', :class => :instance_command %>
+
+<span class="vr">&nbsp;</span>
+
+<b>Total: <span id="load_balancer_<%= @load_balancer.id %>_instances_total"><%= @instances.total_entries %></span></b>
+
+<hr>
+
+<%= render :partial => 'load_balancer/instances/list' %>
+<% end %>

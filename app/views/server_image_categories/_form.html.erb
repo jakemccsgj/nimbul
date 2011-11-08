@@ -1,0 +1,14 @@
+<% semantic_remote_form_for [@parent, @server_image_category], :remote => true do |f| %>
+    <%= hidden_field_tag :anchor, 'server_images' %>
+    <%= hidden_field_tag :update, 'provider_account_server_image_categories' %>
+    <%= f.error_messages %>
+    <% f.inputs do %>
+      <%= f.input :name,
+        :class => 'short'
+      %>
+    <% end %>
+    <% f.buttons do %>
+      <%= f.submit %>
+      <%= cancel_add_provider_account_server_image_category_button 'Cancel', @provider_account %>
+    <% end %>
+<% end %>

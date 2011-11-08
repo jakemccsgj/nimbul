@@ -1,0 +1,38 @@
+<table class="sortable" id="apps_table">
+  <thead>
+  <tr>
+<!--
+    <th>&nbsp;</th>
+-->
+    <th>API Name</th>
+    <th>Name</th>
+    <th>Description</th>
+    <th class"unsortable">Clusters</th>
+    <th>Cost This Month</th>
+    <th>Projection</th>
+    <th class"unsortable">Actions</th>
+  </tr>
+  </thead>
+  <tbody id="account_group_apps">
+    <%= render :partial => 'list', :locals => { :apps => @apps } %>
+  </tbody>
+</table>
+<%= sortable_element("account_group_apps", :url => send("sort_#{ @parent_type }_apps_path", @parent), :tag => "tr", :handle => "handle" ) %>
+
+<hr>
+
+<div id="add_app" <% unless @account_group.can_use_more_of?('App') %>style="display:none;"<% end %>>
+  <%= new_account_group_app_button 'add', @account_group %>
+</div>
+
+<div id="edit_app" style="display:none;overflow:auto;"></div>
+<!--
+  <tr class="sortbottom">
+    <td colspan="4">&nbsp;</td>
+    <td style="text:bold;" id="app_total">&nbsp;</td>
+    <td style="text:bold;" id="app_projection">&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+-->
+
+<%= javascript_tag('sortables_init();') %>

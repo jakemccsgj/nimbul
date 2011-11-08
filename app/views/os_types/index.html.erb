@@ -1,0 +1,35 @@
+<% subtitle 'OS Types' %>
+
+<h1><%= link_to 'Admin Controls', admin_controls_path %> / OS Types</h1>
+<br/>
+
+<table>
+  <tr>
+    <th>&nbsp;</th>
+    <th>API Name</th>
+    <th>Name</th>
+    <th>Description</th>
+    <th>Actions</th>
+  </tr>
+  <tbody id="os_types">
+    <% for os_type in @os_types %>
+      <% fields_for "os_type", os_type do |f| %>
+        <% content_tag_for :tr, os_type, :readonly => false, :class => '' do %>
+          <%= f.hidden_field :id, :index => nil %>
+          <td class="handle">[drag]</td>
+          <td><%= link_to h(os_type.api_name), edit_os_type_path(os_type) %></td>
+          <td><%=h os_type.name %></td>
+          <td><%=h os_type.desc %></td>
+          <td>
+            <%= link_to image_tag('trash.png', { :alt => "Delete", :class => 'control-icon' }), os_type, :confirm => 'Are you sure?', :method => :delete -%>
+          </td>
+        <% end %>
+      <% end %>
+    <% end %>
+  </tbody>
+</table>
+<%= sortable_element("os_types", :url => sort_os_types_path, :tag => "tr", :handle => "handle" ) %>
+
+<br />
+
+<%= link_to 'Add OS Type', new_os_type_path %>

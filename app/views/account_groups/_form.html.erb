@@ -1,0 +1,29 @@
+<% semantic_form_for @account_group do |f| %>
+  <%= f.error_messages %>
+  <% f.inputs do %>
+    <%= f.input :name, :hint => 'Name the Account Group, for example, Digital Accounts' %>
+    <%= f.input :description,
+      :input_html => { :class => 'autogrow', :warp => 'soft', :size => '40x2' },
+      :required => false
+    %>
+  <% end %>
+  <h1>Provider Accounts</h1>
+  <br/>
+  You can also just edit an Account, to move it in and out of the Account Group
+  <br/>
+  <br/>
+  <fieldset class="inputs">
+    <ol>
+    <%= swapselect :account_group,
+      @account_group,
+      :provider_accounts,
+      ProviderAccount.all.select{|account| account.account_group_id.nil? or (account.account_group_id == @account_group.id)}.map{ |account| [account.name, account.id]}
+    %>
+    </ol>
+  </fieldset>
+  <br/>
+  <% f.buttons do %>
+    <%= f.submit %>
+    <%= submit_tag 'Cancel', :name => 'cancel_button' %>
+  <% end %>
+<% end %>

@@ -1,0 +1,16 @@
+<td>
+  <%= link_to h(provider_account.name), provider_account %>
+</td>
+<td><%= h(provider_account.account_group.nil? ? 'Not Set' : provider_account.account_group.name) %></td>
+<td><%= h(provider_account.description) %></td>
+<td><%= provider_account.instances.count %></td>
+<td id="provider_account_<%= provider_account.id %>_total">&nbsp;</td>
+<td id="provider_account_<%= provider_account.id %>_projection">&nbsp;</td>
+<td>
+  <%= time_ago(provider_account.refreshed_at) %>
+</td>
+<td>
+  <%= parent_stats_link('Cost Details', provider_account) %>
+  <%= remove_provider_account_link('Delete', provider_account) %>
+  <%= parent_stats_js(provider_account) %>
+</td>

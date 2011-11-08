@@ -1,0 +1,8 @@
+if @error_messages.empty?
+    page["edit_vm_os_type"].hide
+    page["add_vm_os_type"].appear if @parent.can_use_more_of?('VmOsType')
+    page.insert_html :bottom, params[:update], :partial => "vm_os_type", :object => @vm_os_type
+else
+    page['error_redbox'].replace_html :partial => 'shared/error_redbox'
+    page['error_redbox'].appear
+end

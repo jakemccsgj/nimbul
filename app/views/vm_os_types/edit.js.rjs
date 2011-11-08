@@ -1,0 +1,3 @@
+page[:edit_vm_os_type].replace_html :partial => "form", :object => @vm_os_type
+page[:add_vm_os_type].hide
+page[:edit_vm_os_type].appear
