@@ -3,6 +3,7 @@ class CreateProviderAccountRegions < ActiveRecord::Migration
     create_table :provider_account_regions do |t|
       t.integer :provider_account_id
       t.integer :region_id
+      t.integer :position
 
       t.timestamps
     end
