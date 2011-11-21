@@ -22,6 +22,11 @@ class Server::UserDataController < ApplicationController
     unless @provider_account.messaging_url.blank?
       @server_user_data.sub!(@provider_account.messaging_url, '[FILTERED]')
     end
+
+    respond_to do |fmt|
+      fmt.html
+      fmt.json { render :json => @server_user_data.to_json }
+    end
   end
   
   def self.cloudrc_setup(server_or_user_data)
