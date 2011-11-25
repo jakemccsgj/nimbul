@@ -1,4 +1,6 @@
-source :rubygems
+source 'http://rubygems.org'
+source 'http://gems.rubyforge.org'
+source 'http://gemcutter.org'
 
 gem 'aws'
 gem 'daemons'
@@ -32,6 +34,7 @@ gem 'net-sftp', :require => 'net/sftp'
 gem 'net-ssh', :require => 'net/ssh'
 gem 'rufus-scheduler'
 gem 'work_queue', '~> 1.0.0'
+gem 'SysVIPC'
 git 'https://github.com/nimbul/cloudmaster.git' do
   gem 'cloudmaster'
 end
