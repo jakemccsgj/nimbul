@@ -24,7 +24,7 @@ GIT
 
 GIT
   remote: https://github.com/nimbul/cloudmaster.git
-  revision: 731b089664a82d3c257c557f3dbfcd5560becf13
+  revision: 06d60a20ce54feb8c6e23dc05df730d4ce9e3ff3
   specs:
     cloudmaster (1.0.0)
 
@@ -69,6 +69,7 @@ GEM
       builder (>= 2.1.2)
       diff-lcs (>= 1.1.2)
       gherkin (~> 2.7.1)
+
       json (>= 1.4.6)
       term-ansicolor (>= 1.0.6)
     daemons (1.1.4)
@@ -99,6 +100,7 @@ GEM
       systemu (>= 2.4.0)
     mime-types (1.17.2)
     mysql2 (0.2.18)
+    mysql (2.8.1)
     net-sftp (2.0.5)
       net-ssh (>= 2.0.9)
     net-ssh (2.2.1)
@@ -148,17 +150,9 @@ DEPENDENCIES
   aasm
   autotest
   aws
-  aws-s3
-  carrot
-  chronic
-  cloudmaster!
-  cucumber
-  daemons
-  emissary
-  facter
-  fastthread
-  formtastic!
+  aws
   mysql2 (~> 0.2.7)
+  mysql
   net-sftp
   net-ssh
   open_id_authentication!
@@ -168,4 +162,3 @@ DEPENDENCIES
   ruby-openid
   rufus-scheduler
   wirble
-  work_queue (~> 1.0.0)
