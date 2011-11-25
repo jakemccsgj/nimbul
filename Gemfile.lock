@@ -24,9 +24,12 @@ GIT
 
 GEM
   remote: http://rubygems.org/
+  remote: http://gems.rubyforge.org/
+  remote: http://gemcutter.org/
   specs:
     Ruby-MemCache (0.0.1)
       io-reactor (> 0.0.0)
+    SysVIPC (0.9)
     ZenTest (4.6.2)
     aasm (3.0.0)
       activerecord
@@ -133,6 +136,7 @@ PLATFORMS
 
 DEPENDENCIES
   Ruby-MemCache
+  SysVIPC
   ZenTest
   aasm
   autotest

@@ -7,7 +7,7 @@
 # $Id$
 # CopyRight: The New York Times
 
-require 'sysvipc'
+require 'SysVIPC'
 require 'singleton'
 
 include SystemVIPC
