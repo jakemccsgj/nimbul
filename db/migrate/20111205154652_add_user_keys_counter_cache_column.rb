@@ -3,8 +3,8 @@ class AddUserKeysCounterCacheColumn < ActiveRecord::Migration
     add_column :users, :user_keys_count, :integer, :default => 0
 
     User.reset_column_information
-    User.all.each do |u|
-      User.update_counters u.id, :user_keys_count => u.user_keys.all.size
+    User.find(:all).each do |u|
+      User.update_counters u.id, :user_keys_count => u.user_keys.size
     end
   end
 
