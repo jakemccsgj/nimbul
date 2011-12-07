@@ -382,13 +382,16 @@ ActionController::Routing::Routes.draw do |map|
     map.resources :server_parameters, :collection => { :sort => :post }
     map.resources :operations, :has_many => [ :operation_logs ]
 
-    map.show_server_server_user_data '/server/:id/user_data', :controller => 'server/user_data', :action => 'show'
+    map.resources :server do |server|
+      server.resource :user_data, :controller => 'server/user_data'
+    end
+    #map.show_server_server_user_data '/server/:id/user_data', :controller => 'server/user_data', :action => 'show', 
     map.show_server_server_script_data '/server/:id/user_script', :controller => 'server/user_script', :action => 'show'
 
     # server profiles
     map.resources :server_profiles, :has_many => [ :server_profile_revisions ]
     map.resources :server_profile_revisions, :has_many => [ :server_profile_revision_parameters ]
-    map.show_server_profile_revision_user_data '/server_profile_revision/:id/user_data', :controller => 'server_profile_revision/user_data', :action => 'show'
+    map.show_server_profile_revision_user_data '/server_profile_revision/:id/user_data', :controller => 'server_profile_revision/user_data', :format => nil, :action => 'show'
     map.resources :server_profile_revision_parameters, :collection => { :sort => :post }
 
     # handling instances
@@ -476,5 +479,6 @@ ActionController::Routing::Routes.draw do |map|
     # default routes, exceptions and 404s
     map.root :controller => 'dashboard', :action => 'index'
     map.logged_exceptions "logged_exceptions/:action/:id", :controller => "logged_exceptions"
+    map.connect ':controller/:action.:format'
     map.connect '*path', :controller => 'four_oh_fours'
 end
