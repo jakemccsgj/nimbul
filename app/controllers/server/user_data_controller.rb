@@ -1,6 +1,5 @@
 require 'erb'
 require 'zlib'
-require 'md5'
 
 # Support requesting the .sh extension
 Mime::Type.register 'text/plain', :sh
