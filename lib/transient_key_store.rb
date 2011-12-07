@@ -10,7 +10,7 @@
 require 'SysVIPC'
 require 'singleton'
 
-include SystemVIPC
+include SysVIPC
 
 class TransientKeyStore
   # number of semaphores in set (2 right now, locker and version)
