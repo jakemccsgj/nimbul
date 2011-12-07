@@ -4,7 +4,7 @@ class ServersController < ApplicationController
   require_role  :admin, :except => [ :index, :list ],
     :unless => "(params[:cluster_id] and current_user.has_cluster_access?(Cluster.find(params[:cluster_id]))) "+
       " or (params[:id] and current_user.has_server_access?(Server.find(params[:id]))) "
-  
+
   def prepare_resources
     @server = Server.find(params[:id], :include => [ :server_profile_revision, :security_groups ])
     @cluster = Cluster.find(@server.cluster_id, :include => [ :cluster_parameters ])
@@ -20,7 +20,7 @@ class ServersController < ApplicationController
        @server_image = ServerImage.find(@server_profile_revision.server_image_id, :include => [:cpu_profile, :storage_type]) unless @server_profile_revision.server_image_id.blank?
     end
   end
-  
+
   def index
     options = {
       :search => params[:search],
@@ -39,7 +39,7 @@ class ServersController < ApplicationController
     }
 
     @servers = Server.search_by_user(current_user, options)
-  
+
     @parent_type = 'user'
     @parent = current_user
     @user = current_user
@@ -50,36 +50,36 @@ class ServersController < ApplicationController
     end
   end
   alias :list :index
-  
+
   def show
     prepare_resources
-    
+
     respond_to do |format|
       format.html # show.html.erb
       format.xml  { render :xml => @server }
       format.js
     end
   end
-  
+
   def edit
     prepare_resources
   end
-  
+
   def update
     @server = Server.find(params[:id])
     @server_profile_revision = @server.server_profile_revision
     @server_profile = @server_profile_revision.server_profile if @server_profile_revision
     @cluster = @server.cluster
-        
+
     redirect_url = server_path(@server, :anchor => params[:anchor])
-  
+
     if params[:cancel_button]
       redirect_to redirect_url
     else
       @provider_account = @cluster.provider_account
       @security_groups = @provider_account.security_groups
       @users = User.find(:all, :order => :login)
-  
+
       # FIXME: This prevents removal of the last security group but, fixes a bug where adding/removing
       # SSH access clears out the security groups.
       unless params[:server].try(:[], :security_group_ids).nil?
@@ -87,7 +87,7 @@ class ServersController < ApplicationController
       end
 
       @server.attributes = params[:server]
-    
+
       respond_to do |format|
         if @server.update_attributes(params[:publisher])
           flash[:notice] = 'Server was successfully updated.'
@@ -113,7 +113,7 @@ class ServersController < ApplicationController
           format.json { render :json => @server }
         end
       end
-  
+
     end
   end
 
@@ -140,6 +140,6 @@ class ServersController < ApplicationController
 
     render :update do |page|
       page.replace_html 'server_image_info', :partial => 'server_image_info'
-    end 
+    end
   end
 end
