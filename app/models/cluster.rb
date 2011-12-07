@@ -1,17 +1,17 @@
 class Cluster < BaseModel
   include AASM
   behavior :service
-  
+
   service_parent_relationship :provider_account
   service_child_relationship :servers
 
   belongs_to :provider_account
   belongs_to :app
-  
+
   has_and_belongs_to_many :users
   has_and_belongs_to_many :cloud_resources, :order => 'update_time DESC'
   has_and_belongs_to_many :instance_vm_types, :order => 'instance_vm_types.position', :include => [:cpu_profiles, :storage_types], :uniq => true
-  
+
   has_many :cluster_parameters, :dependent => :destroy
   has_many :servers, :dependent => :destroy
   has_many :instances, :through => :servers
@@ -26,7 +26,7 @@ class Cluster < BaseModel
 
   after_update :save_cluster_parameters
   attr_accessor :should_destroy
-  
+
   aasm_column :state
   aasm_initial_state :active
 
@@ -38,10 +38,12 @@ class Cluster < BaseModel
 
   include TrackChanges # must follow any before filters
 
+  BASE_INSTANCE_USER = 'root'
+
   def zones
     self.provider_account.zones
   end
-  
+
   def addresses
     self.cloud_resources.find(:all, :conditions =>["type = 'CloudAddress'"])
   end
@@ -53,9 +55,25 @@ class Cluster < BaseModel
   def snapshots
     self.cloud_resources.find(:all, :conditions =>["type = 'CloudSnapshot'"])
   end
-  
+
   def should_destroy?
     should_destroy.to_i == 1
+  end
+
+  def root_users
+    (provider_account.users + users).find_all { |u| u.user_keys.size > 0 }
+  end
+
+  def dev_users
+  end
+
+  def instance_users
+    i = {}
+    root_users.each do |u|
+      i[BASE_INSTANCE_USER] ||= []
+      i[BASE_INSTANCE_USER] << u
+    end
+    i
   end
 
   def self.search_by_provider_account(provider_account, search, page, extra_joins, extra_conditions, sort=nil, filter=nil)
@@ -68,10 +86,10 @@ class Cluster < BaseModel
       conditions[0] << ' AND ' + extra_conditions[0]
       conditions << extra_conditions[1..-1]
     end
-  
+
     search(search, page, joins, conditions, sort, filter)
   end
-  
+
   # this method is used by find_all_by_user, count_all_by_user and search_by_user in the searchable behavior
   def self.options_for_find_by_user(user, options={})
     extra_joins = options[:joins]
@@ -94,7 +112,7 @@ class Cluster < BaseModel
       end
       conditions[0] = "(#{cluster_conditions.join(' OR ')})"
     end
-    
+
     joins = joins + extra_joins unless extra_joins.blank?
 
     unless extra_conditions.blank?
@@ -102,7 +120,7 @@ class Cluster < BaseModel
       conditions[0] << ' AND ' + extra_conditions[0]
       conditions << extra_conditions[1..-1]
     end
-    
+
     order = 'provider_accounts.name, '+table_name()+'.name' if order.blank?
 
     options.merge!({
@@ -111,9 +129,9 @@ class Cluster < BaseModel
       :order => order,
     })
 
-    return options        
+    return options
   end
-  
+
   def save_cluster_parameters
     cluster_parameters.each do |i|
       if i.should_destroy?
