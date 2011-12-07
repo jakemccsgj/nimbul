@@ -646,7 +646,7 @@ class Ec2Adapter
         options = {
             :key_name => key_name,
             :instance_type => server.instance_type,
-            :user_data => Server::UserDataController.generate(server, compress_user_data),
+            :user_data => Server::UserDataController.bootstrap(server),
             :security_groups => security_groups,
         }
 
