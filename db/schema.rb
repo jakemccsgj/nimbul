@@ -9,6 +9,11 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
+<<<<<<< HEAD
+=======
+ActiveRecord::Schema.define(:version => 20110913041746) do
+ActiveRecord::Schema.define(:version => 20110817210119) do
+>>>>>>> Added counter cache to user for user_keys
 ActiveRecord::Schema.define(:version => 20111205154652) do
 
   create_table "access_requests", :force => true do |t|
