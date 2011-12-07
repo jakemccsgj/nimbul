@@ -383,11 +383,6 @@ ActionController::Routing::Routes.draw do |map|
     map.resources :operations, :has_many => [ :operation_logs ]
 
     map.server_bootstrap_user_data "server/:server_id/user_data/:auth.:format",
-                                   :controller => 'server/user_data',
-                                   :action => 'show',
-                                   :auth => nil
-    map.resources :server do |s|
-      s.resource :user_data, :controller => 'server/user_data', :only => [ :show ]
     end
 
     map.show_server_server_script_data '/server/:id/user_script', :controller => 'server/user_script', :action => 'show'
