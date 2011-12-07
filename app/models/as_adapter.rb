@@ -5,27 +5,10 @@ require 'pp'
 
 class AsAdapter
     cattr_accessor :launch_configuration_name_regex, :launch_configuration_name_message
-    
+
     self.launch_configuration_name_regex = /\A\w[\w\.\-_]+\z/ # alphanumeric
     self.launch_configuration_name_message = "use only letters, numbers, and .-_ please.".freeze
-#    self.launch_configuration_name_regex = /\A\w[\w\.\-_@]+\z/ # ASCII, strict
-#    self.launch_configuration_name_message = "use only letters, numbers, and .-_@ please.".freeze
-    
-#  self.login_regex       = /\A\w[\w\.\-_@]+\z/                     # ASCII, strict
-  # self.login_regex       = /\A[[:alnum:]][[:alnum:]\.\-_@]+\z/     # Unicode, strict
-  # self.login_regex       = /\A[^[:cntrl:]\\<>\/&]*\z/              # Unicode, permissive
 
-#  self.bad_login_message = "use only letters, numbers, and .-_@ please.".freeze
-
-#  self.name_regex        = /\A[^[:cntrl:]\\<>\/&]*\z/              # Unicode, permissive
-#  self.bad_name_message  = "avoid non-printing characters and \\&gt;&lt;&amp;/ please.".freeze
-
-#  self.email_name_regex  = '[\w\.%\+\-]+'.freeze
-#  self.domain_head_regex = '(?:[A-Z0-9\-]+\.)+'.freeze
-#  self.domain_tld_regex  = '(?:[A-Z]{2}|com|org|net|edu|gov|mil|biz|info|mobi|name|aero|jobs|museum)'.freeze
-#  self.email_regex       = /\A#{email_name_regex}@#{domain_head_regex}#{domain_tld_regex}\z/i
-#  self.bad_email_message = "should look like an email address.".freeze
-    
     def self.get_as(account)
         return if account.nil?
         return if account.aws_access_key.blank? or account.aws_secret_key.blank?
@@ -45,14 +28,14 @@ class AsAdapter
             Rails.logger.error "Account [#{account.id} - #{account.name}] failed to refresh - unable to load AWS::AS object using account credentials."
             return
         end
-      
+
         if resources.nil? or resources == 'load_balancers'
           begin
             refresh_load_balancers(account)
           rescue Exception => e
             Rails.logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
           end
-          
+
         end
         if resources.nil? or resources == 'launch_configurations' or resources == 'auto_scaling_groups'
           begin
@@ -77,25 +60,24 @@ class AsAdapter
         c.attributes.each{ |a, value| options[a.to_sym] = value }
         options[:security_groups] = c.security_groups.collect{ |g| g.name }
         options[:block_device_mappings] = c.block_device_mappings.collect{ |m| { :virtual_name => m.virtual_name, :device_name => m.device_name } }
-        
+
         # make sure we generate user_data if this LC is related to a Server
         unless c.server_id.nil?
             server = Server.find(c.server_id)
             if server
-                compress_user_data = true
-                options[:user_data] = Server::UserDataController.generate(server, compress_user_data)
+              options[:user_data] = server_user_data_url :id => server.id, :format => :sh
             end
         end
-        
+
         begin
             as.create_launch_configuration(options)
             return true
         rescue
             c.status_message = "#{$!}"
-        end        
+        end
         return false
     end
-    
+
     def self.delete_launch_configuration(c)
         as = get_as(c.provider_account)
         begin
@@ -103,10 +85,10 @@ class AsAdapter
             return true
         rescue
             c.status_message = "#{$!}"
-        end        
+        end
         return false
     end
-    
+
     def self.refresh_launch_configurations(account)
         as = get_as(account)
         parsers = as.describe_launch_configurations({})
@@ -134,7 +116,7 @@ class AsAdapter
             return true
         rescue
             g.status_message = "#{$!}"
-        end        
+        end
         return false
     end
 
@@ -160,13 +142,13 @@ class AsAdapter
         as.update_auto_scaling_group(options)
         return true
     end
-    
+
     def self.delete_auto_scaling_group(g)
         as = get_as(g.provider_account)
         as.delete_auto_scaling_group({ :auto_scaling_group_name => g.name })
         return true
     end
-    
+
     def self.refresh_auto_scaling_groups(account)
         as = get_as(account)
         parsers = as.describe_auto_scaling_groups({})
@@ -187,7 +169,7 @@ class AsAdapter
         as = get_as(ast.auto_scaling_group.provider_account)
         options = Hash.new
         ast.attributes.each{ |a,value| options[a.to_sym] = value }
-        
+
         options[:trigger_name] = ast.name
         options[:auto_scaling_group_name] = ast.auto_scaling_group.name
         options[:dimensions] = [
@@ -197,7 +179,7 @@ class AsAdapter
             }
         ]
         options[:namespace] = 'AWS/EC2'
-        
+
         as.create_trigger(options)
         return true
     end
@@ -208,7 +190,7 @@ class AsAdapter
         options = Hash.new
         options[:trigger_name] = ast.name
         options[:auto_scaling_group_name] = ast.auto_scaling_group.name
-        
+
         as.delete_trigger(options)
         return true
     end
@@ -234,7 +216,7 @@ class AsAdapter
     end
 
     private
-    
+
     def self.parse_launch_configuration_info(account, parser)
         launch_configuration = account.launch_configurations.detect{ |s| s.launch_configuration_name == parser.launch_configuration_name }
 
@@ -249,21 +231,21 @@ class AsAdapter
 
         volumes = attributes['block_device_mappings'] || []
         attributes.delete('block_device_mappings')
-        
+
         server_image = account.server_images.detect{ |s| s.image_id == attributes['image_id'] }
         attributes['server_image_id'] = server_image.id unless server_image.nil?
 
         vm_type = account.instance_vm_types.detect{ |z| z.api_name == attributes['instance_type'] }
         attributes[:instance_vm_type_id] = vm_type.id unless vm_type.nil?
         attributes.delete('instance_type')
-        
+
         if launch_configuration.nil?
             attributes[:name] = attributes['launch_configuration_name']
             launch_configuration = account.launch_configurations.build(attributes)
         else
             launch_configuration.attributes = attributes
         end
-        
+
         # known issue with AS Launch Configurations - user_data is base64 encoded
         launch_configuration.user_data = Base64.decode64(user_data) unless user_data.nil?
 
@@ -281,7 +263,7 @@ class AsAdapter
                 mapping.attributes = v_attr
             end
         end
-        
+
         return launch_configuration
     end
 
@@ -297,8 +279,8 @@ class AsAdapter
         launch_configuration_name = attributes['launch_configuration_name']
         attributes.delete('launch_configuration_name')
         launch_configuration = (LaunchConfiguration.find_by_provider_account_id_and_launch_configuration_name(account.id, launch_configuration_name, :include => :server))
-        server = launch_configuration.nil? ? nil : launch_configuration.server 
-        
+        server = launch_configuration.nil? ? nil : launch_configuration.server
+
         # zones
         zone_names = attributes['availability_zones'] || []
         attributes.delete('availability_zones')
@@ -327,7 +309,7 @@ class AsAdapter
             instance.save
             instances << instance
         end
-        
+
         auto_scaling_group = account.auto_scaling_groups.detect{ |s| s.name == parser.auto_scaling_group_name }
         if auto_scaling_group.nil?
             auto_scaling_group = account.auto_scaling_groups.build(attributes)
@@ -345,14 +327,14 @@ class AsAdapter
         auto_scaling_group.zones = ( zones || [] )
         auto_scaling_group.load_balancers = ( load_balancers || [] )
         auto_scaling_group.instances = ( instances || [] )
-        
+
         return auto_scaling_group
     end
 
     def self.parse_auto_scaling_trigger_info(auto_scaling_group, parser)
         # convert parser object into hash
         attributes = parser.to_hash
-        
+
         # TODO - process dimensions
         attributes.delete('dimensions')
 
@@ -372,7 +354,7 @@ class AsAdapter
 
         return auto_scaling_trigger
     end
-    
+
     def self.parse_load_balancer_info(account, parser)
         load_balancer = account.load_balancers.detect{ |s| s.load_balancer_name == parser.load_balancer_name }
 
@@ -442,5 +424,5 @@ class AsAdapter
 
         return load_balancer
     end
-    
+
 end
