@@ -11,11 +11,16 @@
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 ActiveRecord::Schema.define(:version => 20110913041746) do
 ActiveRecord::Schema.define(:version => 20110817210119) do
 >>>>>>> Added counter cache to user for user_keys
 =======
+>>>>>>> Added counter cache to user for user_keys
+=======
+ActiveRecord::Schema.define(:version => 20110913041746) do
+ActiveRecord::Schema.define(:version => 20110817210119) do
 >>>>>>> Added counter cache to user for user_keys
 ActiveRecord::Schema.define(:version => 20111205154652) do
 
@@ -402,21 +407,6 @@ ActiveRecord::Schema.define(:version => 20111205154652) do
   add_index "four_oh_fours", ["url", "referer"], :name => "index_four_oh_fours_on_url_and_referer", :unique => true
   add_index "four_oh_fours", ["url"], :name => "index_four_oh_fours_on_url"
 
-  create_table "health_checks", :force => true do |t|
-    t.integer  "load_balancer_id"
-    t.integer  "healthy_threshold"
-    t.integer  "interval"
-    t.string   "target_protocol"
-    t.integer  "target_port"
-    t.string   "target_path"
-    t.integer  "timeout"
-    t.integer  "unhealthy_threshold"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "health_checks", ["load_balancer_id"], :name => "index_health_checks_on_load_balancer_id"
-
   create_table "iam_conditions", :force => true do |t|
     t.integer  "iam_statement_id"
     t.string   "type"
@@ -674,19 +664,6 @@ ActiveRecord::Schema.define(:version => 20111205154652) do
   add_index "launch_configurations_security_groups", ["launch_configuration_id"], :name => "index_configurations_groups_on_configuration_id"
   add_index "launch_configurations_security_groups", ["security_group_id"], :name => "index_configurations_groups_on_group_id"
 
-  create_table "load_balancer_instance_states", :force => true do |t|
-    t.integer  "load_balancer_id"
-    t.integer  "instance_id"
-    t.string   "state"
-    t.string   "reason_code"
-    t.string   "description"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "load_balancer_instance_states", ["instance_id"], :name => "index_load_balancer_instance_states_on_instance_id"
-  add_index "load_balancer_instance_states", ["load_balancer_id"], :name => "index_load_balancer_instance_states_on_load_balancer_id"
-
   create_table "load_balancer_listeners", :force => true do |t|
     t.integer  "load_balancer_id"
     t.integer  "load_balancer_port"
@@ -694,21 +671,9 @@ ActiveRecord::Schema.define(:version => 20111205154652) do
     t.string   "protocol"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "instance_protocol"
-    t.string   "s_s_l_certificate_id"
   end
 
   add_index "load_balancer_listeners", ["load_balancer_id", "load_balancer_port", "instance_port", "protocol"], :name => "index_ports_on_listener", :unique => true
-
-  create_table "load_balancer_policies", :force => true do |t|
-    t.integer  "load_balancer_id"
-    t.string   "type"
-    t.string   "policy_name"
-    t.string   "cookie_name"
-    t.float    "cookie_expiration_period"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
 
   create_table "load_balancers", :force => true do |t|
     t.integer  "provider_account_id"
@@ -717,9 +682,6 @@ ActiveRecord::Schema.define(:version => 20111205154652) do
     t.string   "d_n_s_name"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "source_security_group_id"
-    t.string   "canonical_hosted_zone_name"
-    t.string   "canonical_hosted_zone_name_id"
   end
 
   add_index "load_balancers", ["provider_account_id", "load_balancer_name"], :name => "index_on_load_balancers_pa_id_and_lb_name"
