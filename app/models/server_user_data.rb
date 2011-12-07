@@ -50,11 +50,18 @@ class ServerUserData
 
     @instance_users = cluster.instance_users.merge(server.server_users)
     @user_data = self
+  end
+
+  def get_loader
+    @emissary_config = tpl.result binding()
+
+    @instance_users = server_data.cluster.instance_users
+    @instance_users = @instance_users.merge(server_data.server.server_users)
+    @user_data = server_data
     @instance_users.find do |instance_user, users|
       @user_home = instance_user == 'root' ? '/root' : File.join('home', instance_user)
       @instance_user = instance_user
     end
-
     script = self.class.template(:payload).result binding
   end
 
