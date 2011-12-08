@@ -400,22 +400,7 @@ class Server < BaseModel
       if startup_script_packager == 'none'
         return startup_script.delete("\C-M")
       end
-
       server_user_data = ServerUserData.new self
-      payload = server_user_data.get_payload
-
-      if compress
-        payload.gsub!(/^\s*\n/,'')
-        payload.gsub!(/^#\s+.*\n/,'')
-        loader = File.read(COMPRESSION_TEMPLATE)
-        StringIO.open(loader, 'ab') do |f|
-          gz = Zlib::GzipWriter.new(f)
-          gz.write payload
-          gz.close
-        end
-        payload = loader
-      end
-
-      payload
+      server_user_data.get_loader compress
     end
 end
