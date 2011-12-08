@@ -13,18 +13,15 @@ fi
 # Deploy user public keys
 SSH_DIR="<%= @user_home %>/.ssh"
 mkdir -p $SSH_DIR
-cat <<'<%= @reol %>' >> $SSH_DIR/authorized_keys
+cat <<'EOLEOLEOL' >> $SSH_DIR/authorized_keys
+<% @instance_users.each_pair do |server_user, users|
+  users.each do |user|
+    user.user_keys.each do |key|
+      unless key.public_key.blank? or key.public_key !~ /^ssh-/
+-%>
+<%= key.public_key.delete("\C-M").delete("\r").delete("\n") %>
 <%
-    @instance_users.each_pair do |server_user, users|
-      users.each do |user|
-        user.user_keys.each do |key|
-          unless key.public_key.blank? or key.public_key !~ /^ssh-/
-  -%>
-  <%= key.public_key.delete("\C-M").delete("\r").delete("\n") %>
-  <%
-            end
-          end
-        end
+      end
     end
   end
 end
