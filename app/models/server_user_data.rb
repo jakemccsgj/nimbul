@@ -44,6 +44,8 @@ class ServerUserData
   end
 
   def get_loader
+    @emissary_config = tpl.result binding()
+
     @instance_users = server_data.cluster.instance_users
     @instance_users = @instance_users.merge(server_data.server.server_users)
     @user_data = server_data
