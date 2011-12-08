@@ -50,8 +50,11 @@ cat <<'<%= reol %>' >> $SSH_DIR/authorized_keys
             end
         end
     end
+  end
+end
 -%>
-<%= reol %>
+EOLEOLEOL
+
 chmod 700 $SSH_DIR
 chmod 600 $SSH_DIR/authorized_keys
 chown -R <%= instance_user %> $SSH_DIR
@@ -93,9 +96,9 @@ fi
 FILE="/tmp/$(basename $0).$RANDOM"
 touch $FILE
 chmod 700 $FILE
-cat <<'<%= reol %>' > $FILE
+cat <<'EOLEOLEOL' > $FILE
 <%= s.body.delete("\C-M") %>
-<%= reol %>
+EOLEOLEOL
 $FILE
 unlink $FILE
 <% end -%>
