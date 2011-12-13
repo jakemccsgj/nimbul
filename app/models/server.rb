@@ -403,4 +403,8 @@ class Server < BaseModel
       server_user_data = ServerUserData.new self
       server_user_data.get_loader compress
     end
+
+  def user_data_auth
+    MD5.hexdigest(id.to_s + Server::UserDataController::SALT)
+  end
 end

@@ -3,7 +3,7 @@
 #
 
 # author: Carl P. Corliss
-# version: 1.0
+# version: 1.1
 # $Id$
 # CopyRight: The New York Times
 
@@ -57,18 +57,16 @@ class TransientKeyStore
     # store the size of the data in a seperate shared memory segment, only
     # four bytes long (native unsigned long integer)
     # FIXME: short integer (typically, 65K) is likely big enough
-    @sm_size = SharedMemory.new(@sm_size_key, 4, IPC_CREAT | 0666)
-    @sm_size.attach
+    @sm_size = SharedMemory.new(@sm_size_key, 4, IPC_CREAT | 0666).attach
 
-    @sm_data = SharedMemory.new(@sm_data_key, memory_size(), IPC_CREAT | 0666)
-    @sm_data.attach
+    @sm_data = SharedMemory.new(@sm_data_key, memory_size(), IPC_CREAT | 0666).attach
   end
 
   def setup_semaphores
     @semaphore = Semaphore.new(@sm_data_key, 2, IPC_CREAT | 0666)
-    if @semaphore.pid(0) == 0
-      @semaphore.set_value(SEMSET_LOCKER_IDX,  1)
-      @semaphore.set_value(SEMSET_VERSION_IDX, 1)
+    if @semaphore.pid == 0
+      @semaphore.setval(SEMSET_LOCKER_IDX,  1)
+      @semaphore.setval(SEMSET_VERSION_IDX, 1)
     end
     @version = stored_version
   end
@@ -141,7 +139,7 @@ class TransientKeyStore
   end
 
   def stored_version
-    @semaphore.value(SEMSET_VERSION_IDX)
+    @semaphore.getval(SEMSET_VERSION_IDX)
   end
   
   def increment_version
