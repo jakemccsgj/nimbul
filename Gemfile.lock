@@ -1,4 +1,10 @@
 GIT
+  remote: git://github.com/nimbul/cloudmaster.git
+  revision: 06d60a20ce54feb8c6e23dc05df730d4ce9e3ff3
+  specs:
+    cloudmaster (1.0.0)
+
+GIT
   remote: https://github.com/Velir/open_id_authentication.git
   revision: 7955a4bf22c08d9f90ffe1e02bb570289a86a8f1
   tag: v1.0.0
@@ -15,12 +21,6 @@ GIT
       actionpack (>= 2.3.7)
       activesupport (>= 2.3.7)
       i18n (~> 0.4)
-
-GIT
-  remote: https://github.com/nimbul/cloudmaster.git
-  revision: 06d60a20ce54feb8c6e23dc05df730d4ce9e3ff3
-  specs:
-    cloudmaster (1.0.0)
 
 GEM
   remote: http://rubygems.org/
@@ -129,7 +129,7 @@ PLATFORMS
 
 DEPENDENCIES
   Ruby-MemCache
-  SysVIPC
+  SysVIPC (~> 0.9.0)
   ZenTest
   aasm
   autotest
