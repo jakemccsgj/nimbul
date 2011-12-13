@@ -1,5 +1,5 @@
 class Parent::InstancesController < ApplicationController
-    parent_resources :provider_account, :cluster, :server, :auto_scaling_group, :owner
+    parent_resources :provider_account, :cluster, :server, :auto_scaling_group, :load_balancer, :owner
     before_filter :login_required
     require_role  :admin, :unless => "current_user.has_access?(parent)"
 

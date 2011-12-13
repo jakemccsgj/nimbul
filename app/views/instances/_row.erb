@@ -12,6 +12,19 @@
     <%- end -%>
     </td>
 <% end %>
+<%
+if @parent.is_a?(LoadBalancer)
+    lbis = @parent.load_balancer_instance_states.detect{|i| i.instance_id == instance.id}
+    if lbis.nil?
+      state = 'Unknown'
+    else
+      state = lbis.state
+    end
+%>
+    <td class="<%= state %>">
+        <%= load_balancer_instance_state_details(lbis) %>
+    </td>
+<% end %>
     <td>
         <%= link_to instance.instance_id, instance_path(instance) %>
 <%- if (instance.status_message || '').length > 0 %><%= link_to_function(image_tag(

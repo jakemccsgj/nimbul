@@ -1,0 +1,15 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  load_balancer_id: 1
+  type: MyString
+  policy_name: MyString
+  cookie_name: MyString
+  cookie_expiration_period: 
+
+two:
+  load_balancer_id: 1
+  type: MyString
+  policy_name: MyString
+  cookie_name: MyString
+  cookie_expiration_period: 

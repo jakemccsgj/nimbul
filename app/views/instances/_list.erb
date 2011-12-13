@@ -23,6 +23,9 @@
         <% end %>
         </th>
     <% end %>
+    <% if @parent.is_a?(LoadBalancer) %>
+      <th>Load Balancer State</th>
+    <% end %>
     <th <%= sort_td_class_helper "instance_id" %>>
       <%= instances_sort_link "Instance", "instance_id" %>
     </th>

@@ -179,6 +179,12 @@ class User < BaseModel
         return false
     end
 
+    def has_load_balancer_access?(load_balancer)
+        return true if has_role?("admin")
+        return true if has_provider_account_access?(load_balancer.provider_account)
+        return false
+    end
+
     def has_auto_scaling_trigger_access?(auto_scaling_trigger)
         return true if has_role?("admin")
         return true if has_provider_account_access?(auto_scaling_trigger.auto_scaling_group)

@@ -91,32 +91,35 @@ Rails::Initializer.run do |config|
   StartupScript = Struct.new(:name,:body)
 
   #Constant values
-  EC2_SERVER_USERS                        = [ 'root', 'dev', 'logpoll' ]
-  PUBLISH_EVERY_VALUES                    = [ 0, 10, 20, 30, 60, 120, 300, 600, 1800, 3600 ]
-  IN_MESSAGE_STATES                       = [ 'new', 'processed' ]
-  OUT_MESSAGE_STATES                      = [ 'pending', 'sent' ]
-  PROTOCOLS_LC                            = [ 'tcp', 'udp', 'icmp' ]
-  PROTOCOLS                               = PROTOCOLS_LC.map{ |p| LabelValue.new(p, p.upcase) }
-  VOLUME_CLASSES                          = [ 'Volume', 'Snapshot', 'AnotherServer' ]
-  RUN_EVERY_UNITS                         = [ 'minutes', 'hours', 'days', 'weeks' ]
-  AS_TRIGGER_MEASURE_NAMES                = {
-    'CPUUtilization'  => [ 'Percent' ],
-    'NetworkIn'       => [ 'Bytes', 'Bytes/Second', 'Bits', 'Bits/Second' ],
-    'NetworkOut'      => [ 'Bytes', 'Bytes/Second', 'Bits', 'Bits/Second' ],
-    'DiskWriteOps'    => [ 'Count', 'Count/Second' ],
-    'DiskReadOps'     => [ 'Count', 'Count/Second' ],
-    'DiskWriteBytes'  => ['Bytes', 'Bytes/Second', 'Bits', 'Bits/Second' ],
-    'DiskReadBytes'   => [ 'Bytes', 'Bytes/Second', 'Bits','Bits/Second' ],
-  }
-  AS_TRIGGER_STATISTICS                   = [ 'Average','Minimum','Maximum','Sum' ]
-  AS_TRIGGER_PERIOD_UNITS                 = [ 'minutes', 'hours', 'days' ]
-  AS_TRIGGER_BREACH_DURATION_UNITS        = [ 'minutes', 'hours', 'days' ]
-  AS_TRIGGER_THRESHOLD_ACTIONS            = [ 'increase', 'decrease' ]
+  EC2_SERVER_USERS = [ 'root', 'dev', 'logpoll' ]
+  PUBLISH_EVERY_VALUES = [ 0, 10, 20, 30, 60, 120, 300, 600, 1800, 3600 ]
+  IN_MESSAGE_STATES = [ 'new', 'processed' ]
+  OUT_MESSAGE_STATES = [ 'pending', 'sent' ]
+  PROTOCOLS_LC = [ 'tcp', 'udp', 'icmp' ]
+  PROTOCOLS = PROTOCOLS_LC.map{ |p| LabelValue.new(p, p.upcase) }
+  VOLUME_CLASSES = [ 'Volume', 'Snapshot', 'AnotherServer' ]
+  RUN_EVERY_UNITS = [ 'minutes', 'hours', 'days', 'weeks' ]
+  AS_TRIGGER_MEASURE_NAMES =  {
+		'CPUUtilization' => [ 'Percent' ],
+		'NetworkIn' => [ 'Bytes', 'Bytes/Second', 'Bits', 'Bits/Second' ],
+		'NetworkOut' => [ 'Bytes', 'Bytes/Second', 'Bits', 'Bits/Second' ],
+		'DiskWriteOps' => [ 'Count', 'Count/Second' ],
+		'DiskReadOps' => [ 'Count', 'Count/Second' ],
+		'DiskWriteBytes' => ['Bytes', 'Bytes/Second', 'Bits', 'Bits/Second' ],
+		'DiskReadBytes' => [ 'Bytes', 'Bytes/Second', 'Bits','Bits/Second' ],
+	}
+  AS_TRIGGER_STATISTICS =  [ 'Average','Minimum','Maximum','Sum' ]
+  AS_TRIGGER_PERIOD_UNITS = [ 'minutes', 'hours', 'days' ]
+  AS_TRIGGER_BREACH_DURATION_UNITS = [ 'minutes', 'hours', 'days' ]
+  AS_TRIGGER_THRESHOLD_ACTIONS = [ 'increase', 'decrease' ]
   AS_TRIGGER_BREACH_SCALE_INCREMENT_UNITS = [ '%', 'instances' ]
-  SERVER_VOLUME_MOUNT_TYPES_ARRAY         = [ 'Mount Volume Mount Type', 'Restore Snapshot Mount Type', 'Restore Latest Snapshot Mount Type' ]
-  SERVER_VOLUME_MOUNT_TYPES               = SERVER_VOLUME_MOUNT_TYPES_ARRAY.map{ |t| LabelValue.new(t.gsub('Mount Type',''), t.gsub(' ','')) }
+  ELB_TARGET_PROTOCOL_NAMES = [ 'HTTP', 'TCP', 'HTTPS', 'SSL'  ]
+  ELB_TARGET_PROTOCOL_WITH_PATH_NAMES = [ 'HTTP', 'HTTPS' ]
+  ELB_THRESHOLD_VALUES = [ 2, 3, 4, 5, 6, 7, 8, 9, 10 ]
+  SERVER_VOLUME_MOUNT_TYPES_ARRAY = [ 'Mount Volume Mount Type', 'Restore Snapshot Mount Type', 'Restore Latest Snapshot Mount Type' ]
+  SERVER_VOLUME_MOUNT_TYPES = SERVER_VOLUME_MOUNT_TYPES_ARRAY.map{ |t| LabelValue.new(t.gsub('Mount Type',''), t.gsub(' ','')) }
 
-  PER_TIME_UNITS                          = [ 'hour', 'day', 'month', '1 year', '3 years' ]
+  PER_TIME_UNITS = [ 'hour', 'day', 'month', '1 year', '3 years' ]
 
   STARTUP_SCRIPT_PACKAGERS = [
     { :name => 'nimbul', :description => "Combines Provider Account's, Cluster's and Server's Variables and Startup Scripts. Minifies and compresses to create the final User Data. The resulting User Data requires an NYTd-built AMI to run successfully." },

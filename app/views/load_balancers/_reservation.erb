@@ -1,0 +1,8 @@
+        <td><%= i.count %></td>
+        <td><%= i.start.strftime("%Y-%m-%d") %></td>
+        <td><%= (i.start + i.duration).strftime("%Y-%m-%d") %></td>
+        <td><%= i.duration.to_i / (60*60*24*30) %></td>
+        <td><%= i.usage_price %></td>
+        <td><%= i.fixed_price %></td>
+        <td class="<%= i.state %>"><%= i.state %></td>
+        <td><%= i.description %></td>
