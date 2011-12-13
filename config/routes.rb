@@ -382,10 +382,14 @@ ActionController::Routing::Routes.draw do |map|
     map.resources :server_parameters, :collection => { :sort => :post }
     map.resources :operations, :has_many => [ :operation_logs ]
 
-    map.resources :server do |server|
-      server.resource :user_data, :controller => 'server/user_data'
+    map.server_bootstrap_user_data "server/:server_id/user_data/:auth.:format",
+                                   :controller => 'server/user_data',
+                                   :action => 'show',
+                                   :auth => nil
+    map.resources :server do |s|
+      s.resource :user_data, :controller => 'server/user_data', :only => [ :show ]
     end
-    #map.show_server_server_user_data '/server/:id/user_data', :controller => 'server/user_data', :action => 'show', 
+
     map.show_server_server_script_data '/server/:id/user_script', :controller => 'server/user_script', :action => 'show'
 
     # server profiles
