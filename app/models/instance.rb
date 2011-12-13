@@ -16,8 +16,6 @@ class Instance < BaseModel
   belongs_to :storage_type
 
   has_and_belongs_to_many :security_groups, :uniq => true
-  has_many :load_balancer_instance_states, :dependent => :destroy
-  has_many :load_balancers, :through => :load_balancer_instance_states, :uniq => true
 
   has_many :operations, :dependent => :destroy
 
@@ -244,21 +242,6 @@ class Instance < BaseModel
 
     def self.find_all_by_server(server, options={})
         find_all_by_server_id(server.id, options)
-    end
-
-    def self.search_by_load_balancer(load_balancer, search, page, extra_joins, extra_conditions, sort=nil, filter=nil, include=nil)
-        joins = [
-            'INNER JOIN load_balancer_instance_states ON load_balancer_instance_states.instance_id = instances.id',
-        ] + [extra_joins].flatten.compact
-
-        conditions = [ 'load_balancer_instance_states.load_balancer_id = ?', (load_balancer.is_a?(LoadBalancer) ? load_balancer.id : load_balancer) ]
-        unless extra_conditions.blank?
-            extra_conditions = [ extra_conditions ].flatten
-            conditions[0] << ' AND ' + extra_conditions[0];
-            conditions << extra_conditions[1..-1]
-        end
-  
-        search(search, page, joins, conditions, sort, filter, include)
     end
 
     def self.search_by_owner(owner, search, page, extra_joins, extra_conditions, sort=nil, filter=nil, include=nil)

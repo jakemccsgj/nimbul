@@ -62,7 +62,6 @@ td.succeeded,
 td.completed,
 td.running,
 td.active,
-td.InService,
 td.ready {
     background-color:#C3DDC3;
 }
@@ -74,7 +73,6 @@ tr.admin {
 
 td.false,
 td.failure,
-td.OutOfService,
 td.terminated	{
     background-color: #FFCCCC;
 }

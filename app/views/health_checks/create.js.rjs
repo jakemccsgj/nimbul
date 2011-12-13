@@ -1,8 +1,0 @@
-if @error_messages.empty?
-    page["edit_health_check"].hide
-    page["add_health_check"].appear if @parent.can_use_more_of?('HealthCheck')
-    page.insert_html :bottom, params[:update], :partial => "health_check", :object => @health_check
-else
-    page['error_redbox'].replace_html :partial => 'shared/error_redbox'
-    page['error_redbox'].appear
-end

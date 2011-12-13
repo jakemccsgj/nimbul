@@ -2,7 +2,6 @@ class Zone < BaseModel
     belongs_to :region
     
     has_and_belongs_to_many :auto_scaling_groups
-    has_and_belongs_to_many :load_balancers
     
     has_many :instances, :dependent => :nullify
     has_many :resource_bundles, :dependent => :nullify

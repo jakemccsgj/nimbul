@@ -1,1 +1,0 @@
-page["#{@parent_type}_#{@parent.id}_load_balancers_index"].replace_html :partial => "load_balancers/index"

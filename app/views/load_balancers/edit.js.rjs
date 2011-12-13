@@ -1,4 +1,0 @@
-#page[:edit_load_balancer].replace_html :partial => "form", :object => @load_balancer
-page[:edit_load_balancer].replace_html :partial => "tabs", :object => @load_balancer
-page[:add_load_balancer].hide
-page[:edit_load_balancer].appear

@@ -1,3 +1,0 @@
-page[:edit_load_balancer_listener].replace_html :partial => "form", :object => @load_balancer_listener
-page[:add_load_balancer_listener].hide
-page[:edit_load_balancer_listener].appear

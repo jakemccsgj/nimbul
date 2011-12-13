@@ -31,7 +31,7 @@ class ProviderAccount < BaseModel
     has_many :dns_hostnames, :dependent => :destroy
     has_many :auto_scaling_groups, :dependent => :destroy
     has_many :auto_scaling_triggers, :dependent => :destroy
-    has_many :load_balancers, :include => [:load_balancer_listeners, :health_checks, :zones, :load_balancer_instance_states, :instances], :dependent => :destroy
+    has_many :load_balancers, :dependent => :destroy
     has_many :reserved_instances, :dependent => :destroy
     
     has_many :cloud_resources, :dependent => :destroy
@@ -82,7 +82,6 @@ class ProviderAccount < BaseModel
     def can_use_more_of?(provider_account_resource_type)
         return true if provider_account_resource_type == 'ServerImageCategory'
         return true if provider_account_resource_type == 'ServerImageGroup'
-        return true if provider_account_resource_type == 'LoadBalancer'
         return false
     end
 
