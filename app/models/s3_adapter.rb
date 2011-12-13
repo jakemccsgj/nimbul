@@ -1,4 +1,3 @@
-require 'AWS/S3'
 require 'pp'
 
 class S3Adapter
