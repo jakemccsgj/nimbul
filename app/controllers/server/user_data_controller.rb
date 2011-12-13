@@ -14,7 +14,7 @@ class Server::UserDataController < ApplicationController
     controller.send(:login_required) unless controller.action_name == 'show' and controller.request.format.sh?
   end
 
-  require_role  :admin, :unless => "params[:id].nil? or current_user.has_server_access?(Server.find(params[:id])) "
+  require_role  :admin, :unless => "params[:server_id].nil? or current_user.has_server_access?(Server.find(params[:server_id])) "
 
   def show
     @server = Server.find(params[:server_id], :include => { :cluster => :provider_account})
@@ -35,23 +35,9 @@ class Server::UserDataController < ApplicationController
       }
       format.json { render :json => @server_user_data.to_json }
       format.sh {
-        render :action => 'show.sh.erb' and return if MD5.hexdigest(params[:server_id].to_s + SALT) == params[:auth]
+        render :action => 'show.sh.erb' and return if @server.user_data_auth == params[:auth]
         raise "No auth!"
       }
-    end
-  end
-
-  def bootstrap server
-    server_user_data_url server, :format => :sh, :params => { :auth => MD5.hexdigest(server.id.to_s + SALT) }
-  end
-
-  class << self
-    def read_template tpl
-      File.read(File.join(USERDATA_PATH, tpl))
-    end
-
-    def get_erb tpl
-      ERB.new(read_template(tpl), nil, "%-").result(binding)
     end
   end
 end
