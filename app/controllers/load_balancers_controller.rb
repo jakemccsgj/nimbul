@@ -1,7 +1,7 @@
 class LoadBalancersController < ApplicationController
   parent_resources :provider_account
   before_filter :login_required
-  require_role  :admin, :unless => "params[:id].nil? or current_user.has_access?(parent)"
+  require_role  :admin, :unless => "current_user.has_access?(parent)"
 
   # GET /load_balancers
   # GET /load_balancers.xml
@@ -19,25 +19,7 @@ class LoadBalancersController < ApplicationController
   # GET /load_balancers/new.xml
   def new
     @load_balancer = parent.load_balancers.build
-    @load_balancer_listener = @load_balancer.load_balancer_listeners.build({
-        :protocol => 'HTTP',
-        :load_balancer_port => 80,
-        :instance_protocol => 'HTTP',
-        :instance_port => 80
-      })
-    @health_check = @load_balancer.health_checks.build({
-        :target_protocol => 'HTTP',
-        :target_port => 80,
-        :target_path => '/index.html',
-        :timeout => 5,
-        :interval => 30,
-        :unhealthy_threshold => 2,
-        :healthy_threshold => 10
-      })
-    @clusters = @parent.clusters
-    @servers = Server.find_all_by_parent(@parent, {:order => :name})
-    @instances = @parent.instances
-    
+
     respond_to do |format|
       format.html # new.html.erb
       format.xml  { render :xml => @load_balancer }
@@ -47,13 +29,7 @@ class LoadBalancersController < ApplicationController
 
   # GET /load_balancers/1/edit
   def edit
-    @load_balancer = parent.load_balancers.find(params[:id], :include => [
-        :load_balancer_listeners, :health_checks, :load_balancer_instance_states, :instances
-      ]
-    )
-    @clusters = @parent.clusters
-    @servers = Server.find_all_by_parent(@parent, {:order => :name})
-    @instances = @parent.instances
+    @load_balancer = parent.load_balancers.find(params[:id])
 
     respond_to do |format|
       format.html # edit.html.erb
@@ -77,23 +53,9 @@ class LoadBalancersController < ApplicationController
       redirect_to redirect_url
     else
       @load_balancer = parent.load_balancers.build(params[:load_balancer])
-      
+
       respond_to do |format|
         if @load_balancer.save
-          @load_balancer.reload
-          p = @parent
-          o = @load_balancer
-          AuditLog.create_for_parent(
-            :parent => p,
-            :auditable_id => o.id,
-            :auditable_type => o.class.to_s,
-            :auditable_name => o.name,
-            :author_login => current_user.login,
-            :author_id => current_user.id,
-            :summary => "created '#{o.name}'",
-            :changes => o.tracked_changes,
-            :force => false
-          )
           flash[:notice] = 'LoadBalancer was successfully created.'
           format.html { redirect_to redirect_url }
           format.xml  { render :xml => @load_balancer, :status => :created, :location => @load_balancer }
@@ -126,19 +88,6 @@ class LoadBalancersController < ApplicationController
 
       respond_to do |format|
         if @load_balancer.update_attributes(params[:load_balancer])
-          p = @parent
-          o = @load_balancer
-          AuditLog.create_for_parent(
-            :parent => p,
-            :auditable_id => o.id,
-            :auditable_type => o.class.to_s,
-            :auditable_name => o.name,
-            :author_login => current_user.login,
-            :author_id => current_user.id,
-            :summary => "updated '#{o.name}'",
-            :changes => o.tracked_changes,
-            :force => false
-          )
           flash[:notice] = 'LoadBalancer was successfully updated.'
           format.html { redirect_to redirect_url }
           format.xml  { head :ok }
@@ -179,52 +128,5 @@ class LoadBalancersController < ApplicationController
       LoadBalancer.update_all(['position=?', index+1], ['id=?', id])
     end
     render :nothing => true
-  end
-
-  def update_servers
-    if params[:id]
-      @load_balancer = parent.load_balancers.find(params[:id])
-    else
-      @load_balancer = parent.load_balancers.build()
-    end
-    # updates servers based on cluster selected
-    if params[:instance_name].blank?
-      if !params[:server_id].blank?
-        @server = Server.find(params[:server_id],
-          :include => [ [:instances => :load_balancer_instance_states] ]
-        )
-        @instances = @server.instances
-      elsif !params[:cluster_id].blank?
-        @cluster = Cluster.find(params[:cluster_id], :include => [
-            :servers, [:instances => :load_balancer_instance_states]
-          ]
-        )
-        @servers = @cluster.servers
-        @instances = @cluster.instances
-      else
-        @servers = Server.find_all_by_parent(parent, {:order => :name})
-        @instances = parent.instances
-      end
-    else
-      @servers = Server.find_all_by_parent(parent, {:order => :name})
-      @instances = parent.instances.select{|i| i.instance_id == params[:instance_name]}
-    end
-
-    render :update do |page|
-      page.replace_html 'load_balancer_servers', :partial => 'servers' if params[:server_id].blank?
-      page.replace_html 'load_balancer_find_instance', :partial => 'find_instance' if params[:instance_name].blank?
-      page.replace_html 'load_balancer_available_instances',
-        :partial => 'load_balancer_instance_states/instance',
-        :locals => { :load_balancer_instance_state => nil },
-        :collection => @instances
-    end
-  end
-
-  def update_instances
-    update_servers
-  end
-
-  def auto_complete_for__instance_name
-    update_servers
   end
 end

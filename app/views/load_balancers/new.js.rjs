@@ -1,2 +1,3 @@
-page['xxlarge_redbox'].replace_html :partial => 'form'
-page['xxlarge_redbox'].appear
+page[:edit_load_balancer].replace_html :partial => "form", :object => @load_balancer
+page[:add_load_balancer].hide
+page[:edit_load_balancer].appear

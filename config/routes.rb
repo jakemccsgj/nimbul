@@ -13,16 +13,12 @@ ActionController::Routing::Routes.draw do |map|
       :only => [ :index, :list ]
   end
 
-  map.resources :load_balancers do |load_balancer|
+  map.resources :load_balancers, :only => [] do |load_balancer|
     load_balancer.resources :instances, :controller => 'parent/instances',
       :collection => { :list => :any, :control => :any },
-      :only => [ :index, :list, :create ]
-    load_balancer.resources :health_checks,
-      :except => [],
-      :member => { :update_target_path => :post }
-    load_balancer.resources :load_balancer_listeners,
-      :except => [],
-      :member => { :update_target_path => :post }
+      :only => [ :index, :list ]
+    load_balancer.resources :health_checks, :except => [], :member => { :update_target_path => :post }
+    load_balancer.resources :load_balancer_listeners, :except => [], :member => { :update_target_path => :post }
   end
 
   map.resources :account_groups do |account_group|
@@ -78,71 +74,82 @@ ActionController::Routing::Routes.draw do |map|
   end
 
   map.resources :provider_accounts,
-    :collection => { :list => :any, :control => :post } do |provider_account|
-    provider_account.resources :instances,
-      :controller => 'parent/instances',
-      :collection => { :list => :any, :control => :any },
-      :only => [ :index, :list ]
-    provider_account.resources :servers,
-      :controller => 'parent/servers',
-      :collection => { :list => :any, :control => :any },
-      :only => [ :index, :list, :new ]
-    provider_account.resources :auto_scaling,
-      :controller => 'provider_account/auto_scaling',
-      :collection => { :list => :any },
-      :only => [ :index, :list ]
-    provider_account.resources :launch_configurations,
-      :controller => 'provider_account/launch_configurations',
-      :collection => { :list => :get },
-      :only => [ :new, :create ]
-    provider_account.resources :auto_scaling_groups,
-      :controller => 'provider_account/auto_scaling_groups',
-      :collection => { :list => :any }
-    provider_account.resources :load_balancers,
-      :collection => {
-        :update_servers => :post, :update_instances => :post,
-        :auto_complete_for__instance_name => :post
-      }
-    provider_account.resources :server_images,
-      :controller => 'provider_account/server_images',
-      :collection => { :list => :any, :control => :any },
-      :only => [ :index, :list, :new, :create ]
-    provider_account.resources :security_groups,
-      :controller => 'provider_account/security_groups',
-      :collection => { :list => :any, :control => :any },
-      :only => [ :index, :list, :new, :create, :destroy ]
-    provider_account.resources :firewall_rules,
-      :controller => 'provider_account/firewall_rules',
-      :collection => { :list => :any, :control => :any },
-      :only => [ :index, :list, :new, :create, :destroy ]
-    provider_account.resources :addresses,
-      :controller => 'parent/addresses',
-      :collection => { :list => :any, :control => :any },
-      :only => [ :index, :list, :new, :create ]
-    provider_account.resources :volumes,
-      :controller => 'parent/volumes',
-      :collection => { :list => :any, :control => :any },
-      :only => [ :index, :list, :new, :create, :destroy ]
-    provider_account.resources :snapshots,
-      :controller => 'parent/snapshots',
-      :collection => { :list => :any, :control => :any },
-      :only => [ :index, :list, :new, :create, :destroy ]
-    provider_account.resources :users,
-      :controller => 'provider_account/users',
-      :only => [ :index, :create, :destroy ]
-    provider_account.resources :services,
-      :controller => 'parent/services',
-      :collection => { :list => :any },
-      :only => [ :index, :list, :new, :create, :destroy ]
-    provider_account.resources :dns_hostnames,
-      :controller => 'provider_account/dns_hostnames',
-      :except => [ :edit, :update, :new ],
-      :member => { :acquire => :post },
-      :collection => { :list => :any } do |hostname|
-      hostname.resources :dns_leases,
-        :controller => 'provider_account/dns_leases',
-        :collection => { :release => :delete },
-        :except => [ :destroy, :edit, :new, :update, :create ]
+        :collection => { :list => :any, :control => :post } do |provider_account|
+        provider_account.resources :instances, :controller => 'parent/instances',
+            :collection => { :list => :any, :control => :any },
+            :only => [ :index, :list ]
+        provider_account.resources :servers, :controller => 'parent/servers',
+            :collection => { :list => :any, :control => :any },
+            :only => [ :index, :list, :new ]
+        provider_account.resources :auto_scaling, :controller => 'provider_account/auto_scaling',
+            :collection => { :list => :any },
+            :only => [ :index, :list ]
+        provider_account.resources :launch_configurations, :controller => 'provider_account/launch_configurations',
+            :collection => { :list => :get },
+            :only => [ :new, :create ]
+        provider_account.resources :auto_scaling_groups, :controller => 'provider_account/auto_scaling_groups',
+            :collection => { :list => :any }
+        provider_account.resources :load_balancers
+        provider_account.resources :server_images, :controller => 'provider_account/server_images',
+            :collection => { :list => :any, :control => :any },
+            :only => [ :index, :list, :new, :create ]
+        provider_account.resources :security_groups, :controller => 'provider_account/security_groups',
+            :collection => { :list => :any, :control => :any },
+            :only => [ :index, :list, :new, :create, :destroy ]
+        provider_account.resources :firewall_rules, :controller => 'provider_account/firewall_rules',
+            :collection => { :list => :any, :control => :any },
+            :only => [ :index, :list, :new, :create, :destroy ]
+        provider_account.resources :addresses, :controller => 'parent/addresses',
+            :collection => { :list => :any, :control => :any },
+            :only => [ :index, :list, :new, :create ]
+        provider_account.resources :volumes, :controller => 'parent/volumes',
+            :collection => { :list => :any, :control => :any },
+            :only => [ :index, :list, :new, :create, :destroy ]
+        provider_account.resources :snapshots, :controller => 'parent/snapshots',
+            :collection => { :list => :any, :control => :any },
+            :only => [ :index, :list, :new, :create, :destroy ]
+        provider_account.resources :users, :controller => 'provider_account/users',
+            :only => [ :index, :create, :destroy ]
+        provider_account.resources :services, :controller => 'parent/services',
+            :collection => { :list => :any },
+            :only => [ :index, :list, :new, :create, :destroy ]
+        provider_account.resources :dns_hostnames,
+            :controller => 'provider_account/dns_hostnames',
+            :except => [ :edit, :update, :new ],
+            :member => { :acquire => :post },
+            :collection => { :list => :any } do |hostname|
+                hostname.resources :dns_leases,
+                    :controller => 'provider_account/dns_leases',
+                    :collection => { :release => :delete },
+                    :except => [ :destroy, :edit, :new, :update, :create ]
+            end
+        provider_account.resources :dns_leases, :controller => 'provider_account/dns_leases',
+            :collection => { :release => :delete, :list => :any  }, :except => [ :destroy, :edit, :new, :update, :create ]
+        provider_account.resources :stats,
+            :controller => 'parent/stats',
+            :collection => { :total => :get },
+            :only => [ :index, :total ]
+        provider_account.connect 'stats/:year',
+            :year => /\d{4}/,
+            :controller => 'parent/stats',
+            :collection => { :total => :get },
+            :only => [ :index, :total ]
+        provider_account.connect 'stats/:year/:month',
+            :year => /\d{4}/, :month => /\d{2}/,
+            :controller => 'parent/stats',
+            :collection => { :total => :get },
+            :only => [ :index, :total ]
+        provider_account.resources :server_image_categories, :collection => { :sort => :post }
+        provider_account.resources :server_image_groups, :collection => { :sort => :post }
+########
+        provider_account.resources :clusters
+        provider_account.resources :provider_account_parameters
+        provider_account.resources :events
+#        provider_account.resources :instance_list_readers
+        provider_account.resources :in_messages
+        provider_account.resources :out_messages
+        provider_account.resources :publishers
+        provider_account.resources :key_pairs
     end
 
     # services

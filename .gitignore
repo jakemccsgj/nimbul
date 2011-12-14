@@ -3,8 +3,3 @@ nimbul.kpf
 cucumber.yml
 pki
 vendor/bundle
-<<<<<<< HEAD
-=======
-vendor/cache
-nbproject
->>>>>>> c0f1896... checkpoint commit for elb support
