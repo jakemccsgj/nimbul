@@ -3,3 +3,5 @@ nimbul.kpf
 cucumber.yml
 pki
 vendor/bundle
+vendor/cache
+.htaccess

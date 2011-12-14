@@ -18,7 +18,7 @@ GIT
 
 GIT
   remote: https://github.com/nimbul/cloudmaster.git
-  revision: 0db6eef571518de1fa5369df7c49ba477ab89798
+  revision: 731b089664a82d3c257c557f3dbfcd5560becf13
   specs:
     cloudmaster (1.0.0)
 
@@ -27,9 +27,8 @@ GEM
   specs:
     Ruby-MemCache (0.0.1)
       io-reactor (> 0.0.0)
-    SysVIPC (0.9.3)
     ZenTest (4.6.2)
-    aasm (2.3.1)
+    aasm (3.0.0)
       activerecord
     actionmailer (2.3.14)
       actionpack (= 2.3.14)
@@ -45,18 +44,22 @@ GEM
       eventmachine (>= 0.12.4)
     autotest (4.4.6)
       ZenTest (>= 4.4.1)
+    aws (2.5.6)
+      http_connection
+      uuidtools
+      xml-simple
     aws-s3 (0.6.2)
       builder
       mime-types
       xml-simple
     bert (1.1.2)
     builder (3.0.0)
-    carrot (1.0.0)
-    chronic (0.6.4)
-    cucumber (1.0.6)
+    carrot (1.2.0)
+    chronic (0.6.6)
+    cucumber (1.1.4)
       builder (>= 2.1.2)
       diff-lcs (>= 1.1.2)
-      gherkin (~> 2.4.18)
+      gherkin (~> 2.7.1)
       json (>= 1.4.6)
       term-ansicolor (>= 1.0.6)
     daemons (1.1.4)
@@ -73,16 +76,19 @@ GEM
       uuid (>= 2.3.0)
       work_queue (>= 1.0.0)
     eventmachine (0.12.10)
+    facter (1.6.4)
     fastthread (1.0.7)
-    gherkin (2.4.18)
+    ffi (1.0.11)
+    gherkin (2.7.1)
       json (>= 1.4.6)
+    http_connection (1.4.1)
     i18n (0.6.0)
     inifile (0.4.1)
     io-reactor (1.0.4)
-    json (1.6.0)
-    macaddr (1.4.0)
-      systemu (~> 2.2.0)
-    mime-types (1.16)
+    json (1.6.3)
+    macaddr (1.5.0)
+      systemu (>= 2.4.0)
+    mime-types (1.17.2)
     mysql (2.8.1)
     net-sftp (2.0.5)
       net-ssh (>= 2.0.9)
@@ -98,43 +104,46 @@ GEM
       activeresource (= 2.3.14)
       activesupport (= 2.3.14)
       rake (>= 0.8.3)
-    rake (0.9.2)
-    rspec (2.6.0)
-      rspec-core (~> 2.6.0)
-      rspec-expectations (~> 2.6.0)
-      rspec-mocks (~> 2.6.0)
-    rspec-core (2.6.4)
-    rspec-expectations (2.6.0)
+    rake (0.9.2.2)
+    rspec (2.7.0)
+      rspec-core (~> 2.7.0)
+      rspec-expectations (~> 2.7.0)
+      rspec-mocks (~> 2.7.0)
+    rspec-core (2.7.1)
+    rspec-expectations (2.7.0)
       diff-lcs (~> 1.1.2)
-    rspec-mocks (2.6.0)
+    rspec-mocks (2.7.0)
     ruby-openid (2.1.8)
-    rufus-scheduler (2.0.10)
+    rufus-scheduler (2.0.14)
       tzinfo (>= 0.3.23)
     servolux (0.9.6)
-    sys-cpu (0.6.3)
-    systemu (2.2.0)
-    term-ansicolor (1.0.6)
-    tzinfo (0.3.29)
+    sys-cpu (0.7.0)
+      ffi (>= 1.0.0)
+    systemu (2.4.2)
+    term-ansicolor (1.0.7)
+    tzinfo (0.3.31)
     uuid (2.3.4)
       macaddr (~> 1.0)
-    work_queue (2.0.0)
-    xml-simple (1.1.0)
+    uuidtools (2.1.2)
+    work_queue (1.0.0)
+    xml-simple (1.1.1)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   Ruby-MemCache
-  SysVIPC
   ZenTest
   aasm
   autotest
+  aws
   aws-s3
   carrot
   chronic
   cloudmaster!
   cucumber
   emissary
+  facter
   fastthread
   formtastic!
   mysql (~> 2.8.1)
@@ -145,4 +154,4 @@ DEPENDENCIES
   rspec
   ruby-openid
   rufus-scheduler
-  work_queue
+  work_queue (~> 1.0.0)
