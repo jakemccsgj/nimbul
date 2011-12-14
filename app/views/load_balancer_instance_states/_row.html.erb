@@ -1,0 +1,41 @@
+<td class="nowrap">
+  <% if instance.server_id %>
+    <% if params[:cluster_id].blank? %>
+      <%= link_to instance.server.cluster.name, cluster_path(instance.server.cluster_id) -%>
+      /
+    <% end -%>
+    <% if params[:server_id].blank? %>
+      <%= link_to h(instance.server_name), server_path(instance.server_id) %>
+      /
+    <% end -%>
+  <% end -%>
+  <%= link_to instance.instance_id, instance_path(instance) %>
+  <%- if (instance.status_message || '').length > 0 %><%= link_to_function(image_tag(
+        'important.png', :width => 16, :height => 16, :align => 'absmiddle',
+        :alt => 'Important Information', :title => 'Important Information: click to read'
+      ),
+      "$('instance_#{instance.id}_status_message').toggle()"
+    )%>
+    <div id="instance_<%= instance.id %>_status_message" style="display:none; postion:fixed;">
+      <%= instance.status_message %>
+    </div>
+  <%- end %>
+</td>
+<td>
+  <% if instance.auto_scaling_group %>
+    <%= link_to h(instance.auto_scaling_group.name), provider_account_path(instance.provider_account_id, :anchor => :auto_scaling) %>
+  <% else %>
+    N/A
+  <% end %>
+</td>
+<td>
+  <% if instance.user %>
+    <strong><%= instance.user.login_and_name %></strong>
+  <% else %>
+    System
+  <% end %>
+</td>
+<td><%= instance.zone %></td>
+<td>
+  <%= instance_console_link 'Console Output', instance %>
+</td>

@@ -16,7 +16,10 @@ class ProviderAccount < BaseModel
     has_many :regions, :through => :provider_account_regions, :order => :position
     has_many :zones, :through => :regions, :order => :name
 
-    has_many :instances, :dependent => :destroy
+    has_many :instances, :dependent => :destroy, :include => [
+      [:server => :cluster], :cpu_profile, :storage_type, :instance_vm_type, :zone, :user,
+      :security_groups, :provider_account, :load_balancer_instance_states
+    ]
     has_many :server_images, :order => :name, :dependent => :destroy
     has_many :key_pairs, :dependent => :destroy
     has_many :security_groups, :dependent => :destroy

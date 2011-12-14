@@ -1,0 +1,13 @@
+<%-
+  state = instance.state || ''
+-%>
+<% style = instance.load_balancer_instance_states.empty? ? nil : 'display: none;' %>
+<% content_tag_for :tr, instance, :style => style do %>
+  <td>
+    <%= add_load_balancer_instance_link('Add', instance) %>
+  </td>
+  <td class="<%= state %>">
+    <%=h state.gsub('_',' ') %>
+  </td>
+  <%= render :partial => 'load_balancer_instance_states/row', :locals => { :instance => instance } %>
+<% end %>
