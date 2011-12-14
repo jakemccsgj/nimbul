@@ -1,6 +1,5 @@
 if @error_messages.empty?
-    page["edit_load_balancer"].hide
-    page["add_load_balancer"].appear if @parent.can_use_more_of?('LoadBalancer')
+    page["xxlarge_redbox"].hide
     page.insert_html :bottom, params[:update], :partial => "load_balancer", :object => @load_balancer
 else
     page['error_redbox'].replace_html :partial => 'shared/error_redbox'

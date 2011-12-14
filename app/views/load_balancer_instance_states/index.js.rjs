@@ -1,0 +1,1 @@
+page["#{@parent_type}_#{@parent.id}_load_balancer_instance_states_index"].replace_html :partial => "load_balancer_instance_states/index"

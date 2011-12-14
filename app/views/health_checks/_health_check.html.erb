@@ -1,14 +1,21 @@
-    <% fields_for "health_check", health_check do |f| %>
-    <% content_tag_for :tr, health_check, :readonly => false, :class => '' do %>
+<% fields_for "load_balancer[health_check_attributes][]", health_check do |f| %>
+  <% content_tag_for :tr, health_check do %>
+    <td>
+      <% unless health_check.new_record? %>
         <%= f.hidden_field :id, :index => nil %>
-        <td><%= health_check.target %></td>
-        <td><%= health_check.timeout %></td>
-        <td><%= health_check.interval %></td>
-        <td><%= health_check.unhealthy_threshold %></td>
-        <td><%= health_check.healthy_threshold %></td>
-        <td>
-          <%= edit_load_balancer_health_check_link('Edit', @parent, health_check) %>
-          <%= remove_load_balancer_health_check_link('Delete', @parent, health_check) %>
-        </td>
-    <% end %>
-    <% end %>
+      <% end %>
+      <%= f.select :target_protocol, ELB_TARGET_PROTOCOL_NAMES, :index => nil %>
+      <%= f.text_field :target_port, :class => :tiny, :index => nil %>
+      <%= f.text_field :target_path, :index => nil %>
+      <%= f.text_field :interval, :class => :tiny, :index => nil %> sec
+    </td>
+    <td>
+      <%= f.text_field :timeout, :class => :tiny, :index => nil %> sec
+    </td>
+    <td>
+      <%= f.text_field :unhealthy_threshold, :class => :tiny, :index => nil %> /
+      <%= f.text_field :healthy_threshold, :class => :tiny, :index => nil %>
+      attempts
+    </td>
+  <% end %>
+<% end %>

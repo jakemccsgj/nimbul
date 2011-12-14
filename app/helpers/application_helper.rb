@@ -773,6 +773,10 @@ module ApplicationHelper
         link_to_function text, "$('#{redbox}').hide(); $('#{redbox}').innerHTML = '';"
     end
 
+    def close_redbox_button(text, redbox)
+        button_to_function text, "$('#{redbox}').hide(); $('#{redbox}').innerHTML = '';"
+    end
+
     def to_month_day(date)
         date.strftime('%b %d, %Y')
     end

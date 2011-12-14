@@ -1,0 +1,3 @@
+page[:edit_load_balancer_instance_state].replace_html :partial => "form", :object => @load_balancer_instance_state
+page[:add_load_balancer_instance_state].hide
+page[:edit_load_balancer_instance_state].appear

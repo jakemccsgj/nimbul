@@ -1,21 +1,19 @@
 <table>
-  <tr>
-    <th>Ping Target</th>
-    <th>Timeout</th>
-    <th>Interval</th>
-    <th>Unhealthy Threshold</th>
-    <th>Healthy Threshold</th>
-    <th>Action</th>
-  </tr>
-  <tbody id="load_balancer_load_balancer_listeners">
-    <%= render :partial => 'list', :locals => { :load_balancer_listeners => @load_balancer_listeners } %>
+  <thead>
+    <tr>
+      <th>Load Balancer Protocol</th>
+      <th>Load Balancer Port</th>
+      <th>Instance Protocol</th>
+      <th>Instance Port</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody id="load_balancer_listeners">
+    <%= render :partial => "load_balancer_listeners/load_balancer_listener", :collection => @load_balancer.load_balancer_listeners %>
+  </tbody>
+  <tbody id="add_load_balancer_listener" <% unless @load_balancer.can_use_more_of?('LoadBalancerListener') %>style="display:none;"<% end %>>
+    <tr><td align="right" colspan="5">
+        [ <%= add_load_balancer_listener_link 'add', @load_balancer %> ]
+      </td></tr>
   </tbody>
 </table>
-
-<hr>
-
-<div id="add_load_balancer_listener" <% unless @load_balancer.can_use_more_of?('HealthCheck') %>style="display:none;"<% end %>>
-  <%= new_load_balancer_load_balancer_listener_button 'add', @load_balancer %>
-</div>
-
-<div id="edit_load_balancer_listener" style="display:none;overflow:auto;"></div>

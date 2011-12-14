@@ -1,0 +1,8 @@
+if @error_messages.empty?
+    page["edit_load_balancer_instance_state"].hide
+    page["add_load_balancer_instance_state"].appear if @parent.can_use_more_of?('HealthCheck')
+    page["load_balancer_instance_state_#{@load_balancer_instance_state.id}"].replace_html :partial => "load_balancer_instance_state", :object => @load_balancer_instance_state
+else
+    page['error_redbox'].replace_html :partial => 'shared/error_redbox'
+    page['error_redbox'].appear
+end

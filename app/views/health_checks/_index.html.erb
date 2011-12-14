@@ -1,21 +1,12 @@
 <table>
-  <tr>
-    <th>Ping Target</th>
-    <th>Timeout</th>
-    <th>Interval</th>
-    <th>Unhealthy Threshold</th>
-    <th>Healthy Threshold</th>
-    <th>Action</th>
-  </tr>
-  <tbody id="load_balancer_health_checks">
-    <%= render :partial => 'list', :locals => { :health_checks => @health_checks } %>
+  <thead>
+    <tr>
+      <th>Check Protocol / Port / Path / Interval</th>
+      <th>Timeout</th>
+      <th>Unhealthy / Healthy Thresholds</th>
+    </tr>
+  </thead>
+  <tbody id="health_checks">
+    <%= render :partial => "health_checks/health_check", :collection => @load_balancer.health_checks %>
   </tbody>
 </table>
-
-<hr>
-
-<div id="add_health_check" <% unless @load_balancer.can_use_more_of?('HealthCheck') %>style="display:none;"<% end %>>
-  <%= new_load_balancer_health_check_button 'add', @load_balancer %>
-</div>
-
-<div id="edit_health_check" style="display:none;overflow:auto;"></div>

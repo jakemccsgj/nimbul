@@ -1,0 +1,39 @@
+<%
+  target_path_wrapper_html = {
+    :id => "load_balancer_instance_state_#{@load_balancer_instance_state.id}_target_path"
+  } 
+  unless @load_balancer_instance_state.target_protocol.nil? or ELB_TARGET_PROTOCOL_WITH_PATH_NAMES.include?(@load_balancer_instance_state.target_protocol)
+    target_path_wrapper_html[:style] = "display:none;"
+  end
+%>
+<% semantic_remote_form_for [@parent, @load_balancer_instance_state], :remote => true do |f| %>
+    <%= f.error_messages %>
+    <% f.inputs do %>
+      <%= f.input :target_protocol, :label => 'Ping Protocol',
+          :as => :select,
+          :collection => ELB_TARGET_PROTOCOL_NAMES,
+          :input_html => { :onchange => "#{remote_function(:url  => {:action => "update_target_path"}, :with => "'target_protocol='+value")}" }
+      %>
+      <%= f.input :target_port, :label => 'Ping Port'
+      %>
+      <%= f.input :target_path, :label => 'Ping Path',
+          :wrapper_html => target_path_wrapper_html
+      %>
+      <%= f.input :timeout, :label => 'Response Timeout'
+      %>
+      <%= f.input :interval, :label => 'Health Check Interval'
+      %>
+      <%= f.input :unhealthy_threshold,
+          :as => :select,
+          :collection => ELB_THRESHOLD_VALUES
+      %>
+      <%= f.input :healthy_threshold,
+          :as => :select,
+          :collection => ELB_THRESHOLD_VALUES
+      %>
+    <% end %>
+    <% f.buttons do %>
+      <%= f.submit %>
+      <%= cancel_add_load_balancer_load_balancer_instance_state_button 'Cancel', @load_balancer %>
+    <% end %>
+<% end %>
