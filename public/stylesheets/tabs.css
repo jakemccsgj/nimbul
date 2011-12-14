@@ -73,3 +73,12 @@
     border: 1px solid #c0c0c0;
     overflow: auto;
 }
+
+.records-table {
+  border: 1px solid #c0c0c0;
+  width: 97%;
+  padding-left: 0px;
+  margin: 10px;
+  max-height: 200px;
+  overflow: auto;
+}
