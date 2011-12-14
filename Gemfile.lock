@@ -1,10 +1,4 @@
 GIT
-  remote: git://github.com/nimbul/cloudmaster.git
-  revision: 06d60a20ce54feb8c6e23dc05df730d4ce9e3ff3
-  specs:
-    cloudmaster (1.0.0)
-
-GIT
   remote: https://github.com/Velir/open_id_authentication.git
   revision: 7955a4bf22c08d9f90ffe1e02bb570289a86a8f1
   tag: v1.0.0
@@ -22,16 +16,19 @@ GIT
       activesupport (>= 2.3.7)
       i18n (~> 0.4)
 
+GIT
+  remote: https://github.com/nimbul/cloudmaster.git
+  revision: 731b089664a82d3c257c557f3dbfcd5560becf13
+  specs:
+    cloudmaster (1.0.0)
+
 GEM
   remote: http://rubygems.org/
-  remote: http://gems.rubyforge.org/
-  remote: http://gemcutter.org/
   specs:
     Ruby-MemCache (0.0.1)
       io-reactor (> 0.0.0)
-    SysVIPC (0.9)
     ZenTest (4.6.2)
-    aasm (2.3.1)
+    aasm (3.0.0)
       activerecord
     actionmailer (2.3.14)
       actionpack (= 2.3.14)
@@ -51,14 +48,18 @@ GEM
       http_connection
       uuidtools
       xml-simple
+    aws-s3 (0.6.2)
+      builder
+      mime-types
+      xml-simple
     bert (1.1.2)
     builder (3.0.0)
     carrot (1.2.0)
-    chronic (0.6.4)
-    cucumber (1.1.1)
+    chronic (0.6.6)
+    cucumber (1.1.4)
       builder (>= 2.1.2)
       diff-lcs (>= 1.1.2)
-      gherkin (~> 2.6.0)
+      gherkin (~> 2.7.1)
       json (>= 1.4.6)
       term-ansicolor (>= 1.0.6)
     daemons (1.1.4)
@@ -75,17 +76,19 @@ GEM
       uuid (>= 2.3.0)
       work_queue (>= 1.0.0)
     eventmachine (0.12.10)
-    facter (1.6.2)
+    facter (1.6.4)
     fastthread (1.0.7)
-    gherkin (2.6.1)
+    ffi (1.0.11)
+    gherkin (2.7.1)
       json (>= 1.4.6)
     http_connection (1.4.1)
     i18n (0.6.0)
     inifile (0.4.1)
     io-reactor (1.0.4)
-    json (1.6.1)
-    macaddr (1.4.0)
-      systemu (~> 2.2.0)
+    json (1.6.3)
+    macaddr (1.5.0)
+      systemu (>= 2.4.0)
+    mime-types (1.17.2)
     mysql (2.8.1)
     net-sftp (2.0.5)
       net-ssh (>= 2.0.9)
@@ -111,13 +114,14 @@ GEM
       diff-lcs (~> 1.1.2)
     rspec-mocks (2.7.0)
     ruby-openid (2.1.8)
-    rufus-scheduler (2.0.12)
+    rufus-scheduler (2.0.14)
       tzinfo (>= 0.3.23)
     servolux (0.9.6)
-    sys-cpu (0.6.4)
-    systemu (2.2.0)
+    sys-cpu (0.7.0)
+      ffi (>= 1.0.0)
+    systemu (2.4.2)
     term-ansicolor (1.0.7)
-    tzinfo (0.3.30)
+    tzinfo (0.3.31)
     uuid (2.3.4)
       macaddr (~> 1.0)
     uuidtools (2.1.2)
@@ -129,11 +133,11 @@ PLATFORMS
 
 DEPENDENCIES
   Ruby-MemCache
-  SysVIPC (~> 0.9.0)
   ZenTest
   aasm
   autotest
   aws
+  aws-s3
   carrot
   chronic
   cloudmaster!
@@ -142,7 +146,7 @@ DEPENDENCIES
   facter
   fastthread
   formtastic!
-  mysql
+  mysql (~> 2.8.1)
   net-sftp
   net-ssh
   open_id_authentication!
