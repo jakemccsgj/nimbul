@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/nimbul/cloudmaster.git
-  revision: 06d60a20ce54feb8c6e23dc05df730d4ce9e3ff3
+  revision: 731b089664a82d3c257c557f3dbfcd5560becf13
   specs:
     cloudmaster (1.0.0)
 
@@ -23,6 +23,7 @@ GIT
       i18n (~> 0.4)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 GIT
   remote: https://github.com/nimbul/cloudmaster.git
   revision: 06d60a20ce54feb8c6e23dc05df730d4ce9e3ff3
@@ -31,6 +32,8 @@ GIT
 
 =======
 >>>>>>> Updates to support user data from service
+=======
+>>>>>>> Updating gemfile
 GEM
   remote: http://rubygems.org/
   remote: http://gems.rubyforge.org/
@@ -59,15 +62,30 @@ GEM
     aws (2.5.6)
       http_connection
       uuidtools
+<<<<<<< HEAD
+=======
+      xml-simple
+    aws-s3 (0.6.2)
+      builder
+      mime-types
+>>>>>>> Updating gemfile
       xml-simple
     bert (1.1.2)
     builder (3.0.0)
     carrot (1.2.0)
+<<<<<<< HEAD
     chronic (0.6.4)
     cucumber (1.1.1)
       builder (>= 2.1.2)
       diff-lcs (>= 1.1.2)
       gherkin (~> 2.6.0)
+=======
+    chronic (0.6.6)
+    cucumber (1.1.4)
+      builder (>= 2.1.2)
+      diff-lcs (>= 1.1.2)
+      gherkin (~> 2.7.1)
+>>>>>>> Updating gemfile
       json (>= 1.4.6)
       term-ansicolor (>= 1.0.6)
     daemons (1.1.4)
@@ -84,17 +102,31 @@ GEM
       uuid (>= 2.3.0)
       work_queue (>= 1.0.0)
     eventmachine (0.12.10)
+<<<<<<< HEAD
     facter (1.6.2)
     fastthread (1.0.7)
     gherkin (2.6.1)
+=======
+    facter (1.6.4)
+    fastthread (1.0.7)
+    ffi (1.0.11)
+    gherkin (2.7.1)
+>>>>>>> Updating gemfile
       json (>= 1.4.6)
     http_connection (1.4.1)
     i18n (0.6.0)
     inifile (0.4.1)
     io-reactor (1.0.4)
+<<<<<<< HEAD
     json (1.6.1)
     macaddr (1.4.0)
       systemu (~> 2.2.0)
+=======
+    json (1.6.3)
+    macaddr (1.5.0)
+      systemu (>= 2.4.0)
+    mime-types (1.17.2)
+>>>>>>> Updating gemfile
     mysql (2.8.1)
     net-sftp (2.0.5)
       net-ssh (>= 2.0.9)
@@ -120,6 +152,7 @@ GEM
       diff-lcs (~> 1.1.2)
     rspec-mocks (2.7.0)
     ruby-openid (2.1.8)
+<<<<<<< HEAD
     rufus-scheduler (2.0.12)
       tzinfo (>= 0.3.23)
     servolux (0.9.6)
@@ -127,6 +160,16 @@ GEM
     systemu (2.2.0)
     term-ansicolor (1.0.7)
     tzinfo (0.3.30)
+=======
+    rufus-scheduler (2.0.14)
+      tzinfo (>= 0.3.23)
+    servolux (0.9.6)
+    sys-cpu (0.7.0)
+      ffi (>= 1.0.0)
+    systemu (2.4.2)
+    term-ansicolor (1.0.7)
+    tzinfo (0.3.31)
+>>>>>>> Updating gemfile
     uuid (2.3.4)
       macaddr (~> 1.0)
     uuidtools (2.1.2)
@@ -143,6 +186,10 @@ DEPENDENCIES
   aasm
   autotest
   aws
+<<<<<<< HEAD
+=======
+  aws-s3
+>>>>>>> Updating gemfile
   carrot
   chronic
   cloudmaster!
@@ -151,7 +198,7 @@ DEPENDENCIES
   facter
   fastthread
   formtastic!
-  mysql
+  mysql (~> 2.8.1)
   net-sftp
   net-ssh
   open_id_authentication!
