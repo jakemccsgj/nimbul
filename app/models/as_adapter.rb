@@ -117,7 +117,7 @@ class AsAdapter
         rescue
             g.status_message = "#{$!}"
         end
-    return false
+        return false
     end
 
     def self.update_auto_scaling_group(g)

@@ -12,6 +12,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 ActiveRecord::Schema.define(:version => 20110913041746) do
 ActiveRecord::Schema.define(:version => 20110817210119) do
@@ -22,6 +23,8 @@ ActiveRecord::Schema.define(:version => 20110817210119) do
 ActiveRecord::Schema.define(:version => 20110913041746) do
 ActiveRecord::Schema.define(:version => 20110817210119) do
 >>>>>>> Added counter cache to user for user_keys
+=======
+>>>>>>> ef31ca532a0f3de26d9b79a5b2478d690afda7bb
 ActiveRecord::Schema.define(:version => 20111205154652) do
 
   create_table "access_requests", :force => true do |t|
