@@ -1,0 +1,124 @@
+#!/usr/bin/ruby
+$:.unshift File.join(File.dirname(__FILE__))
+require 'AWS/AS'
+require 'basic_configuration'
+require 'aws_context'
+require 'pp'
+
+valid_statistic = "Minimum|Maximum|Sum|Average"
+valid_measure_name = "CPUUtilization|NetworkIn|NetworkOut|DiskWriteOps|DiskReadBytes|DiskReadOps|DiskWriteBytes"
+valid_unit = "Seconds|Percent|Bytes|Bits|Count|BytesPerSecond|BitsPerSecond|CountPerSecond|None"
+
+if ARGV[0] == '-?' || ARGV[0] == '--help' || ARGV[0] == '-h' || ARGV.size < 19
+    usage = 'usage: as-create-or-update-trigger TriggerName --auto-scaling-group value --breach-duration value --lower-breach-increment value --lower-threshold value --measure value --period value --statistic value --upper-breach-increment value --upper-threshold value [--dimensions "key1=value,key2=value2..."] [--namespace value] [--unit value]'
+    about = 'Create a new trigger or update an existing trigger.'
+    puts usage
+    puts about
+    exit 1
+end
+
+Signal.trap("INT") do
+    exit 2
+end
+
+options = {}
+options[:trigger_name] = ARGV.shift
+
+while ARGV.size > 0
+    if ARGV[0] == '--auto-scaling-group'
+        ARGV.shift
+        options[:auto_scaling_group_name] = ARGV.shift
+    end
+    if ARGV[0] == '--breach-duration'
+        ARGV.shift
+        options[:breach_duration] = ARGV.shift
+    end
+    if ARGV[0] == '--lower-breach-increment'
+        ARGV.shift
+        options[:lower_breach_scale_increment] = ARGV.shift
+    end
+    if ARGV[0] == '--lower-threshold'
+        ARGV.shift
+        options[:lower_threshold] = ARGV.shift
+    end
+    if ARGV[0] == '--measure'
+        ARGV.shift
+        options[:measure_name] = ARGV.shift
+    end
+    if ARGV[0] == '--statistic'
+        ARGV.shift
+        options[:statistic] = ARGV.shift
+    end
+    if ARGV[0] == '--upper-breach-increment'
+        ARGV.shift
+        options[:upper_breach_scale_increment] = ARGV.shift
+    end
+    if ARGV[0] == '--upper-threshold'
+        ARGV.shift
+        options[:upper_threshold] = ARGV.shift
+    end
+    if ARGV[0] == '--period'
+        ARGV.shift
+        options[:period] = ARGV.shift
+    end
+    if ARGV[0] == '--dimensions'
+        ARGV.shift
+        options[:dimensions] = []
+        ARGV.shift.split(',').each do |dimension|
+            d = dimension.split('=')
+            options[:dimensions] << {
+                :name => d[0],
+                :value => d[1],
+            }
+        end
+    end
+    if ARGV[0] == '--namespace'
+        ARGV.shift
+        options[:namespace] = ARGV.shift
+    end
+    if ARGV[0] == '--unit'
+        ARGV.shift
+        options[:unit] = ARGV.shift
+    end
+end
+
+if options[:dimensions].nil?
+    options[:dimensions] = [
+        { :name => 'AutoScalingGroupName', :value => options[:auto_scaling_group_name] }
+    ]
+end
+
+unless options[:statistic] =~ Regexp.new("[#{valid_statistic}]")
+    puts "Error: #{options[:statistic]} must be one of #{valid_statistic.gsub('|',', ')}"
+    exit 1
+end
+
+unless options[:measure_name] =~ Regexp.new("[#{valid_measure_name}]")
+    puts "Error: #{options[:measure_name]} must be one of #{valid_measure_name.gsub('|',', ')}"
+    exit 1
+end
+
+unless options[:unit].nil? or options[:unit] =~ Regexp.new("[#{valid_unit}]")
+    puts "Error: #{options[:unit]} must be one of #{valid_unit.gsub('|',', ')}"
+    exit 1
+end
+
+config = BasicConfiguration.new
+as = AwsContext.instance.as(*config.keys)
+
+begin
+    result = as.create_trigger(options)
+    triggers = as.describe_triggers({:auto_scaling_group_name => options[:auto_scaling_group_name]})
+    triggers.each do |t|
+        next unless t.trigger_name == options[:trigger_name]
+        puts "trigger #{t.trigger_name} #{t.statistic} #{t.measure_name} in #{t.unit} measured every #{t.period} seconds"
+        puts "    breach duration #{t.breach_duration}"
+        puts "    lower #{t.lower_threshold} increment #{t.lower_breach_scale_increment}"
+        puts "    upper #{t.upper_threshold} increment #{t.upper_breach_scale_increment}"
+    end
+rescue
+    puts "error #{$!}"
+    exit 1
+end
+
+exit 0

@@ -1,0 +1,66 @@
+#!/usr/bin/ruby
+$:.unshift File.join(File.dirname(__FILE__))
+require 'AWS/AS'
+require 'basic_configuration'
+require 'aws_context'
+require 'pp'
+
+if ARGV[0] == '-?' || ARGV[0] == '--help' || ARGV[0] == '-h' || ARGV.size < 9
+    usage = "usage: as-create-auto-scaling-group AutoScalingGroupName --availability-zones value[,value...] --launch-configuration value --max-size value --min-size value [--cooldown value] [--load-balancers value[,value...]]"
+    about = "Create a new auto scaling group with specified name and other attributes."
+    puts usage
+    puts about
+    exit 1
+end
+
+Signal.trap("INT") do
+    exit 2
+end
+
+options = {}
+options[:auto_scaling_group_name] = ARGV.shift
+
+while ARGV.size > 0
+    if ARGV[0] == '--availability-zones'
+        ARGV.shift
+        options[:availability_zones] = ARGV.shift.split(',')
+    end
+    if ARGV[0] == '--launch-configuration'
+        ARGV.shift
+        options[:launch_configuration_name] = ARGV.shift
+    end
+    if ARGV[0] == '--max-size'
+        ARGV.shift
+        options[:max_size] = ARGV.shift
+    end
+    if ARGV[0] == '--min-size'
+        ARGV.shift
+        options[:min_size] = ARGV.shift
+    end
+    if ARGV[0] == '--cooldown'
+        ARGV.shift
+        options[:cooldown] = ARGV.shift
+    end
+    if ARGV[0] == '--load-balancers'
+        ARGV.shift
+        options[:load_balancer_names] = ARGV.shift.split(',')
+    end
+end
+
+config = BasicConfiguration.new
+as = AwsContext.instance.as(*config.keys)
+
+begin
+    result = as.create_auto_scaling_group(options)
+    groups = as.describe_auto_scaling_groups({})
+    groups.each do |group|
+        if group.auto_scaling_group_name == options[:auto_scaling_group_name]
+            puts "#{group.auto_scaling_group_name} configuration:#{group.launch_configuration_name} zones:#{group.availability_zones.join(',')} min:#{group.min_size} max:#{group.max_size} desired:#{group.desired_capacity} cooldown:#{group.cooldown}s"
+        end
+    end
+rescue
+    puts "error: #{$!}"
+    exit 1
+end
+
+exit 0
