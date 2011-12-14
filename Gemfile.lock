@@ -18,7 +18,7 @@ GIT
 
 GIT
   remote: https://github.com/nimbul/cloudmaster.git
-  revision: 06d60a20ce54feb8c6e23dc05df730d4ce9e3ff3
+  revision: 731b089664a82d3c257c557f3dbfcd5560becf13
   specs:
     cloudmaster (1.0.0)
 
