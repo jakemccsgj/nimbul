@@ -142,6 +142,7 @@ DEPENDENCIES
   chronic
   cloudmaster!
   cucumber
+  daemons
   emissary
   facter
   fastthread
