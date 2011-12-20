@@ -1,7 +1,9 @@
+#require 'rubygems'
+require 'ostruct'
 require 'drb'
-require 'time'
-require 'rinda/ring'
-require 'rinda/tuplespace'
+require 'logger'
+
+#$SAFE = 1
 
 ##
 # = Purpose
@@ -14,90 +16,81 @@ require 'rinda/tuplespace'
 # opening a firewall port to allow Nimbul to be running across multiple instances, sharing
 # data objects and calling methods on each other.
 #
+#class OpenStruct
+#  include DRb::DRbUndumped
+#end
+
+
 class TransientKeyStore
-  attr_accessor :environment
+  at_exit { DRb.thread.join if DRv.alive? rescue nil }
 
   private
-  attr :server_pid, :provider_pid
+  attr_accessor :uri, :env, :logger, :drb
+
+  DEFAULT_URI    = 'druby://localhost:55534'
+  DEFAULT_LOGGER = Logger.new($stderr)
+  DEFAULT_ENVIRONMENTS = [ :development, :testing, :production ]
 
   public
-  ##
-  # [env] Initialize the KeyStore to this environment (RAILS_ENV)
-  def initialize env
-    @environment = env.to_sym
-    get_ring_server
+  #
+  #
+  # 
+  def initialize uopts={}
+    opts = {:env => DEFAULT_ENVIRONMENTS.first, :uri => DEFAULT_URI, :logger => DEFAULT_LOGGER}
+    opts.merge! uopts
+    # Set up attributes
+    opts.each_pair { |opt, val|
+      self.send "#{opt}=".to_sym, val
+    }
+    DRb.start_service
   end
   alias :instance :initialize
 
-  def read key, all=false
-    method = all ? :read_all : :read
-    tuple = [key.to_sym, nil]
-    get_ring_server.send(method, tuple)[1]
+  def read key
+    logger.debug "Getting key #{key}"
+    keystore.send(key.to_sym)
   end
 
   def write key, value
-    ring_server.write([key.to_sym, value])
+    key = "#{key.to_s}="
+    #value = value.untaint
+    logger.debug "Setting key #{key} = #{value}"
+    keystore.send(key.to_sym, value)
   end
 
-  private
+  #private
+
+  def keystore
+    #return @drb if @drb
+    logger.debug "Getting keystore for #{env}"
+    @drb = DRbObject.new_with_uri uri
+    logger.debug "#{@drb.__drburi} - #{@drb.__drbref}\n"
+    obj = @drb.send(env.to_s)
+    logger.debug "#{obj.to_s}: #{obj.hash} #{obj.object_id}"
+    obj
+  end
+
+  public
+
   ##
   # Run a server instance
   #
-  def run_server
-    Process.fork {
-      DRb.start_service
-      @server = Rinda::RingServer.new Rinda::TupleSpace.new
+  class << self
+    def run_server uri=DEFAULT_URI, environments=DEFAULT_ENVIRONMENTS, logger=DEFAULT_LOGGER
+      #trap("INT") { self.stop_server logger; exit }
+
+      service = OpenStruct.new(Hash[ environments.map { |env| [env.to_sym, OpenStruct.new( :environment => env )] } ])
+      DRb::DRbServer.verbose = true
+      DRb.start_service uri, service
+      logger.info "Server started @ #{DRb.uri} serving front object: #{service}"
       DRb.thread.join
-    }
-  end
-
-#  ##
-#  # Set up the keystore service provider
-#  def register_keystore
-#    Process.fork {
-#      DRb.start_service
-#      provider = Rinda::RingProvider.new(
-#        ('KeyStore' + @environment.to_s.capitalize).to_sym,
-#        Rinda::RingFinger.primary,
-#        "Memory based keystore for the #{@environment} environment"
-#      )
-#
-#      provider.provide
-#      DRb.thread.join
-#    }
-#  end
-
-  ##
-  # Find our ring server.  Will start a fresh one if one is not available.
-  def get_ring_server
-    DRb.start_service
-    begin
-      Rinda::RingFinger.primary
-    rescue RuntimeError => m
-      if m.to_s == 'RingNotFound'
-        Process.detach run_server
-        sleep 2
-        #Process.detach register_keystore
-        get_ring_server
-      else
-        raise
-      end
     end
-  end
-  alias :ring_server :get_ring_server
-end
 
-ks = TransientKeyStore.new ENV['RAILS_ENV']
-
-sleep 3
-if ARGV[0] == 'write'
-  while true
-    ks.write :test, Time.now
-    sleep 0.1
-  end
-else
-  while true
-    puts ks.read(:test)
-    sleep 0.2
+    def stop_server logger=DEFAULT_LOGGER
+      logger.debug "Stopping DRb service"
+      DRb.stop_service
+      logger.debug "Joining DRb thread"
+      DRb.thread.join rescue nil
+    end
   end
 end
