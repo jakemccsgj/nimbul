@@ -2,7 +2,6 @@ source :rubygems
 
 gem 'aws'
 gem 'daemons'
-gem 'drb'
 gem 'rails', '~> 2.3.0'
 gem 'Ruby-MemCache', :require => 'memcache'
 gem 'ruby-openid'
