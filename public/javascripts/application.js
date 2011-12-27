@@ -67,64 +67,64 @@ Object.extend(Selectable, {
     uncheck_all: function(klass) {
         klass = klass || '.selectable_check_box';
         $$(klass).each(Selectable.uncheck);
-    },
+    }
 });
 
 var EditableSelect = Class.create({})
 
 // EditableSelect class methods
 Object.extend(EditableSelect, {
-	create: function(element) {
-		element.editable({
-			editField: {
-				'type': 'select',
-    			'options': [["black", "1"], ["gray", "2"], ["white", "3"]],
-    			'foreignKey': true
-  			}
-		});
-	},
-	setupAll: function(klass) {
-		klass = klass || '.editable_select';
-		$$(klass).each(EditableSelect.create);
-	}
+    create: function(element) {
+        element.editable({
+            editField: {
+                'type': 'select',
+                'options': [["black", "1"], ["gray", "2"], ["white", "3"]],
+                'foreignKey': true
+            }
+        });
+    },
+    setupAll: function(klass) {
+        klass = klass || '.editable_select';
+        $$(klass).each(EditableSelect.create);
+    }
 });
 
 var Loading = Class.create({})
 
 Object.extend(Loading, {
     setup: function() {
-	    $('loading').hide();
-	    $('error_redbox').hide();
-	    $('notice_redbox').hide();
-	    $('tiny_redbox').hide();
-	    $('small_redbox').hide();
-	    $('large_redbox').hide();
+        $('loading').hide();
+        $('error_redbox').hide();
+        $('notice_redbox').hide();
+        $('tiny_redbox').hide();
+        $('small_redbox').hide();
+        $('large_redbox').hide();
 
         //This is used to tell, everytime an AJAX function is created and completed, the following will get executed.
         Ajax.Responders.register({
             onCreate: function() {
-//                new Effect.Opacity('page', { from: 1.0, to: 0.3, duration: 0.5 });
+                //                new Effect.Opacity('page', { from: 1.0, to: 0.3, duration: 0.5 });
                 new Effect.toggle('loading', 'appear');
             },
             onComplete: function() {
                 $('loading').hide();
-//                new Effect.Opacity('page', { from: 0.3, to: 1, duration: 0.5 });
-            },
+            //                new Effect.Opacity('page', { from: 0.3, to: 1, duration: 0.5 });
+            }
         });
-    },
+    }
 });
 
 function enterKeyPressed(e) {
-	var key;
+    var key;
 
-	if (window.event)
-		key = window.event.keyCode;     //IE
-	else
-		key = e.which;     //firefox
+    if (window.event)
+        key = window.event.keyCode;     //IE
+    else
+        key = e.which;     //firefox
 
-	if (key == 13)
-		return true;
-	else
+    if (key == 13)
+        return true;
+    else
         return false;
 }
 
@@ -133,7 +133,7 @@ function disableEnterKey(e) {
 }
 
 function click_create_snapshot(el, suffix) {
-	suffix = suffix || "";
+    suffix = suffix || "";
     var msg = "Please specify name suffix for new snapshots.\n\n";
     msg += "Snapshot names will be assigned as follows:\n";
     msg += "<Snapshot Name> = <Volume Name> + <Name Suffix>\n";
@@ -148,25 +148,25 @@ function click_create_snapshot(el, suffix) {
 }
 
 function click_create_volume(el, zone_el, prefix) {
-	zone = zone_el.value;
+    zone = zone_el.value;
     prefix = prefix || "";
-	if (zone == null || zone.length == 0) {
-		alert("Please choose which zone to restore snapshots in");
-		zone_el.focus();
-		return false;
-	}
-	var msg = "Creating new Volumes in Availability Zone "+zone+"\n\n";
-	msg += "Specify Name Prefix for new Volumes\n\n";
-	msg += "Volume Names will be assigned as follows:\n";
-	msg += "<Volume Name> =  <Name Prefix> + <Snapshot Name>\n";
-	var response = prompt(msg, prefix);
-	if (response == null) {
-	    return false;
-	} else {
-	    $(el).next(".command").value = "restore";
-	    $(el).next(".command_parameter").value = response;
-	    return true;
-	}
+    if (zone == null || zone.length == 0) {
+        alert("Please choose which zone to restore snapshots in");
+        zone_el.focus();
+        return false;
+    }
+    var msg = "Creating new Volumes in Availability Zone "+zone+"\n\n";
+    msg += "Specify Name Prefix for new Volumes\n\n";
+    msg += "Volume Names will be assigned as follows:\n";
+    msg += "<Volume Name> =  <Name Prefix> + <Snapshot Name>\n";
+    var response = prompt(msg, prefix);
+    if (response == null) {
+        return false;
+    } else {
+        $(el).next(".command").value = "restore";
+        $(el).next(".command_parameter").value = response;
+        return true;
+    }
 }
 
 function confirm_delete_cluster() {
@@ -225,107 +225,146 @@ function confirm_task_run(message) {
 }
 
 function setup_tooltip_titles() {
-	// Find all title attributes and create tooltip popups for them
-	$$('*').findAll(
-		function(node) { return node.getAttribute('title'); }
-	).each(
-		function(node) { new Tooltip(node, node.title, { default_css: true }); node.removeAttribute('title'); }
-	);
+    // Find all title attributes and create tooltip popups for them
+    $$('*').findAll(
+        function(node) {
+            return node.getAttribute('title');
+        }
+        ).each(
+        function(node) {
+            new Tooltip(node, node.title, {
+                default_css: true
+            });
+            node.removeAttribute('title');
+        }
+        );
 }
 
 function unanchored_location() {
-	return location.protocol + '//' + location.host + location.pathname
+    return location.protocol + '//' + location.host + location.pathname
 }
 
 function reload_hostname_leases(options) {
-	hostname = $(hostname_id = 'hostname_' + options.hostname_id);
-	leases = $(lease_id = hostname_id + '_leases');
+    hostname = $(hostname_id = 'hostname_' + options.hostname_id);
+    leases = $(lease_id = hostname_id + '_leases');
 
-	timeout_delay = options.delay || 3;
-	pulse_duration = Math.ceil(Math.sqrt(timeout_delay)) + timeout_delay;
-	pulses = (Math.ceil(pulse_duration / 2) + 1)
+    timeout_delay = options.delay || 3;
+    pulse_duration = Math.ceil(Math.sqrt(timeout_delay)) + timeout_delay;
+    pulses = (Math.ceil(pulse_duration / 2) + 1)
 
-	parameters = "authenticity_token=" + encodeURIComponent(options.auth_token);
-	if (options.method && options.method != 'get') {
-		method = 'post';
-		parameters += '&_method=' + options.method;
-	} else {
-		method = 'get'
-	}
+    parameters = "authenticity_token=" + encodeURIComponent(options.auth_token);
+    if (options.method && options.method != 'get') {
+        method = 'post';
+        parameters += '&_method=' + options.method;
+    } else {
+        method = 'get'
+    }
 
-	hostnames_url = location.pathname + '/dns_hostnames/' + options.hostname_id;
-	leases_url = location.pathname + '/dns_hostnames/' + options.hostname_id + '/dns_leases';
+    hostnames_url = location.pathname + '/dns_hostnames/' + options.hostname_id;
+    leases_url = location.pathname + '/dns_hostnames/' + options.hostname_id + '/dns_leases';
 
-	if (timeout_delay > 0) {
-		hostname_effect = new Effect.Pulsate(hostname, { duration: pulse_duration, pulses: pulses, from: 0.1 });
-		if (leases.childElementCount > 0) { lease_effect = new Effect.Pulsate(leases, { duration: pulse_duration, pulses: pulses, from: 0.1 }) }
-	}
+    if (timeout_delay > 0) {
+        hostname_effect = new Effect.Pulsate(hostname, {
+            duration: pulse_duration,
+            pulses: pulses,
+            from: 0.1
+        });
+        if (leases.childElementCount > 0) {
+            lease_effect = new Effect.Pulsate(leases, {
+                duration: pulse_duration,
+                pulses: pulses,
+                from: 0.1
+            })
+        }
+    }
 
-	setTimeout(
-		function() {
-			new Ajax.Updater(hostname, hostnames_url, {
-				asynchronous:true, evalScripts:true, method:method, parameters:parameters,
-				onComplete: function() { hostname_effect.cancel(); Effect.Appear(hostname); } // force show of hostname once it's complete
-			})
+    setTimeout(
+        function() {
+            new Ajax.Updater(hostname, hostnames_url, {
+                asynchronous:true,
+                evalScripts:true,
+                method:method,
+                parameters:parameters,
+                onComplete: function() {
+                    hostname_effect.cancel();
+                    Effect.Appear(hostname);
+                } // force show of hostname once it's complete
+            })
 
-			if (leases.childElementCount > 0) {
-				new Ajax.Request(leases_url, {
-					asynchronous:true, evalScripts:true, method:method, parameters:parameters,
-					onComplete: function() {
-						$(hostname_id +'_expand_leases').hide();
-						$(hostname_id+'_compress_leases').show();
-						lease_effect.cancel(); Effect.Appear(leases);
-					}
-				})
-			}
+            if (leases.childElementCount > 0) {
+                new Ajax.Request(leases_url, {
+                    asynchronous:true,
+                    evalScripts:true,
+                    method:method,
+                    parameters:parameters,
+                    onComplete: function() {
+                        $(hostname_id +'_expand_leases').hide();
+                        $(hostname_id+'_compress_leases').show();
+                        lease_effect.cancel();
+                        Effect.Appear(leases);
+                    }
+                })
+            }
 
-			$('loading').hide(); // make sure the loading thingie goes away
-		}, (timeout_delay * 1000)
-	); // 5 second delay in update to allow for dns request to process
-	return false;
+            $('loading').hide(); // make sure the loading thingie goes away
+        }, (timeout_delay * 1000)
+        ); // 5 second delay in update to allow for dns request to process
+    return false;
 }
 
 function reload_leases(options) {
-	leases = $(lease_id = 'hostname_' + options.hostname_id + '_leases');
+    leases = $(lease_id = 'hostname_' + options.hostname_id + '_leases');
 
-	timeout_delay = options.delay || 3;
-	pulse_duration = Math.ceil(Math.sqrt(timeout_delay)) + timeout_delay;
-	pulses = (Math.ceil(pulse_duration / 2) + 1)
+    timeout_delay = options.delay || 3;
+    pulse_duration = Math.ceil(Math.sqrt(timeout_delay)) + timeout_delay;
+    pulses = (Math.ceil(pulse_duration / 2) + 1)
 
-	parameters = "authenticity_token=" + encodeURIComponent(options.auth_token);
-	if (options.method && options.method != 'get') {
-		method = 'post';
-		parameters += '&_method=' + options.method;
-	} else {
-		method = 'get'
-	}
+    parameters = "authenticity_token=" + encodeURIComponent(options.auth_token);
+    if (options.method && options.method != 'get') {
+        method = 'post';
+        parameters += '&_method=' + options.method;
+    } else {
+        method = 'get'
+    }
 
-	leases_url = location.pathname + '/dns_hostnames/' + options.hostname_id + '/dns_leases';
+    leases_url = location.pathname + '/dns_hostnames/' + options.hostname_id + '/dns_leases';
 
-	if (leases.childElementCount > 0) {
-		if (timeout_delay > 0) {
-			lease_effect = new Effect.Pulsate(leases, { duration: pulse_duration, pulses: pulses, from: 0.1 })
-		}
+    if (leases.childElementCount > 0) {
+        if (timeout_delay > 0) {
+            lease_effect = new Effect.Pulsate(leases, {
+                duration: pulse_duration,
+                pulses: pulses,
+                from: 0.1
+            })
+        }
 
-		setTimeout(
-			function() {
-				new Ajax.Request(leases_url, {
-					asynchronous:true, evalScripts:true, method:method, parameters:parameters,
-					onComplete: function() { if (timeout_delay > 0) { lease_effect.cancel(); Effect.Appear(leases); } }
-				})
-				$('loading').hide(); // make sure the loading thingie goes away if present
-			}, (timeout_delay * 1000) + 250
-		);
-	}
+        setTimeout(
+            function() {
+                new Ajax.Request(leases_url, {
+                    asynchronous:true,
+                    evalScripts:true,
+                    method:method,
+                    parameters:parameters,
+                    onComplete: function() {
+                        if (timeout_delay > 0) {
+                            lease_effect.cancel();
+                            Effect.Appear(leases);
+                        }
+                    }
+                })
+                $('loading').hide(); // make sure the loading thingie goes away if present
+            }, (timeout_delay * 1000) + 250
+            );
+    }
 
-	return false;
+    return false;
 
 }
 
 function checked_size(klass) {
     var count = 0;
     klass = klass || 'selectable_check_box';
-	klass = '.'+klass;
+    klass = '.'+klass;
     var myArray = $$(klass);
     for (var index = 0, len = myArray.length; index < len; ++index) {
         var item = myArray[index];
@@ -337,12 +376,12 @@ function checked_size(klass) {
 }
 
 function confirm_selection_not_empty(empty_selection_msg, klass) {
-	empty_selection_msg = empty_selection_msg || 'Your selection is empty';
+    empty_selection_msg = empty_selection_msg || 'Your selection is empty';
     if (checked_size(klass) == 0) {
-		alert(empty_selection_msg);
-		return false;
+        alert(empty_selection_msg);
+        return false;
     }
-	return true;
+    return true;
 }
 
 function confirm_multiple_action(el, ctl_param_class, ctl_param_value, empty_selection_msg, confirm_msg, double_confirm_msg, double_confirm_answer, check_box_klass) {
@@ -350,33 +389,51 @@ function confirm_multiple_action(el, ctl_param_class, ctl_param_value, empty_sel
     ctl_param_value = ctl_param_value || 'reboot';
     empty_selection_msg = empty_selection_msg || 'Your selection is empty';
     confirm_msg = confirm_msg || '';
-	double_confirm_msg = double_confirm_msg || '';
-	double_confirm_answer = double_confirm_answer || 'yes';
-	check_box_klass = check_box_klass || 'selectable_check_box';
+    double_confirm_msg = double_confirm_msg || '';
+    double_confirm_answer = double_confirm_answer || 'yes';
+    check_box_klass = check_box_klass || 'selectable_check_box';
 
     if (!confirm_selection_not_empty(empty_selection_msg, check_box_klass)) {
-		return false;
+        return false;
     }
 
     if (confirm_msg == '' || confirm(confirm_msg)) {
-		if (double_confirm_msg == '' || (double_confirm_answer == prompt(double_confirm_msg))) {
-			$(el).next(ctl_param_class).value = ctl_param_value;
-			return true;
-		}
+        if (double_confirm_msg == '' || (double_confirm_answer == prompt(double_confirm_msg))) {
+            $(el).next(ctl_param_class).value = ctl_param_value;
+            return true;
+        }
     }
 
     return false;
 }
 
 function switchPositionsWithMove(first, second) {
-	if(typeof Effect == 'undefined')
-		throw("application.js requires including script.aculo.us' effects.js library");
+    if(typeof Effect == 'undefined')
+        throw("application.js requires including script.aculo.us' effects.js library");
 
     var delta = Position.cumulativeOffset(first)[1] - Position.cumulativeOffset(second)[1];
-    new Effect.Fade(first, {from: 1.0, to: 0.3});
-    new Effect.Fade(second, {from: 1.0, to: 0.3});
-    new Effect.Move(second, {x: 0, y: delta});
-    new Effect.Move(first, {x: 0, y: -delta});
-    new Effect.Appear(second, {from: 0.3, to: 1.0});
-    new Effect.Appear(first, {from: 0.3, to: 1.0});
+    new Effect.Fade(first, {
+        from: 1.0,
+        to: 0.3
+    });
+    new Effect.Fade(second, {
+        from: 1.0,
+        to: 0.3
+    });
+    new Effect.Move(second, {
+        x: 0,
+        y: delta
+    });
+    new Effect.Move(first, {
+        x: 0,
+        y: -delta
+    });
+    new Effect.Appear(second, {
+        from: 0.3,
+        to: 1.0
+    });
+    new Effect.Appear(first, {
+        from: 0.3,
+        to: 1.0
+    });
 }

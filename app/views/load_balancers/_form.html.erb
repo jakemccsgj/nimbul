@@ -1,32 +1,113 @@
-<% semantic_remote_form_for [@parent, @load_balancer], :remote => true do |f| %>
+<%= javascript_tag "var load_balancer_listener='';" -%>
+<%= javascript_tag "var health_check='';" -%>
+<% semantic_remote_form_for [@parent, @load_balancer], :remote => true do |load_balancer_form| %>
+  <%= javascript_tag "load_balancer_listener='#{generate_template(load_balancer_form, :load_balancer_listeners)}';" -%>
+  <%= javascript_tag "health_check='#{generate_template(load_balancer_form, :health_checks)}';" -%>
+  <%= hidden_field_tag :anchor, 'load_balancers' -%>
+  <%= hidden_field_tag :update, 'provider_account_load_balancers' -%>
+
   <%= close_redbox_button 'Cancel', 'xxlarge_redbox' %>
-  <%= f.submit 'Submit' %>
+  <%= load_balancer_form.submit %>
   <br/>
   <br/>
 
-  <%= hidden_field_tag :anchor, 'load_balancers' %>
-  <%= hidden_field_tag :update, 'provider_account_load_balancers' %>
-  <%= f.error_messages %>
+  <%= load_balancer_form.error_messages %>
 
   <h1>General Information</h1>
   <hr/>
   <table>
     <tr>
       <th>Load Balancer Name</th>
-      <td><%= f.text_field :load_balancer_name, { :class => 'long' } %></td>
+      <td>
+        <%= load_balancer_form.text_field :load_balancer_name, {
+          :readonly => !@load_balancer.new_record?, :class => 'long' } %>
+      </td>
+    </tr>
+    <tr>
+      <th>Load Balancer DNS</th>
+      <td>
+        <%= load_balancer_form.text_field :d_n_s_name, {
+          :readonly => true, :class => 'long' } %>
+      </td>
     </tr>
   </table>
 
   <h1>Listeners</h1>
   <hr/>
-  <%= render :partial => "load_balancer_listeners/index" %>
+  <table>
+    <thead>
+      <tr>
+        <th>Load Balancer Protocol</th>
+        <th>Load Balancer Port</th>
+        <th>Instance Protocol</th>
+        <th>Instance Port</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="load_balancer_listeners">
+      <% load_balancer_form.fields_for :load_balancer_listeners do |load_balancer_listener_form| %>
+        <%= render :partial => 'load_balancer_listener', :locals => { :f => load_balancer_listener_form } %>
+      <% end %>
+    </tbody>
+    <tbody id="add_load_balancer_listener" <% unless @load_balancer.can_use_more_of?('LoadBalancerListener') %>style="display:none;"<% end %>>
+      <tr>
+        <td colspan="5" align="right">
+          <%= link_to 'Add a listener',
+            '#load_balancer_listener', :class => "add_nested_item",
+            :rel => "load_balancer_listeners" %>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 
   <h1>Health Checks</h1>
   <hr/>
-  <%= render :partial => "health_checks/index" %>
+  <table>
+    <thead>
+      <tr>
+        <th>Check Protocol / Port / Path / Interval (sec)</th>
+        <th>Timeout (sec)</th>
+        <th>Unhealthy / Healthy Thresholds</th>
+        <% if @load_balancer.can_loose_some_of?('HealthCheck') %>
+         <th>Actions</th>
+        <% end %>
+      </tr>
+    </thead>
+    <tbody id="health_checks">
+      <% load_balancer_form.fields_for :health_checks do |health_check_form| %>
+        <%= render :partial => 'health_check', :locals => { :f => health_check_form } %>
+      <% end %>
+    </tbody>
+    <tbody id="add_health_check" <% unless @load_balancer.can_use_more_of?('HealthCheck') %>style="display:none;"<% end %>>
+      <tr>
+        <td colspan="4" align="right">
+          <%= link_to 'Add a health check',
+            '#health_check', :class => "add_nested_item",
+            :rel => "health_checks" %>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 
-  <%= render :partial => "load_balancer_instance_states/index" %>
+  <h1>Zones</h1>
+  <hr/>
+  <fieldset class="inputs">
+    <ol id="select_load_balancer_zones">
+      <%= swapselect(:load_balancer,
+        @load_balancer,
+        :zones,
+        @parent.zones.map{ |zone| [zone.name, zone.id]},
+        { :id => 'select_load_balancer_zones' })
+    %>
+    </ol>
+  </fieldset>
+  <br/>
+
+  <%= render :partial => "load_balancer_instance_states/index",
+    :locals => {:f => form} %>
 
   <%= close_redbox_button 'Cancel', 'xxlarge_redbox' %>
-  <%= f.submit 'Submit' %>
+  <%= load_balancer_form.submit %>
 <% end %>
+
+<%= javascript_tag "$('xxlarge_redbox').delegate('click', myrules);" -%>

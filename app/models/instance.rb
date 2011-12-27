@@ -15,7 +15,8 @@ class Instance < BaseModel
   belongs_to :cpu_profile
   belongs_to :storage_type
 
-  has_and_belongs_to_many :security_groups, :uniq => true
+  has_and_belongs_to_many :security_groups, :uniq => true, :order => :name
+
   has_many :load_balancer_instance_states, :dependent => :destroy
   has_many :load_balancers, :through => :load_balancer_instance_states, :uniq => true
 

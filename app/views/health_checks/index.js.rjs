@@ -1,1 +1,0 @@
-page["#{@parent_type}_#{@parent.id}_health_checks_index"].replace_html :partial => "health_checks/index"

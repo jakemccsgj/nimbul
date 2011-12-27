@@ -40,7 +40,7 @@ module RedboxHelper
     return build_hidden_content(hidden_content_id) + javascript_tag(remote_function(link_to_remote_options))
   end
   
-private
+  private
 
   def id_from_url(url_options, link_id)
     result = ''
@@ -74,5 +74,11 @@ private
     remote_options
   end
   
-  
+  def close_redbox_link(text, redbox)
+    link_to_function text, "$('#{redbox}').hide(); $('#{redbox}').innerHTML = '';"
+  end
+
+  def close_redbox_button(text, redbox)
+    button_to_function text, "$('#{redbox}').hide(); $('#{redbox}').innerHTML = '';"
+  end
 end

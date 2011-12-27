@@ -19,13 +19,13 @@ class LoadBalancersController < ApplicationController
   # GET /load_balancers/new.xml
   def new
     @load_balancer = parent.load_balancers.build
-    @load_balancer_listener = @load_balancer.load_balancer_listeners.build({
-        :protocol => 'HTTP',
-        :load_balancer_port => 80,
-        :instance_protocol => 'HTTP',
-        :instance_port => 80
-      })
-    @health_check = @load_balancer.health_checks.build({
+    @load_balancer.load_balancer_listeners.build({
+      :protocol => 'HTTP',
+      :load_balancer_port => 80,
+      :instance_protocol => 'HTTP',
+      :instance_port => 80
+    })
+    @load_balancer.health_checks.build({
         :target_protocol => 'HTTP',
         :target_port => 80,
         :target_path => '/index.html',
@@ -76,8 +76,11 @@ class LoadBalancersController < ApplicationController
     if params[:cancel_button]
       redirect_to redirect_url
     else
+      params[:load_balancer][:zone_ids] ||= []
+      params[:load_balancer][:zone_ids] += Instance.find(params[:load_balancer][:instance_ids]).collect{|i| i.zone_id}
+      params[:load_balancer][:zone_ids].uniq
       @load_balancer = parent.load_balancers.build(params[:load_balancer])
-      
+
       respond_to do |format|
         if @load_balancer.save
           @load_balancer.reload
@@ -87,10 +90,10 @@ class LoadBalancersController < ApplicationController
             :parent => p,
             :auditable_id => o.id,
             :auditable_type => o.class.to_s,
-            :auditable_name => o.name,
+            :auditable_name => o.load_balancer_name,
             :author_login => current_user.login,
             :author_id => current_user.id,
-            :summary => "created '#{o.name}'",
+            :summary => "created '#{o.load_balancer_name}'",
             :changes => o.tracked_changes,
             :force => false
           )
@@ -123,19 +126,23 @@ class LoadBalancersController < ApplicationController
       redirect_to redirect_url
     else
       @load_balancer = LoadBalancer.find(params[:id])
-
+      params[:load_balancer][:zone_ids] ||= []
+      params[:load_balancer][:zone_ids] += Instance.find(params[:load_balancer][:instance_ids]).collect{|i| i.zone_id}
+      params[:load_balancer][:zone_ids].uniq
+      
       respond_to do |format|
         if @load_balancer.update_attributes(params[:load_balancer])
+          @load_balancer.reload
           p = @parent
           o = @load_balancer
           AuditLog.create_for_parent(
             :parent => p,
             :auditable_id => o.id,
             :auditable_type => o.class.to_s,
-            :auditable_name => o.name,
+            :auditable_name => o.load_balancer_name,
             :author_login => current_user.login,
             :author_id => current_user.id,
-            :summary => "updated '#{o.name}'",
+            :summary => "updated '#{o.load_balancer_name}'",
             :changes => o.tracked_changes,
             :force => false
           )

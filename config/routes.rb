@@ -14,9 +14,7 @@ ActionController::Routing::Routes.draw do |map|
   end
 
   map.resources :load_balancers do |load_balancer|
-    load_balancer.resources :instances, :controller => 'parent/instances',
-      :collection => { :list => :any, :control => :any },
-      :only => [ :index, :list, :create ]
+    load_balancer.resources :instances, :controller => 'load_balancer/instances'
     load_balancer.resources :health_checks,
       :except => [],
       :member => { :update_target_path => :post }

@@ -1,0 +1,21 @@
+<tr class="health_check">
+  <td>
+    <%= f.select :target_protocol, ELB_TARGET_PROTOCOL_NAMES %>
+    <%= f.text_field :target_port, :class => :medium %>
+    <%= f.text_field :target_path %>
+    <%= f.text_field :interval, :class => :tiny %>
+  </td>
+  <td>
+    <%= f.text_field :timeout, :class => :tiny %>
+  </td>
+  <td>
+    <%= f.text_field :unhealthy_threshold, :class => :tiny %> /
+    <%= f.text_field :healthy_threshold, :class => :tiny %>
+    attempts
+  </td>
+  <% if @load_balancer.can_loose_some_of?('HealthCheck') %>
+    <td>
+      <%= remove_link_unless_new_record(f) -%>
+    </td>
+  <% end %>
+</tr>

@@ -1,3 +1,0 @@
-page[:edit_health_check].replace_html :partial => "form", :object => @health_check
-page[:add_health_check].hide
-page[:edit_health_check].appear

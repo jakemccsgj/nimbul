@@ -4,7 +4,7 @@
 <% style = instance.load_balancer_instance_states.empty? ? nil : 'display: none;' %>
 <% content_tag_for :tr, instance, :style => style do %>
   <td>
-    <%= add_load_balancer_instance_link('Add', instance) %>
+    <%= add_load_balancer_instance_link('Add', @load_balancer, instance) %>
   </td>
   <td class="<%= state %>">
     <%=h state.gsub('_',' ') %>

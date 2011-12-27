@@ -1,19 +1,16 @@
 <%-
-  state = load_balancer_instance_state.state || ''
+state = load_balancer_instance_state.state || ''
+instance = load_balancer_instance_state.instance
 -%>
-<% fields_for "load_balancer[load_balancer_instance_state_attributes][]", load_balancer_instance_state do |f| %>
-  <% content_tag_for :tr, load_balancer_instance_state do %>
-    <td>
-      <% unless load_balancer_instance_state.new_record? %>
-        <%= f.hidden_field :id, :index => nil %>
-      <% end %>
-      <%= f.hidden_field :instance_id, :value => load_balancer_instance_state.instance_id, :index => nil %>
-      <%= f.hidden_field :should_destroy, :index => nil, :class => 'should_destroy' %>
-      <%= remove_load_balancer_instance_link('Remove', load_balancer_instance_state) %>
-    </td>
-    <td class="<%= state %>">
-      <%=h state.gsub('_',' ') %>
-    </td>
-    <%= render :partial => 'load_balancer_instance_states/row', :locals => { :instance => load_balancer_instance_state.instance } %>
-  <% end %>
+<% content_tag_for :tr, load_balancer_instance_state do %>
+  <td>
+    <%= hidden_field_tag 'load_balancer[instance_ids][]', instance.id %>
+    <%= remove_load_balancer_instance_link('Remove', @load_balancer, instance) %>
+  </td>
+  <td class="<%= state %>">
+    <%=h state.gsub('_',' ') %>
+  </td>
+  <%=  render :partial => 'load_balancer_instance_states/row',
+    :locals => { :instance => load_balancer_instance_state.instance }
+%>
 <% end %>

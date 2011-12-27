@@ -1,8 +1,0 @@
-if @error_messages.empty?
-    page["edit_load_balancer_listener"].hide
-    page["add_load_balancer_listener"].appear if @parent.can_use_more_of?('HealthCheck')
-    page.insert_html :bottom, params[:update], :partial => "load_balancer_listener", :object => @load_balancer_listener
-else
-    page['error_redbox'].replace_html :partial => 'shared/error_redbox'
-    page['error_redbox'].appear
-end
