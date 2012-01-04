@@ -67,4 +67,9 @@ rescue LoadError
   warn "metrics not available - install metric_fu for metrics"
 end
 
-
+# Rakefile
+begin
+  require 'query_reviewer/tasks'
+rescue LoadError
+  STDERR.puts "The query_reviewer gem could not be found!"
+end
