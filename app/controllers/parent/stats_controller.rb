@@ -63,7 +63,7 @@ class Parent::StatsController < ApplicationController
       stats_condition = "cluster_id=#{@parent.id}"
     elsif @parent.is_a? Server
       stats_condition = "server_id=#{@parent.id}"
-    else
+    elsif @parent.cluster_ids.length > 0
       cluster_ids = @parent.cluster_ids.empty? ? [ 0 ] : @parent.cluster_ids
       stats_condition = "cluster_id in (#{cluster_ids.join(',')})"
     end

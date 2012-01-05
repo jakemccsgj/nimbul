@@ -235,7 +235,7 @@ module ApplicationHelper
         observe_tag = observe_field name,
             :frequency => 2,
             :update => update,
-            :url => url,
+            #:url => url,
             :method => :get,
             :with => with
         field_tag + observe_tag

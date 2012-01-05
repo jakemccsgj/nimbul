@@ -1,10 +1,9 @@
 <%= javascript_tag "Editable.setupAll();" %>
 <div id="key_pairs">
 
-
 Search: <%= will_paginate_search_field 'key_pair_search', 'key_pairs', nil, :list %>
 
-<%= refresh_link image_tag("refresh.png", :align => "absmiddle", :alt => "Refresh"), 'key_pairs', nil, :list %>
+<%= refresh_link image_tag("refresh.png", :align => "absmiddle", :alt => "Refresh"), 'key_pairs', nil, :index %>
 
 <b>Total: <%= @key_pairs.total_entries %></b>
 
@@ -17,7 +16,7 @@ Search: <%= will_paginate_search_field 'key_pair_search', 'key_pairs', nil, :lis
   <thead>
   <tr>
     <th <%= sort_td_class_helper "name" %>>
-      <%= key_pairs_sort_link "Name", "name" %>
+      <%#= provider_account_key_pairs_sort_link "Name", "name" %>
     </th>
     <th>
       Fingerprint
@@ -29,6 +28,6 @@ Search: <%= will_paginate_search_field 'key_pair_search', 'key_pairs', nil, :lis
   </tbody>
 </table>
 
-<%= will_paginate_remote @key_pairs, 'key_pairs' %>
+<%= will_paginate_remote @key_pairs, 'provider_account_key_pairs' %>
 
 </div>

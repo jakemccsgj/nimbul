@@ -50,7 +50,8 @@ class KeyPairsController < ApplicationController
   # GET /key_pairs/new.xml
   def new
     @key_pair = KeyPair.new
-    @key_pair.key_pair_params.build( :name => 'ROLES' )
+    @provider_account = ProviderAccount.find(params[:provider_account_id])
+    @provider_account.key_pairs.build( :name => 'ROLES' )
 
     respond_to do |format|
       format.html # new.html.erb

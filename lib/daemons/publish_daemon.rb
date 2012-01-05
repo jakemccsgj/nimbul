@@ -25,14 +25,14 @@ Signal.trap("TERM") { shutdown }
 Signal.trap("INT")  { shutdown }
 
 while($running) do
-    Rails.logger.info File.basename(__FILE__, '.rb') + " daemon is still running at #{Time.now}.\n"
+  Rails.logger.info File.basename(__FILE__, '.rb') + " daemon is still running at #{Time.now}.\n"
 
-    Publisher.all.each do |publisher|
-      $manager.add_task { publisher.publish! }
-    end
+  Publisher.all.each do |publisher|
+    $manager.add_task { publisher.publish! }
+  end
 
-    # wait for all publishers to finish
-    $manager.complete_tasks
+  # wait for all publishers to finish
+  $manager.complete_tasks
 
-    sleep LOOP_SLEEP_TIME
+  sleep LOOP_SLEEP_TIME
 end

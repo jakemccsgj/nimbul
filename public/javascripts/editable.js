@@ -248,7 +248,7 @@ Object.extend(Editable, {
             cancelText: 'Cancel',
             editField: {
                 'type': 'textarea',
-                'class': 'edit-textarea'
+                'class': 'editable-textarea'
             }
         };
         new Editable(element, options);
