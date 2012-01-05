@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-LOOP_SLEEP_TIME = 1.0
+LOOP_SLEEP_TIME = 10.0
 
 require 'rubygems'
 
@@ -26,19 +26,19 @@ Signal.trap("TERM") { shutdown }
 Signal.trap("INT")  { shutdown }
 
 while($running) do
-	# move each operation in proceed state to it's next step
-	# and handle operations that need to timeout
-	
+  # move each operation in proceed state to it's next step
+  # and handle operations that need to timeout
+    
   Operation.find_all_by_state(:proceed).each do |operation|
     $manager.add_task { operation.step! }
   end
 
-	Operation.find_all_by_state(:waiting, :conditions => [ 'timeout_at <= ?', Time.zone.now ]).each do |operation| 
+  Operation.find_all_by_state(:waiting, :conditions => [ 'timeout_at <= ?', Time.zone.now ]).each do |operation| 
     $manager.add_task { operation.reentrant_timeout! }
-	end
+  end
 
   $manager.complete_tasks
   
-	sleep LOOP_SLEEP_TIME
+  sleep LOOP_SLEEP_TIME
 end
 

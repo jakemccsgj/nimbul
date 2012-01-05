@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+LOOP_SLEEP_TIME = 10
+
 # You might want to change this
 ENV["RAILS_ENV"] ||= "production"
 ENV['DAEMON_SCRIPTLET'] = 'true'
@@ -12,7 +14,7 @@ Signal.trap("TERM") do
 end
 
 while($running) do
-    Rails.logger.info File.basename(__FILE__).sub('.rb','')+" daemon is still running at #{Time.now}.\n"
+  Rails.logger.info File.basename(__FILE__).sub('.rb','')+" daemon is still running at #{Time.now}.\n"
 
     InstanceResource.pending.each do |ir|
         topic = "'#{ir.cloud_resource.name}' #{ir.cloud_resource.cloud_id} [#{ir.cloud_resource.id}]"
@@ -30,5 +32,5 @@ while($running) do
         end
     end
 
-    sleep 5
+  sleep LOOP_SLEEP_TIME
 end
