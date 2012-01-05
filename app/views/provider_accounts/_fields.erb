@@ -64,7 +64,7 @@
         <% if @provider_account.ssh_master_key_ui.blank? %>
             <td><%= f.text_area :ssh_master_key_ui, :size => '60x5', :warp => 'soft'  %></td>
         <% else %>
-            <td><%= edit_in_place(@provider_account, :ssh_master_key_ui, :class => 'editable-textarea') %></td>
+            <td><%= edit_in_place(@provider_account, :ssh_master_key_ui, :class => 'editable') %></td>
         <% end %>
     </tr>
     <% end %>

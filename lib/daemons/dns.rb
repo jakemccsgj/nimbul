@@ -12,11 +12,7 @@ Signal.trap("TERM") do
 end
 
 while($running) do
-
-    # Replace this with your code
-    Rails.logger.info File.basename(__FILE__).sub('.rb','')+" daemon is still running at #{Time.now}.\n"
-
     # process any dns acquire/release requests
-	DnsRequest.process_requests
-	sleep 1
+    DnsRequest.process_requests
+    sleep 10
 end

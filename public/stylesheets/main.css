@@ -73,6 +73,7 @@ td.top-bottom-border {
 .editable-textarea {
 	border-bottom: 1px dotted blue;
 	width: 100%;
+	cursor: pointer;
 } 
 
 .edit-textarea {
