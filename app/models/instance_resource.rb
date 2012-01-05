@@ -1,7 +1,12 @@
 
-class InstanceResource < BaseModel
+class InstanceResource < ActiveRecord::Base
     belongs_to :instance
     belongs_to :cloud_resource, :counter_cache => true
+    delegate :provider_account, :to => :instance
+
+    named_scope :pending,
+                :conditions => { :state => 'pending' },
+                :include => [ :cloud_resource, :instance ]
     
     serialize :params, Hash
     
