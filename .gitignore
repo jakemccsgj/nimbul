@@ -5,3 +5,5 @@ pki
 vendor/bundle
 vendor/cache
 .htaccess
+.ctags
+app/tags
