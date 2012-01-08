@@ -3,7 +3,7 @@
   {
     :onchange => "#{remote_function(
       :url  => {:action => "update_instances"},
-      :with => "'cluster_id=#{params[:cluster_id]}&server_id='+value")}"
+      :with => "'cluster_id=#{params[:cluster_id]}&server_id='+value")};"
   }
 )
 -%>

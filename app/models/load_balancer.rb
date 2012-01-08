@@ -17,7 +17,11 @@ class LoadBalancer < BaseModel
   validates_presence_of :health_checks,
     :message => 'you must specify at least one health check.'
   
-  accepts_nested_attributes_for :load_balancer_listeners, :health_checks, :allow_destroy => true
+  accepts_nested_attributes_for :load_balancer_listeners,
+    :reject_if => proc { |a| a['load_balancer_port'].blank? and a['instance_port'].blank? },
+    :allow_destroy => true
+  accepts_nested_attributes_for :health_checks,
+    :allow_destroy => true
 
   include TrackChanges # must follow any before filters
 

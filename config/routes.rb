@@ -99,7 +99,7 @@ ActionController::Routing::Routes.draw do |map|
     provider_account.resources :load_balancers,
       :collection => {
         :update_servers => :post, :update_instances => :post,
-        :auto_complete_for__instance_name => :post
+        :search_instances => :get
       }
     provider_account.resources :server_images,
       :controller => 'provider_account/server_images',

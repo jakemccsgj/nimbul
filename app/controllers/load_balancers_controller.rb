@@ -188,14 +188,14 @@ class LoadBalancersController < ApplicationController
     render :nothing => true
   end
 
-  def update_servers
+  def update_instances
     if params[:id]
       @load_balancer = parent.load_balancers.find(params[:id])
     else
       @load_balancer = parent.load_balancers.build()
     end
     # updates servers based on cluster selected
-    if params[:instance_name].blank?
+    if params[:search].blank?
       if !params[:server_id].blank?
         @server = Server.find(params[:server_id],
           :include => [ [:instances => :load_balancer_instance_states] ]
@@ -214,12 +214,12 @@ class LoadBalancersController < ApplicationController
       end
     else
       @servers = Server.find_all_by_parent(parent, {:order => :name})
-      @instances = parent.instances.select{|i| i.instance_id == params[:instance_name]}
+      @instances = parent.instances.select{|i| i.instance_id == params[:search]}
     end
 
     render :update do |page|
       page.replace_html 'load_balancer_servers', :partial => 'servers' if params[:server_id].blank?
-      page.replace_html 'load_balancer_find_instance', :partial => 'find_instance' if params[:instance_name].blank?
+      page.replace_html 'load_balancer_find_instance', :partial => 'find_instance' if params[:search].blank?
       page.replace_html 'load_balancer_available_instances',
         :partial => 'load_balancer_instance_states/instance',
         :locals => { :load_balancer_instance_state => nil },
@@ -227,11 +227,11 @@ class LoadBalancersController < ApplicationController
     end
   end
 
-  def update_instances
-    update_servers
+  def search_instances
+    update_instances
   end
 
-  def auto_complete_for__instance_name
-    update_servers
+  def update_servers
+    update_instances
   end
 end

@@ -1,13 +1,11 @@
 <td class="nowrap">
-  <% if instance.server_id %>
-    <% if params[:cluster_id].blank? %>
+  <% if instance.server %>
+    <% if instance.server.cluster %>
       <%= link_to instance.server.cluster.name, cluster_path(instance.server.cluster_id) -%>
       /
     <% end -%>
-    <% if params[:server_id].blank? %>
-      <%= link_to h(instance.server_name), server_path(instance.server_id) %>
-      /
-    <% end -%>
+    <%= link_to h(instance.server_name), server_path(instance.server_id) %>
+    /
   <% end -%>
   <%= link_to instance.instance_id, instance_path(instance) %>
   <%- if (instance.status_message || '').length > 0 %><%= link_to_function(image_tag(

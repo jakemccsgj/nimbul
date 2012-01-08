@@ -1,11 +1,1 @@
-<%= text_field_with_auto_complete nil, :instance_name,
-  {
-  :autocomplete => 'off',
-  :class => 'medium',
-  },
-  {
-  :skip_style => true,
-  :min_chars => 3,
-  :select => 'instance_name'
-  }
--%>
+<%= will_paginate_search_field "load_balancer_instance_search", nil, nil, :search_instances -%>
