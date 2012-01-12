@@ -6,7 +6,6 @@ gem 'Ruby-MemCache', :require => 'memcache'
 gem 'ruby-openid'
 gem 'facter'
 gem 'aasm'
-gem 'aws-s3', :require => 'aws/s3'
 gem 'carrot'
 gem 'chronic'
 gem 'emissary'
@@ -25,6 +24,7 @@ end
 git 'https://github.com/Velir/open_id_authentication.git', :tag => 'v1.0.0' do
   gem 'open_id_authentication'
 end
+gem 'json'
 group :development do
 end
 
