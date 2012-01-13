@@ -26,7 +26,11 @@ class TransientKeyStore
   @@instances = {}
 
   attr_reader :version
-  
+
+  protected
+  attr :data
+
+  public
   def self.instance(env = 'production')
     if not @@instances.has_key?(env.to_s.downcase)
       @@instances[env] = new(env)
@@ -49,7 +53,24 @@ class TransientKeyStore
     setup_semaphores
     load
    end
-   
+
+   # Initialize the object from YAML, and then have it store it's data to the keystore
+   def self.from_yaml str
+     base_obj = YAML::load(str)
+     base_obj.reinit
+     base_obj
+   end
+
+   # Restore the keystore from locally stored data (self->@data)
+   def reinit
+     setup_data
+     setup_semaphores
+     keys.each do |k|
+       set k, @data[k]
+     end
+     self
+   end
+
   def setup_data
     @sm_data_key = ftok('/dev/random', TransientKeyStore.crc16(@env_token + ':data'))
     @sm_size_key = ftok('/dev/random', TransientKeyStore.crc16(@env_token + ':data_size'))
@@ -262,4 +283,5 @@ private
     end
     r ^ 0xFFFF
   end
+
 end
