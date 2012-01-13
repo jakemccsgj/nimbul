@@ -5,10 +5,9 @@ class InstanceResource < ActiveRecord::Base
     delegate :provider_account, :to => :instance
 
     named_scope :pending,
-                :conditions => { :state => 'pending' },
-                :joins => { :instance => { :provider_account => :cloud_resources } }
-                #:include => [:cloud_resource, :instance]
-    
+                :conditions => 'instances.provider_account_id = cloud_resources.provider_account_id and instance_resources.cloud_resource_id = cloud_resources.id and instance_resources.state = "pending"',
+                :include => [ :cloud_resource, :instance ]
+
     serialize :params, Hash
     
     validates_presence_of :cloud_resource_id

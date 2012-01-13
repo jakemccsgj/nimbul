@@ -68,6 +68,7 @@ class TransientKeyStore
      keys.each do |k|
        set k, @data[k]
      end
+     @@instances[@env] = self
      self
    end
 
