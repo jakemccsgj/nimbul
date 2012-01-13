@@ -6,7 +6,8 @@ class InstanceResource < ActiveRecord::Base
 
     named_scope :pending,
                 :conditions => { :state => 'pending' },
-                :include => [ :cloud_resource, :instance ]
+                :joins => { :instance => { :provider_account => :cloud_resources } }
+                #:include => [:cloud_resource, :instance]
     
     serialize :params, Hash
     

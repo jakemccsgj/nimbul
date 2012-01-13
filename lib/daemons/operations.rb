@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-LOOP_SLEEP_TIME = 10.0
+LOOP_SLEEP_TIME = 10
 
 require 'rubygems'
 
@@ -9,6 +9,8 @@ ENV["RAILS_ENV"] ||= "production"
 ENV['DAEMON_SCRIPTLET'] = 'true'
 
 require File.dirname(__FILE__) + "/../../config/environment"
+Rails.logger.auto_flushing = true
+
 load File.join(RAILS_ROOT, 'lib', 'detached_workers.rb')
 
 DetachedWorkers.post_fork { ActiveRecord::Base.connection.reconnect! }
@@ -28,7 +30,7 @@ Signal.trap("INT")  { shutdown }
 while($running) do
   # move each operation in proceed state to it's next step
   # and handle operations that need to timeout
-    
+  Rails.logger.info("Operations daemon still running @ #{Time.now}")
   Operation.find_all_by_state(:proceed).each do |operation|
     $manager.add_task { operation.step! }
   end

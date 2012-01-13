@@ -1,8 +1,7 @@
 #!/usr/bin/env ruby
 require File.dirname(__FILE__) + "/../../config/environment"
 
-$: << File.join(RAILS_ROOT, 'vendor', 'plugins', 'activemessaging', 'lib')
-require 'activemessaging'
+Rails.logger.auto_flushing = true
 
 # You might want to change this
 ENV["RAILS_ENV"] ||= "production"

@@ -7,6 +7,7 @@ ENV["RAILS_ENV"] ||= "production"
 ENV['DAEMON_SCRIPTLET'] = 'true'
 
 require File.dirname(__FILE__) + "/../../config/environment"
+Rails.logger.auto_flushing = true
 require 'rubygems'
 require 'rufus/scheduler'
 
@@ -28,8 +29,7 @@ Signal.trap("TERM") do
 end
 
 while($running) do
-  ActiveRecord::Base.logger.info File.basename(__FILE__).sub('.rb','')+" daemon is still running at #{Time.now}.\n"
-  #Rails.logger.info File.basename(__FILE__).sub('.rb','')+" daemon is still running at #{Time.now}.\n"
+  Rails.logger.info File.basename(__FILE__).sub('.rb','')+" daemon is still running at #{Time.now}.\n"
 
   # unschedule all non-active tasks
   unschedule_tasks = Task.find_all_by_is_active_and_is_scheduled( false, true )
@@ -38,7 +38,7 @@ while($running) do
       job.unschedule
     end
     t.update_attribute( :is_scheduled, false )
-    ActiveRecord::Base.logger.info "Unscheduled Task #{t.name} [#{t.id}]\n"
+    Rails.logger.info "Unscheduled Task #{t.name} [#{t.id}]\n"
     # Rails.logger.info "Unscheduled Task #{t.name} [#{t.id}]\n"
   end
 
@@ -50,7 +50,7 @@ while($running) do
         job.unschedule
       end
       t.update_attributes( { :is_active => false, :is_scheduled => false } )
-      ActiveRecord::Base.logger.info "Unscheduled Task #{t.name} [#{t.id}]\n"
+      Rails.logger.info "Unscheduled Task #{t.name} [#{t.id}]\n"
       # Rails.logger.info "Unscheduled Task #{t.name} [#{t.id}]\n"
     end
   end
@@ -81,7 +81,7 @@ while($running) do
     end
     # mark the task as scheduled
     t.update_attribute( :is_scheduled, true )
-    ActiveRecord::Base.logger.info "Scheduled Task #{t.name} [#{t.id}]\n"
+    Rails.logger.info "Scheduled Task #{t.name} [#{t.id}]\n"
     #Rails.logger.info "Scheduled Task #{t.name} [#{t.id}]\n"
   end
 

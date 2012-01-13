@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-LOOP_SLEEP_TIME = 5
+LOOP_SLEEP_TIME = 10
 
 require 'rubygems'
 
@@ -9,6 +9,7 @@ ENV["RAILS_ENV"] ||= "production"
 ENV['DAEMON_SCRIPTLET'] = 'true'
 
 require File.dirname(__FILE__) + "/../../config/environment"
+Rails.logger.auto_flushing = true
 
 $running = true
 Signal.trap("TERM") do 

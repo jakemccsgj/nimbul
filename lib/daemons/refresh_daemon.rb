@@ -9,6 +9,7 @@ ENV["RAILS_ENV"] ||= "production"
 ENV['DAEMON_SCRIPTLET'] = 'true'
 
 require File.dirname(__FILE__) + "/../../config/environment"
+Rails.logger.auto_flushing = true
 load File.join(RAILS_ROOT, 'lib', 'detached_workers.rb')
 
 DetachedWorkers.post_fork { ActiveRecord::Base.connection.reconnect! }
