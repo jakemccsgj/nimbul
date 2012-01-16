@@ -5,3 +5,4 @@ pki
 vendor/bundle
 vendor/cache
 nbproject
+bin/rdebug
