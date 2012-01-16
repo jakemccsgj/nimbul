@@ -6,10 +6,16 @@ class ServersController < ApplicationController
       " or (params[:id] and current_user.has_server_access?(Server.find(params[:id]))) "
   
   def prepare_resources
-    @server = Server.find(params[:id], :include => [ :server_profile_revision, :security_groups ])
-    @cluster = Cluster.find(@server.cluster_id, :include => [ :cluster_parameters ])
-    @provider_account = ProviderAccount.find(@cluster.provider_account_id, :include => [ :volumes, :snapshots, :clusters, :provider_account_parameters])
-    @instance_vm_types = @cluster.instance_vm_types
+    @server = Server.find(params[:id], :include => [
+        :server_profile_revision, :security_groups, { :cluster => [:cluster_parameters, :instance_vm_types] }
+        ]
+    )
+    @cluster = @server.cluster if @server.cluster
+    @provider_account = ProviderAccount.find(@cluster.provider_account_id, :include => [
+        :volumes, :snapshots, :clusters, :provider_account_parameters
+      ]
+    ) if @cluster
+    @instance_vm_types = @cluster.instance_vm_types if @cluster
     @server_profile_revision = @server.server_profile_revision
     @server_profile = @server_profile_revision.server_profile if @server_profile_revision
     if @server_profile_revision.instance_vm_type_id.nil?

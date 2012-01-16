@@ -1,0 +1,97 @@
+<% subtitle @auto_scaling_group %>
+
+<p>
+<h1><%= pagetitle @auto_scaling_group, { :create_links => true } %>, Created: <%= time_ago(@auto_scaling_group.created_time) %></h1>
+</p>
+
+<%- if @auto_scaling_group.disabled? %>
+  <p>
+    <%= link_to "Edit This Auto-Scaling Group", { :action => :edit } %>
+  </p>
+<%- end %>
+
+<p>
+<table width="335px">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <td><%= @auto_scaling_group.name %></td>
+    </tr>
+
+    <tr>
+      <th>Internal Name</th>
+      <td><%= h( (@auto_scaling_group.auto_scaling_group_name || 'Not Yet Generated') ) %></td>
+    </tr>
+
+    <tr>
+      <th>Based On:</th>
+      <td>
+        <%- if @auto_scaling_group.try :server %>
+                                          Existing Record
+        <%- else %>
+                                          Manual Configuration
+        <%- end %>
+      </td>
+    </tr>
+    <tr><td colspan="2" align="center">&nbsp;</td></tr>
+  </thead>
+
+  <%- if @auto_scaling_group.try :server %>
+    <tbody id="existing_configuration">
+      <tr>
+        <th>Cluster</th>
+        <td><%= @auto_scaling_group.server.cluster.name %></td>
+      </tr>
+      <tr>
+        <th>Server</th>
+        <td><%= @auto_scaling_group.server.name %></td>
+      </tr>
+      <tr>
+        <th>Revision</th>
+        <td><%= @auto_scaling_group.server.server_profile_revision.revision %></td>
+      </tr>
+    </tbody>
+
+  <%- else %>
+
+    <tbody id="manual_configuration" >
+      <tr>
+        <th>Image</th>
+        <td>
+          <% if @auto_scaling_group.server_image_id.blank? %>
+            <%= h(@auto_scaling_group.image_id) %>
+          <% else %>
+            <%= h(@auto_scaling_group.server_image.name) %>
+          <% end %>
+        </td>
+      </tr>
+      <tr>
+        <th>Instance Type</th>
+        <td><%= @auto_scaling_group.instance_type %></td>
+      </tr>
+      <tr>
+        <th>Key Name</th>
+        <td><%= @auto_scaling_group.key_name %></td>
+      </tr>
+      <tr>
+        <th>RAM Disk</th>
+        <td><%= @auto_scaling_group.ramdisk_id %></td>
+      </tr>
+      <tr>
+        <th>Kernel</th>
+        <td><%= @auto_scaling_group.kernel_id %></td>
+      </tr>
+      <tr>
+        <th>User Data</th>
+        <td>
+          <%= link_to_function 'show/hide', "$$('.startup_script').each(function(d) { Effect.toggle(d, 'appear') });" %>
+          <br />
+          <textarea rows="15" cols="90" readonly="readonly" class="startup_script"
+                    style="display:none;"><%= @auto_scaling_group.user_data %></textarea>
+        </td>
+      </tr>
+    </tbody>
+  <%- end %>
+</table>
+<%= button_to 'Back', :back, :method => :get, :anchor => :auto_scaling %>
+</p>

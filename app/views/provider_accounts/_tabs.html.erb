@@ -29,9 +29,9 @@
         ) %>
     </li>
     <li class="tab-unselected" id="auto_scaling_tab">
-        <%= link_to_function(
-            'Auto-Scaling',
-            "loadPane($('auto_scaling_pane'), '" + provider_account_auto_scaling_index_url(@provider_account) + "');
+        <%= link_to_function('Auto-Scaling',
+            "loadDiv($('provider_account_#{@provider_account.id}_launch_configurations_index'), '" + provider_account_launch_configurations_url(@provider_account) + "');
+            loadDiv($('provider_account_#{@provider_account.id}_auto_scaling_groups_index'), '" + provider_account_auto_scaling_groups_url(@provider_account) + "');
             tabselect($('auto_scaling_tab'));
             paneselect($('auto_scaling_pane'));
             return true;",
@@ -140,7 +140,12 @@
         <h1>Snapshots</h1><br/>
         <div id="provider_account_<%= @provider_account.id %>_snapshots_index"></div>
     </li>
-    <li id="auto_scaling_pane" class="pane-unselected"></li>
+    <li id="auto_scaling_pane" class="pane-unselected">
+        <h1>Launch Configurations</h1><br/>
+        <div id="provider_account_<%= @provider_account.id %>_launch_configurations_index"></div>
+        <h1>Auto-Scaling Groups</h1><br/>
+        <div id="provider_account_<%= @provider_account.id %>_auto_scaling_groups_index"></div>
+    </li>
     <li id="load_balancers_pane" class="pane-unselected">
         <div id="provider_account_<%= @provider_account.id %>_load_balancers_index"></div>
     </li>
@@ -181,7 +186,8 @@
             loadDiv($('provider_account_#{@provider_account.id}_snapshots_index'), '" + provider_account_snapshots_url(@provider_account) + "');
         }
         if (anchor == 'auto_scaling') {
-            loadPane($('auto_scaling_pane'), '#{provider_account_auto_scaling_index_url(@provider_account)}');
+            loadDiv($('provider_account_#{@provider_account.id}_launch_configurations_index'), '" + provider_account_launch_configurations_url(@provider_account) + "');
+            loadDiv($('provider_account_#{@provider_account.id}_auto_scaling_groups_index'), '" + provider_account_auto_scaling_groups_url(@provider_account) + "');
         }
         if (anchor == 'load_balancers') {
             loadDiv($('provider_account_#{@provider_account.id}_load_balancers_index'), '" + provider_account_load_balancers_url(@provider_account) + "');
@@ -208,5 +214,5 @@
     }
 " %>
 <%= javascript_tag(remote_function(:url => provider_account_instances_url(@provider_account), :method => :get) ) %>
-<%= javascript_tag(remote_function(:url => provider_account_server_image_categories_url(@provider_account), :method => :get) ) %>
-<%= javascript_tag(remote_function(:url => provider_account_server_image_groups_url(@provider_account), :method => :get) ) %>
+<%#= javascript_tag(remote_function(:url => provider_account_server_image_categories_url(@provider_account), :method => :get) ) %>
+<%#= javascript_tag(remote_function(:url => provider_account_server_image_groups_url(@provider_account), :method => :get) ) %>

@@ -1,0 +1,2 @@
+page["#{@parent_type}_#{@parent.id}_load_balancers_total"].replace_html "#{@load_balancers.total_entries}"
+page["#{@parent_type}_#{@parent.id}_load_balancers"].replace_html :partial => "load_balancers/list"

@@ -80,15 +80,21 @@ class ServerProfileRevision < BaseModel
     %w(name server_image_id)
   end
 
-  def self.search_by_server_image(server_image, search, page, extra_joins, extra_conditions, sort=nil, filter=nil, include=nil)
-    joins = [extra_joins].flatten.compact unless extra_joins.blank?
+  def self.search_by_server_image(server_image, search, options={})
+    extra_joins = options[:joins]
+    extra_conditions = options[:conditions]
 
+    joins = [extra_joins].flatten.compact unless extra_joins.blank?
     conditions = [ 'server_image_id = ?', (server_image.is_a?(ServerImage) ? server_image.id : server_image) ]
     unless extra_conditions.blank?
       extra_conditions = [ extra_conditions ].flatten
       conditions[0] << ' AND ' + extra_conditions[0];
       conditions << extra_conditions[1..-1]
     end
-    search(search, page, joins, conditions, sort, filter, include)
+
+    options[:joins] = joins
+    options[:conditions] = conditions
+
+    search(search, options)
   end
 end

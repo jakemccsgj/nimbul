@@ -5,14 +5,14 @@ class ServerImagesController < ApplicationController
         :unless => "params[:id].nil? or current_user.has_server_image_access?(ServerImage.find(params[:id])) "
 
     def index
+        search = params[:search]
         options = {
-            :search => params[:search],
             :page => params[:page],
             :order => params[:sort],
-            :filter => params[:filter],
+            :filters => params[:filter],
             :include => [ :provider_account, :cpu_profile, :storage_type ],
         }
-        @server_images = ServerImage.search_by_user(current_user, options)
+        @server_images = ServerImage.search_by_user(current_user, search, options)
 
         @parent_type = 'user'
         @parent = current_user

@@ -9,42 +9,30 @@ class ProviderAccount::AutoScalingController < ApplicationController
 	def index
 		@provider_account = ProviderAccount.find(params[:provider_account_id])
 		
-		# We can only perform one action at a time (search XOR refresh)
-		# so, using that, we can determine what to refresh based on either
-		# the refresh value or the the particular search being done
 		if params[:refresh]
-			@refresh = params[:refresh].gsub(/_data/, 's')
-			#@refresh = params[:refresh]
-		elsif params[:search]
-			if params[:launch_configuration_search]
-				@refresh = 'launch_configurations'
-			elsif params[:auto_scaling_group_search]
-				@refresh = 'auto_scaling_groups'
-			end
-		else
-			@refresh = nil
-		end
+      refresh = params[:refresh].gsub(/_data/, 's')
+      @provider_account.refresh(refresh)
+    end
 
-		@provider_account.refresh(@refresh) unless @refresh.nil?
+    if params[:launch_configuration_search]
+  		search = params[:launch_configuration_search]
+      options ={
+        :page => params[:launch_configuration_page],
+        :order => params[:sort],
+        :include => [ :server, :server_image, :provider_account, :auto_scaling_groups, :server_profile_revision, :instance_vm_type ],
+      }
+      @launch_configurations = LaunchConfiguration.search_by_provider_account(@provider_account, search, options)
+    end
 
-		joins = nil
-		conditions  = [ 'provider_account_id = ?', @provider_account.id ]
-
-		@launch_configurations = LaunchConfiguration.search(
-			params[:launch_configuration_search],
-			params[:launch_configuration_page], joins, conditions.dup,
-			params[:sort],
-			nil,
-			[ :server, :server_image, :provider_account, :auto_scaling_groups ]
-		) unless @refresh == 'auto_scaling_groups'
-        
-		@auto_scaling_groups   = AutoScalingGroup.search(
-			params[:auto_scaling_group_search],
-			params[:auto_scaling_group_page], joins, conditions.dup,
-			params[:sort],
-			nil,
-			[ :launch_configuration, :provider_account, :zones, :instances ]
-		) unless @refresh == 'launch_configurations'
+    if params[:auto_scaling_group_search]
+      search = params[:auto_scaling_group_search]
+      options ={
+        :page => params[:auto_scaling_group_page],
+        :order => params[:sort],
+        :include => [ :launch_configuration, :provider_account, :zones, :instances ],
+      }
+      @auto_scaling_groups   = AutoScalingGroup.search_by_provider_account(@provider_account, search, options)
+    end
 		
 		if params[:sort] =~ /launch_configuration/
 			@auto_scaling_groups.sort! { |a,b| a.launch_configuration.name <=> b.launch_configuration.name }

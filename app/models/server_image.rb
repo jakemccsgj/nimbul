@@ -7,6 +7,7 @@ class ServerImage < BaseModel
     belongs_to :storage_type
 
     has_many :server_profile_revisions, :dependent => :nullify
+    has_many :servers, :through => :server_profile_revisions, :uniq => true
     has_many :launch_configurations, :dependent => :nullify
 
     has_and_belongs_to_many :server_image_groups, :uniq => true
@@ -127,10 +128,12 @@ class ServerImage < BaseModel
         return options        
     end
 
-    def self.search_by_provider_account(provider_account, search, page, extra_joins, extra_conditions, sort = nil, filter=nil, include=nil)
+    def self.search_by_provider_account(provider_account, search, options={})
+        extra_joins = options[:joins]
+        extra_conditions = options[:conditions]
+
         joins = []
         joins = joins + extra_joins unless extra_joins.blank?
-
         conditions = [ 'provider_account_id = ?', (provider_account.is_a?(ProviderAccount) ? provider_account.id : provider_account) ]
         unless extra_conditions.blank?
             extra_conditions = [ extra_conditions ] if not extra_conditions.is_a? Array
@@ -138,7 +141,10 @@ class ServerImage < BaseModel
             conditions << extra_conditions[1..-1]
         end
         
-        search(search, page, joins, conditions, sort, filter, include)
+        options[:joins] = joins
+        options[:conditions] = conditions
+
+        search(search, options)
     end
     
     def allocate!

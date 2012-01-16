@@ -1,0 +1,2 @@
+page["#{@parent_type}_#{@parent.id}_launch_configurations_total"].replace_html "#{@launch_configurations.total_entries}"
+page["#{@parent_type}_#{@parent.id}_launch_configurations_list"].replace_html :partial => "#{@parent_type}/launch_configurations/list"

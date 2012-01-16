@@ -93,30 +93,42 @@ class LaunchConfiguration < BaseModel
     end
 
     def find_similar_servers
-        Server.find :all,
-            :select => 'servers.*, c.name as cname',
-            :conditions => [
-                'spr.image_id = ? AND sp.provider_account_id = ?', image_id, provider_account_id
-            ],
-            :joins => [
-                'INNER JOIN server_profile_revisions AS spr ON servers.server_profile_revision_id = spr.id',
-                'INNER JOIN server_profiles AS sp ON spr.server_profile_id = sp.id',
-                'INNER JOIN clusters AS c ON servers.cluster_id = c.id'
-            ],
-            :order => 'c.name ASC, servers.name ASC'
+      options ={
+        :include => :servers
+      }
+      si = ServerImage.find_by_provider_account_id_and_image_id(self.provider_account_id, self.image_id, options)
+      return (si.nil? ? [] : si.servers)
     end
     
+    def self.search_by_provider_account(provider_account, search, options={})
+        extra_joins = options[:joins]
+        extra_conditions = options[:conditions]
+
+        joins = extra_joins
+        conditions = [ 'provider_account_id = ?', (provider_account.is_a?(ProviderAccount) ? provider_account.id : provider_account) ]
+        unless extra_conditions.blank?
+            extra_conditions = [ extra_conditions ] if not extra_conditions.is_a? Array
+            conditions[0] << ' AND ' + extra_conditions[0];
+            conditions << extra_conditions[1..-1]
+        end
+
+        options[:joins] = joins
+        options[:conditions] = conditions
+
+        search(search, options)
+    end
+
     # sort, search and paginate parameters
     def self.per_page
         10
     end
 
     def self.sort_fields
-        %w(name launch_configuration_name image_id instance_vm_type_id created_at server_id state)
+        %w(launch_configuration_name name image_id instance_vm_type_id created_time server_id state)
     end
 
     def self.search_fields
-        %w(name launch_configuration_name image_id state)
+        %w(launch_configuration_name name image_id state)
     end
 
 end

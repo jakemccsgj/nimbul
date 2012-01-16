@@ -1,17 +1,18 @@
 source :rubygems
 
-gem 'aws'
+#gem 'aws'
 gem 'rails', '~> 2.3.0'
 gem 'Ruby-MemCache', :require => 'memcache'
 gem 'ruby-openid'
 gem 'facter'
 gem 'aasm'
-gem 'aws-s3', :require => 'aws/s3'
+#gem 'aws-s3', :require => 'aws/s3'
 gem 'carrot'
 gem 'chronic'
 gem 'emissary'
 gem 'fastthread'
-gem 'mysql', '~> 2.8.1'
+#gem 'mysql', '~> 2.8.1'
+gem "mysql2", "~> 0.2.7"
 gem 'net-sftp', :require => 'net/sftp'
 gem 'net-ssh', :require => 'net/ssh'
 gem 'rufus-scheduler'

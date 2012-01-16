@@ -1,0 +1,61 @@
+<td class="small controls">
+  <%= delete_launch_configuration_link('Delete', @parent, launch_configuration) %>
+  <%= toggle_active_launch_configuration_link(['Activate','Disable'], @parent, launch_configuration) %>
+</td>
+
+<td>
+  <%= h(launch_configuration.launch_configuration_name) %>
+</td>
+
+<td>
+  <%= edit_launch_configuration_link(h(launch_configuration.name), @parent, launch_configuration) -%>
+  <%- if (launch_configuration.status_message || '').length > 0 %><%= link_to_function(image_tag(
+        'important.png', :width => 16, :height => 16, :align => 'absmiddle',
+        :alt => 'Important Information', :title => 'Important Information: click to read'
+      ),
+      "$('launch_configuration_#{launch_configuration.id}_status_message').toggle()"
+    )%>
+    <div id="launch_configuration_<%= launch_configuration.id %>_status_message" style="display:none; postion:fixed;">
+      <%= launch_configuration.status_message %>
+    </div>
+  <%- end %>
+</td>
+
+<td>
+  <%- if launch_configuration.try :server %>
+    <%= link_to( h(launch_configuration.server.name), server_url(launch_configuration.server) ) -%>
+    <sup>(REV #<%= launch_configuration.server.server_profile_revision.revision %>)</sup>
+  <%- elsif launch_configuration.locked? || launch_configuration.active? %>
+    Deactivate To Set
+  <%- else %>
+    <%- possibles = [ ['Choose One', 0] ] | launch_configuration.find_similar_servers.map {
+      |s| [s.cname + ' - ' + s.name, s.id ]
+    }
+    # set to zero so we default to 'none selected' - we're faking :enum style column editing here
+    %>
+    <% if launch_configuration.new_record? -%>&nbsp;<% else -%>
+      <%= editable_list(
+        launch_configuration, :server_id, possibles,
+        {
+          :display_value => 'Click To Set',
+          :url => polymorphic_url([@parent, launch_configuration], {:action => :associate}),
+          :format => :js
+        }
+      )
+    %>
+    <% end -%>
+  <%- end %>
+</td>
+<%# State %>
+<td class="<%=launch_configuration.state%>">
+  <%= launch_configuration.state %>
+</td>
+<td class="small">
+  <% if launch_configuration.server_image_id.blank? %>
+    <%= h(launch_configuration.image_id) %>
+  <% else %>
+    <%= h(launch_configuration.server_image.name) %>
+  <% end %>
+</td>
+<td class="small"><%=h launch_configuration.instance_type %></td>
+<td class="small"><%=h launch_configuration.created_time %></td>

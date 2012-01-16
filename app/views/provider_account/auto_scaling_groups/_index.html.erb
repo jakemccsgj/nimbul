@@ -1,0 +1,24 @@
+Groups are containers for launch configurations and triggers, and define an atomic auto-scaling vector.
+<br/>
+<br/>
+<%= will_paginate_search_field "provider_account_#{@provider_account.id}_auto_scaling_group_search",
+  nil, nil, :list, 'Search by ' + AutoScalingGroup.search_fields.collect{|f| f.titleize}.join(', ') %>
+
+<%= refresh_image 'Refresh', 'auto_scaling_groups', nil, :list, nil %>
+
+<span class="vr">&nbsp;</span>
+
+<%= link_to(
+  image_tag('add.png', :class => 'control-icon', :alt => 'Add', :title => 'Add a New Launch Configuration'),
+  new_provider_account_auto_scaling_group_path(@provider_account),
+  :method => :get
+)
+-%>
+
+<span class="vr">&nbsp;</span>
+
+<b>Total: <span id="provider_account_<%= @provider_account.id %>_auto_scaling_groups_total"><%= @auto_scaling_groups.total_entries %></span></b>
+
+<hr/>
+
+<%= render :partial => 'provider_account/auto_scaling_groups/list' %>

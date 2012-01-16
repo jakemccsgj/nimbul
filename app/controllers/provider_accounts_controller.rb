@@ -35,9 +35,12 @@ class ProviderAccountsController < ApplicationController
         if params[:refresh]
             @provider_account.refresh
         end
-        joins = nil
-        conditions = [ 'provider_account_id = ?', @provider_account.id ]
-        @instances = Instance.search(params[:search], params[:page], joins, conditions, params[:sort])
+        search = params[:search]
+        options = {
+          :page => params[:page],
+          :order => params[:sort],
+        }
+        @instances = Instance.search_by_parent(@provider_account, search, options)
         @users = User.find(:all, :order => :login)
 
         respond_to do |format|

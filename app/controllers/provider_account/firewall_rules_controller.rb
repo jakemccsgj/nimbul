@@ -6,9 +6,13 @@ class ProviderAccount::FirewallRulesController < ApplicationController
     def index
         @provider_account = ProviderAccount.find(params[:provider_account_id])
 
-        joins = nil
-        conditions = nil
-        @firewall_rules = FirewallRule.search_by_provider_account(@provider_account, params[:search], params[:page], joins, conditions, params[:sort], nil, [ :security_groups, :provider_account ] )
+        search = params[:search]
+        options ={
+          :page => params[:page],
+          :order => params[:sort],
+          :include => [ :security_groups, :provider_account ],
+        }
+        @firewall_rules = FirewallRule.search_by_provider_account(@provider_account, search, options)
 
         @partial ||= 'firewall_rules/index'
         respond_to do |format|

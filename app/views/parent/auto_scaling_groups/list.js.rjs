@@ -1,0 +1,2 @@
+page["#{@parent_type}_#{@parent.id}_auto_scaling_groups_total"].replace_html "#{@auto_scaling_groups.total_entries}"
+page["#{@parent_type}_#{@parent.id}_auto_scaling_groups_list"].replace_html :partial => "#{@parent_type}/auto_scaling_groups/list"

@@ -14,7 +14,7 @@
 </td>
 <td>in use</td>
 <td><%= lease.fqdn %></td>
-<td><%= link_to lease.instance_id, edit_instance_path(lease.instance) %></td>
+<td><%= link_to lease.instance_id, instance_path(lease.instance) %></td>
 <td><%= link_to lease.instance.server, server_path(lease.instance.server) %></td>
 <% else %>
 <td>&nbsp;</td>

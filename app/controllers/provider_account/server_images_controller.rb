@@ -7,9 +7,14 @@ class ProviderAccount::ServerImagesController < ApplicationController
         # commented out refresh from ui for performance reasons
         parent.refresh(params[:refresh]) if params[:refresh] and parent.respond_to?('refresh')
         
-        joins = nil
-        conditions = nil
-        @server_images  = ServerImage.search_by_parent(parent, params[:search], params[:page], joins, conditions, params[:sort], params[:filter], [:provider_account, :server_profile_revisions])
+        search = params[:search]
+        options ={
+          :page => params[:page],
+          :order => params[:sort],
+          :filters => params[:filter],
+          :include => [:provider_account, :server_profile_revisions],
+        }
+        @server_images  = ServerImage.search_by_parent(parent, search, options)
 
         @parent_type = parent_type
         @parent = parent

@@ -1,0 +1,1 @@
+page["#{@parent_type}_#{@parent.id}_auto_scaling_groups_index"].replace_html :partial => "#{@parent_type}/auto_scaling_groups/index"

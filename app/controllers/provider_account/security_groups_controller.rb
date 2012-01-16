@@ -6,10 +6,14 @@ class ProviderAccount::SecurityGroupsController < ApplicationController
   def index
     @provider_account = ProviderAccount.find(params[:provider_account_id])
     @provider_account.refresh(params[:refresh]) if params[:refresh] and @provider_account.respond_to?('refresh')
-    
-    joins = nil
-    conditions = nil
-    @security_groups = SecurityGroup.search_by_provider_account(@provider_account, params[:search], params[:page], joins, conditions, params[:sort], nil, [:servers, :instances, :provider_account])
+
+    search = params[:search]
+    options ={
+      :page => params[:page],
+      :order => params[:sort],
+      :include => [:servers, :instances, :provider_account],
+    }
+    @security_groups = SecurityGroup.search_by_provider_account(@provider_account, search, options)
 
     @partial ||= 'security_groups/index'
     @controls_enabled = true

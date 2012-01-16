@@ -220,11 +220,17 @@ class DnsHostname < BaseModel
       conditions << hostname_id
     end
 
-    hostnames = DnsHostname.search(
-      params[:search], params[:page], joins,
-      conditions, params[:sort], nil, include,
-      'dns_hostnames.id'
-    )
+    search = params[:search]
+    options ={
+      :page => params[:page],
+      :joins => joins,
+      :conditions => conditions,
+      :order => params[:sort],
+      :include => include,
+      :group_by => 'dns_hostnames.id',
+    }
+
+    hostnames = DnsHostname.search(search, options)
     
     decorate_stats(hostnames, model)
   end

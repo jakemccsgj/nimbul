@@ -120,6 +120,24 @@ class AutoScalingGroup < BaseModel
 		self.zones.include?(zone)
     end
 
+    def self.search_by_provider_account(provider_account, search, options={})
+        extra_joins = options[:joins]
+        extra_conditions = options[:conditions]
+
+        joins = extra_joins
+        conditions = [ 'provider_account_id = ?', (provider_account.is_a?(ProviderAccount) ? provider_account.id : provider_account) ]
+        unless extra_conditions.blank?
+            extra_conditions = [ extra_conditions ] if not extra_conditions.is_a? Array
+            conditions[0] << ' AND ' + extra_conditions[0];
+            conditions << extra_conditions[1..-1]
+        end
+
+        options[:joins] = joins
+        options[:conditions] = conditions
+
+        search(search, options)
+    end
+
     # sort, search and paginate parameters
     def self.per_page
         10

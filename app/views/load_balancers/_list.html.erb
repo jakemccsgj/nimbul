@@ -1,1 +1,29 @@
-<%= render :partial => 'load_balancer', :collection => load_balancers %>
+<%= javascript_tag "Editable.setupAll('.load-balancer-editable');" %>
+<div id="load_balancers">
+
+<%= will_paginate_remote @load_balancers, nil %>
+
+<table>
+  <thead>
+  <tr>
+    <th <%= sort_td_class_helper "load_balancer_name" %>>
+      <%= load_balancers_sort_link "Name", "load_balancer_name" %>
+    </th>
+    <th <%= sort_td_class_helper "d_n_s_name" %>>
+      <%= load_balancers_sort_link "DNS Name", "d_n_s_name" %>
+    </th>
+    <th>Port Configuration</th>
+    <th>Zones</th>
+    <th>Action</th>
+  </tr>
+  </thead>
+  <tbody id="load_balancer_records">
+    <%= render :partial => 'load_balancer', :collection => @load_balancers %>
+  </tbody>
+</table>
+
+<%= will_paginate_remote @load_balancers, nil %>
+
+</div>
+
+

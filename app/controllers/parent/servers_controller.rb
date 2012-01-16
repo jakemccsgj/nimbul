@@ -14,9 +14,14 @@ class Parent::ServersController < ApplicationController
     def index
         parent.refresh(params[:refresh]) if params[:refresh] and parent.respond_to?('refresh')
 
-        joins = nil
-        conditions = nil
-        @servers  = Server.search_by_parent(parent, params[:search], params[:page], joins, conditions, params[:sort], params[:filter], [ :instances, :resource_bundles, :default_resource_bundle, :server_profile_revision, :security_groups, :zones, :addresses, :volumes ])
+        search = params[:search]
+        options = {
+          :page => params[:page],
+          :order => params[:sort],
+          :filters => params[:filter],
+          :include => [ :instances, :resource_bundles, :default_resource_bundle, :server_profile_revision, :security_groups, :zones, :addresses, :volumes ],
+        }
+        @servers  = Server.search_by_parent(parent, search, options)
 
         @parent_type = parent_type
         @parent = parent

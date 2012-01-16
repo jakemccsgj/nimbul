@@ -125,10 +125,12 @@ class FirewallRule < BaseModel
         %w(name type protocol from_port to_port ip_range group_user_id group_name)
     end
 
-    def self.search_by_provider_account(provider_account, search, page, extra_joins, extra_conditions, sort=nil, filter=nil, include=nil)
+    def self.search_by_provider_account(provider_account, search, options={})
+        extra_joins = options[:joins]
+        extra_conditions = options[:conditions]
+
         joins = []
         joins = joins + extra_joins unless extra_joins.blank?
-
         conditions = [ 'provider_account_id = ?', (provider_account.is_a?(ProviderAccount) ? provider_account.id : provider_account) ]
         unless extra_conditions.blank?
             extra_conditions = [ extra_conditions ] if not extra_conditions.is_a? Array
@@ -136,6 +138,9 @@ class FirewallRule < BaseModel
             conditions << extra_conditions[1..-1]
         end
         
-        self.search(search, page, joins, conditions, sort, filter, include)
+        options[:joins] = joins
+        options[:conditions] = conditions
+        
+        search(search, options)
     end
 end

@@ -1,31 +1,36 @@
 class Parent::SnapshotsController < ApplicationController
-    parent_resources :provider_account, :cluster
-    before_filter :login_required
-    require_role  :admin, :unless => "current_user.has_access?(parent)"
+  parent_resources :provider_account, :cluster
+  before_filter :login_required
+  require_role  :admin, :unless => "current_user.has_access?(parent)"
 
-    def index
-	    parent.refresh(params[:refresh]) if params[:refresh] and parent.respond_to?('refresh')
+  def index
+    parent.refresh(params[:refresh]) if params[:refresh] and parent.respond_to?('refresh')
 
-        joins = nil
-	    conditions = nil
-	    @snapshots  = CloudSnapshot.search_by_parent(parent, params[:search], params[:page], joins, conditions, params[:sort], params[:filter])
+    search = params[:search]
+    options ={
+      :page => params[:page],
+      :order => params[:sort],
+      :filters => params[:filter],
+      :include => [ :clusters, :instance, :zone ]
+    }
+    @snapshots  = CloudSnapshot.search_by_parent(parent, search, options)
 
-        @parent_type = parent_type
-        @parent = parent
-	    @controls_enabled = true
-	    respond_to do |format|
-	        format.html
-	        format.xml  { render :xml => @snapshots }
-	        format.js
-	    end
+    @parent_type = parent_type
+    @parent = parent
+    @controls_enabled = true
+    respond_to do |format|
+      format.html
+      format.xml  { render :xml => @snapshots }
+      format.js
     end
-    def list
-        index
-    end
+  end
+  def list
+    index
+  end
 
 	def show
 		@snapshot = CloudSnapshot.find(params[:id], :include => [ :snapshot_params, :security_groups ])
-    	@snapshot_params = @snapshot.snapshot_params
+    @snapshot_params = @snapshot.snapshot_params
 		@security_groups = @snapshot.security_groups
 
 		respond_to do |format|
@@ -54,28 +59,33 @@ class Parent::SnapshotsController < ApplicationController
 		end
 	end
 
-    def control
-        joins = nil
-	    conditions = nil
-	    @snapshots  = CloudSnapshot.search_by_parent(parent, params[:snapshot_ids], params[:page], joins, conditions, params[:sort], nil, :clusters)
+  def control
+    search = params[:snapshot_ids]
+    options ={
+      :page => params[:page],
+      :order => params[:sort],
+      :filters => params[:filter],
+      :include => [ :clusters ]
+    }
+    @snapshots  = CloudSnapshot.search_by_parent(parent, search, options)
 	    
-        options = {
-            :search => params[:search],
-            :sort => params[:sort],
-            :page => params[:page],
-            :anchor => :storage,
-        }
-	    redirect_url = send("#{ parent_type }_url", parent, options)
+    options = {
+      :search => params[:search],
+      :sort => params[:sort],
+      :page => params[:page],
+      :anchor => :storage,
+    }
+    redirect_url = send("#{ parent_type }_url", parent, options)
 
 		zone = parent.zones.find(params[:zone_id]) unless params[:zone_id].blank?
-        prefix = params[:command_parameter]
+    prefix = params[:command_parameter]
         
-        @error_message = ''
-        @volumes = []
-        if @snapshots.size == 0
-		    @error_message = "No snapshots are specified."
-        else
-	        @snapshots.each do |snapshot|
+    @error_message = ''
+    @volumes = []
+    if @snapshots.size == 0
+      @error_message = "No snapshots are specified."
+    else
+      @snapshots.each do |snapshot|
 				volume = nil
 				begin
 					if params[:command] == 'restore'
@@ -83,25 +93,25 @@ class Parent::SnapshotsController < ApplicationController
 						@volumes << volume if !volume.nil? and volume.errors.empty?
 					end
 					snapshot.delete! if params[:command] == 'destroy'
-		            snapshot.enable! if params[:command] == 'enable'
-		            snapshot.disable! if params[:command] == 'disable'
+          snapshot.enable! if params[:command] == 'enable'
+          snapshot.disable! if params[:command] == 'disable'
 				rescue
 					snapshot.errors.add(:state, "Failed to #{params[:command]} snapshot '#{snapshot.name}': #{$!}")
 				end
-	            unless snapshot.errors.empty?
+        unless snapshot.errors.empty?
 					@error_message += '<br/>' + snapshot.errors.collect{ |attr,msg| attr.humanize+' - '+msg }.join('<br />')
-	            end
-	            unless volume.nil? or volume.errors.empty?
+        end
+        unless volume.nil? or volume.errors.empty?
 					@error_message += '<br/>' + volume.errors.collect{ |attr,msg| attr.humanize+' - '+msg }.join('<br />')
 				end
 				@message = "#{params[:command]} snapshot(s) - success" if @error_message.blank?
 			end
 		end
 
-        @controls_enabled = true
-        respond_to do |format|
-            if @error_message.blank?
-                flash[:notice] = @message
+    @controls_enabled = true
+    respond_to do |format|
+      if @error_message.blank?
+        flash[:notice] = @message
 				@snapshots.each do |snapshot|
 					p = parent
 					o = snapshot
@@ -134,14 +144,14 @@ class Parent::SnapshotsController < ApplicationController
 					)
 				end
 				format.html { redirect_to redirect_url }
-                format.xml  { head :ok }
-                format.js
-            else
-                flash[:error] = @error_message
-                format.html { redirect_to redirect_url }
-                format.xml  { render :xml => @error_message, :status => :unprocessable_entity }
-                format.js
-            end
-        end
+        format.xml  { head :ok }
+        format.js
+      else
+        flash[:error] = @error_message
+        format.html { redirect_to redirect_url }
+        format.xml  { render :xml => @error_message, :status => :unprocessable_entity }
+        format.js
+      end
     end
+  end
 end

@@ -6,9 +6,14 @@ class Parent::AddressesController < ApplicationController
     def index
 	    parent.refresh(params[:refresh]) if params[:refresh] and parent.respond_to?('refresh')
 
-        joins = nil
-	    conditions = nil
-	    @addresses  = CloudAddress.search_by_parent(parent, params[:search], params[:page], joins, conditions, params[:sort], params[:filter], [ :clusters, :instance ])
+      search = params[:search]
+      options ={
+        :page => params[:page],
+        :order => params[:sort],
+        :filters => params[:filter],
+        :include => [ :clusters, :instance, :provider_account ]
+      }
+      @addresses  = CloudAddress.search_by_parent(parent, search, options)
 
 	    @parent_type = parent_type
 	    @parent = parent
@@ -68,9 +73,14 @@ class Parent::AddressesController < ApplicationController
     end
 
     def control
-        joins = nil
-	    conditions = nil
-	    @addresses  = CloudAddress.search_by_parent(parent, params[:address_ids], params[:page], joins, conditions, params[:sort], nil, :provider_account)
+      search = params[:address_ids]
+      options ={
+        :page => params[:page],
+        :order => params[:sort],
+        :filters => params[:filter],
+        :include => [ :clusters, :instance, :provider_account ]
+      }
+      @addresses  = CloudAddress.search_by_parent(parent, search, options)
 
         options = {
             :search => params[:search],

@@ -3,16 +3,28 @@ class LoadBalancersController < ApplicationController
   before_filter :login_required
   require_role  :admin, :unless => "params[:id].nil? or current_user.has_access?(parent)"
 
-  # GET /load_balancers
-  # GET /load_balancers.xml
   def index
-    @load_balancers = parent.load_balancers
+    parent.refresh(params[:refresh]) if params[:refresh] and parent.respond_to?('refresh')
 
+    search = params[:search]
+    options = {
+      :page => params[:page],
+      :order => params[:sort],
+      :filter => params[:filter],
+      :include => [:load_balancer_listeners, :health_checks, :zones, :load_balancer_instance_states, :instances],
+    }
+    @load_balancers  = LoadBalancer.search_by_parent(parent, search, options)
+
+    #@parent_type = parent_type
+    #@parent = parent
     respond_to do |format|
-      format.html # index.html.erb
+      format.html
       format.xml  { render :xml => @load_balancers }
       format.js
     end
+  end
+  def list
+    index
   end
 
   # GET /load_balancers/new
@@ -20,11 +32,11 @@ class LoadBalancersController < ApplicationController
   def new
     @load_balancer = parent.load_balancers.build
     @load_balancer.load_balancer_listeners.build({
-      :protocol => 'HTTP',
-      :load_balancer_port => 80,
-      :instance_protocol => 'HTTP',
-      :instance_port => 80
-    })
+        :protocol => 'HTTP',
+        :load_balancer_port => 80,
+        :instance_protocol => 'HTTP',
+        :instance_port => 80
+      })
     @load_balancer.health_checks.build({
         :target_protocol => 'HTTP',
         :target_port => 80,

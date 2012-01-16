@@ -85,19 +85,17 @@ ActionController::Routing::Routes.draw do |map|
       :controller => 'parent/servers',
       :collection => { :list => :any, :control => :any },
       :only => [ :index, :list, :new ]
-    provider_account.resources :auto_scaling,
-      :controller => 'provider_account/auto_scaling',
-      :collection => { :list => :any },
-      :only => [ :index, :list ]
     provider_account.resources :launch_configurations,
-      :controller => 'provider_account/launch_configurations',
-      :collection => { :list => :get },
-      :only => [ :new, :create ]
+      :controller => 'parent/launch_configurations',
+      :collection => { :list => :any },
+      :member => {:activate => :post, :disable => :post, :associate => :put}
     provider_account.resources :auto_scaling_groups,
-      :controller => 'provider_account/auto_scaling_groups',
-      :collection => { :list => :any }
+      :controller => 'parent/auto_scaling_groups',
+      :collection => { :list => :any },
+      :member => {:activate => :post, :disable => :post}
     provider_account.resources :load_balancers,
       :collection => {
+        :list => :any,
         :update_servers => :post, :update_instances => :post,
         :search_instances => :get
       }
@@ -221,14 +219,8 @@ ActionController::Routing::Routes.draw do |map|
       :only => [ :index ]
   end
 
-  # auto scaling launch configurations
-  map.resources :launch_configurations,
-    :member => { :associate => :put, :disable => :post, :activate => :post },
-    :only => [ :associate, :show, :edit, :destroy, :update ]
-        
-  # auto scaling group
-  map.resources :auto_scaling_groups,
-    :member => { :disable => :post, :activate => :post } do |group|
+  # auto scaling groups
+  map.resources :auto_scaling_groups do |group|
     group.resources :instances, :controller => 'parent/instances',
       :collection => { :list => :any, :control => :any },
       :only => [ :index ]

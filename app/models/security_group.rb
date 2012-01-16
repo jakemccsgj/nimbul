@@ -27,12 +27,14 @@ class SecurityGroup < BaseModel
         %w(api_name name description)
     end
     
-    def self.search_by_firewall_rule(firewall_rule, search, page, extra_joins, extra_conditions, sort=nil, filter=nil, include=nil)
+    def self.search_by_firewall_rule(firewall_rule, search, options={})
+        extra_joins = options[:joins]
+        extra_conditions = options[:conditions]
+
         joins = [
             'INNER JOIN firewall_rules_security_groups ON firewall_rules_security_groups.security_group_id = security_groups.id'
         ]
         joins = joins + extra_joins unless extra_joins.blank?
-
         conditions = [ 'firewall_rules_security_groups.firewall_rule_id = ?', (firewall_rule.is_a?(FirewallRule) ? firewall_rule.id : firewall_rule) ]
         unless extra_conditions.blank?
             extra_conditions = [ extra_conditions ] if not extra_conditions.is_a? Array
@@ -40,13 +42,18 @@ class SecurityGroup < BaseModel
             conditions << extra_conditions[1..-1]
         end
         
-        search(search, page, joins, conditions, sort, filter, include)
+        options[:joins] = joins
+        options[:conditions] = conditions
+
+        search(search, options)
     end
   
-    def self.search_by_provider_account(provider_account, search, page, extra_joins, extra_conditions, sort=nil, filter=nil, include=nil)
+    def self.search_by_provider_account(provider_account, search, options={})
+        extra_joins = options[:joins]
+        extra_conditions = options[:conditions]
+
         joins = []
         joins = joins + extra_joins unless extra_joins.blank?
-
         conditions = [ 'provider_account_id = ?', (provider_account.is_a?(ProviderAccount) ? provider_account.id : provider_account) ]
         unless extra_conditions.blank?
             extra_conditions = [ extra_conditions ] if not extra_conditions.is_a? Array
@@ -54,6 +61,9 @@ class SecurityGroup < BaseModel
             conditions << extra_conditions[1..-1]
         end
         
-        self.search(search, page, joins, conditions, sort, filter, include)
+        options[:joins] = joins
+        options[:conditions] = conditions
+
+        search(search, options)
     end
 end

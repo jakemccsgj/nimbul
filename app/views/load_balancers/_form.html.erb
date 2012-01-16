@@ -4,7 +4,7 @@
   <%= javascript_tag "load_balancer_listener='#{generate_template(load_balancer_form, :load_balancer_listeners)}';" -%>
   <%= javascript_tag "health_check='#{generate_template(load_balancer_form, :health_checks)}';" -%>
   <%= hidden_field_tag :anchor, 'load_balancers' -%>
-  <%= hidden_field_tag :update, 'provider_account_load_balancers' -%>
+  <%= hidden_field_tag :update, 'load_balancer_records' -%>
 
   <%= close_redbox_button 'Cancel', 'xxlarge_redbox' %>
   <%= load_balancer_form.submit %>

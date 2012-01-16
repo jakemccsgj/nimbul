@@ -7,9 +7,14 @@ class Parent::ServerProfileRevisionsController < ApplicationController
         # commented out refresh from ui for performance reasons
         parent.refresh(params[:refresh]) if params[:refresh] and parent.respond_to?('refresh')
         
-        joins = nil
-        conditions = nil
-        @server_profile_revisions  = ServerProfileRevision.search_by_parent(parent, params[:search], params[:page], joins, conditions, params[:sort], params[:filter], [ { :servers => :cluster }, :server_profile ])
+        search = params[:search]
+        options = {
+          :page => params[:page],
+          :order => params[:sort],
+          :filters => params[:filter],
+          :include => [ { :servers => :cluster }, :server_profile ]
+        }
+        @server_profile_revisions  = ServerProfileRevision.search_by_parent(parent, search, options)
 
         @parent_type = parent_type
         @parent = parent

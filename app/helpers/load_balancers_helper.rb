@@ -1,4 +1,8 @@
 module LoadBalancersHelper
+  def load_balancers_sort_link(text, param)
+    sort_link(text, param, nil, nil, :list)
+  end
+
   def add_provider_account_load_balancer_link(text, provider_account)
     link_text = image_tag("add.png", :class => 'control-icon', :alt => text)
 		url = new_provider_account_load_balancer_url(provider_account)

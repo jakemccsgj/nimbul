@@ -5,12 +5,15 @@ class Parent::OperationsController < ApplicationController
 
   def index
     parent.refresh(params[:refresh]) if params[:refresh] and parent.respond_to?('refresh')
-
-		joins = nil
-		conditions = nil
     params[:sort] = 'created_at_reverse' if params[:sort].blank?
 
-    @operations = Operation.search_by_parent(parent, params[:search], params[:page], joins, conditions, params[:sort], params[:filter])
+    search = params[:search]
+    options = {
+      :page => params[:page],
+      :order => params[:sort],
+      :filter => params[:filter],
+    }
+    @operations = Operation.search_by_parent(parent, search, options)
     @parent_type = parent_type
     @parent = parent
 

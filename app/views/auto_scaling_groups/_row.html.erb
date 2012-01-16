@@ -1,0 +1,46 @@
+<td class="controls">
+  <%= delete_auto_scaling_group_link('Delete', @parent, auto_scaling_group) -%>
+  <%= toggle_active_auto_scaling_group_link(['Activate','Disable'], @parent, auto_scaling_group) -%>
+  <%= show_hide_auto_scaling_group_instances_link(auto_scaling_group) -%>
+  <%= show_hide_auto_scaling_group_triggers_link(auto_scaling_group) -%>
+</td>
+<td class="name">
+  <% if auto_scaling_group.disabled? -%>
+    <%= editable(auto_scaling_group, :name ) %>
+  <% else -%>
+    <%= h(auto_scaling_group.name) %>
+  <% end -%>
+  <%- if (auto_scaling_group.status_message || '').length > 0 %><%= link_to_function(image_tag(
+        'important.png', :width => 16, :height => 16, :align => 'absmiddle',
+        :alt => 'Important Information', :title => 'Important Information: click to read'
+      ),
+      "$('auto_scaling_group_#{auto_scaling_group.id}_status_message').toggle()"
+    )%>
+    <div id="auto_scaling_group_<%= auto_scaling_group.id %>_status_message" style="display:none; postion:fixed;">
+      <%= auto_scaling_group.status_message %>
+    </div>
+  <%- end %>
+</td>
+<td class="launch_configuration small">
+  <%= h(auto_scaling_group.launch_configuration.name) %>
+</td>
+<td class="<%= auto_scaling_group.state %> state">
+  <%= auto_scaling_group.state %>
+</td>
+<td class="small zones">
+  <%- if auto_scaling_group.zones.empty? %>
+    not specified
+  <%- else %>
+    <% auto_scaling_group.zones.each do |zone| %>
+      <% content_tag_for :span, zone do %>
+        <%= h zone.name %>
+        <br />
+      <% end %>
+    <% end %>
+  <%- end %>
+</td>
+<td class="min_size"><%= auto_scaling_group_min_size(@parent, auto_scaling_group) %></td>
+<td class="max_size"><%= auto_scaling_group_max_size(@parent, auto_scaling_group) %></td>
+<td class="desired_capacity"><%= auto_scaling_group_desired_capacity(@parent, auto_scaling_group) %></td>
+<td class="current_size"><%= auto_scaling_group.instances.size %></td>
+<td class="cooldown"><%= auto_scaling_group_cooldown(@parent, auto_scaling_group) %></td>

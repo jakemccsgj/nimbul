@@ -39,20 +39,29 @@ module Behaviors::Searchable
 			count(:all, options)
 		end
 
-		def search_by_parent(parent, search, page=nil, extra_joins=nil, extra_conditions=nil, sort=nil, filter=nil, include=nil)
+		def search_by_parent(parent, search, options={})
 			parent_type = parent.class.to_s.underscore
 			# handle SiteUser and LdapUser subclasses
 			parent_type = 'user' if parent.is_a?(User)
-			send("search_by_#{ parent_type }", parent, search, page, extra_joins, extra_conditions, sort, filter, include)
+			send("search_by_#{ parent_type }", parent, search, options)
 		end
 
-		def search_by_user(user, options={})
+		def search_by_user(user, search, options={})
 			options = options_for_find_by_user(user, options)
-			search(options[:search], options[:page], options[:joins], options[:conditions], options[:order], options[:filter], options[:include])
+			search(search, options)
 		end
 
-		def search(search, page, joins, conditions, order=nil, filters=nil, include=nil, group_by=nil)
-			unless search.blank?
+		def search(search, options={})
+      page = options[:page]
+      joins = options[:joins]
+      conditions = options[:conditions]
+      order = options[:order]
+      filters = options[:filters] || options[:filter]
+      include = options[:include]
+      group_by = options[:group_by]
+      
+			# allow search against allowed fields only
+      unless search.blank?
 				conditions = [ '' ] if conditions.nil? or conditions.empty?
 				conditions[0] = conditions[0] + " AND " unless conditions[0].blank?
 				# support array of ids
@@ -65,7 +74,8 @@ module Behaviors::Searchable
 				end
 			end
 			
-			unless filters.nil? or !self.respond_to?('filter_fields')
+			# build filters for allowed fields only
+      unless filters.nil? or !self.respond_to?('filter_fields')
 				filters = filters.split(',') if filters.is_a?(String)
 				if filters.is_a?(Array)
 					fs = {}

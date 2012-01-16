@@ -62,10 +62,11 @@ class CloudResource < BaseModel
         should_destroy.to_i == 1
     end
     
-    def self.search_by_provider_account(provider_account, search, page, extra_joins, extra_conditions, sort=nil, filter=nil, include=nil)
-        joins = []
-        joins = joins + extra_joins unless extra_joins.blank?
+    def self.search_by_provider_account(provider_account, search, options={})
+        extra_joins = options[:joins]
+        extra_conditions = options[:conditions]
 
+        joins = extra_joins
         conditions = [ 'cloud_resources.type = ? AND provider_account_id = ?', self.to_s, (provider_account.is_a?(ProviderAccount) ? provider_account.id : provider_account) ]
         unless extra_conditions.blank?
             extra_conditions = [ extra_conditions ] if not extra_conditions.is_a? Array
@@ -73,15 +74,20 @@ class CloudResource < BaseModel
             conditions << extra_conditions[1..-1]
         end
         
-        search(search, page, joins, conditions, sort, filter, include)
+        options[:joins] = joins
+        options[:conditions] = conditions
+
+        search(search, options)
     end
   
-    def self.search_by_cluster(cluster, search, page, extra_joins, extra_conditions, sort=nil, filter=nil, include=nil)
+    def self.search_by_cluster(cluster, search, options={})
+        extra_joins = options[:joins]
+        extra_conditions = options[:conditions]
+
         joins = [
               'INNER JOIN cloud_resources_clusters ON cloud_resources_clusters.cloud_resource_id = cloud_resources.id',
         ]
         joins = joins + extra_joins unless extra_joins.blank?
-
         conditions = [ 'cloud_resources.type = ? AND cloud_resources_clusters.cluster_id = ?', self.to_s, (cluster.is_a?(Cluster) ? cluster.id : cluster) ]
         unless extra_conditions.blank?
             extra_conditions = [ extra_conditions ] if not extra_conditions.is_a? Array
@@ -89,7 +95,10 @@ class CloudResource < BaseModel
             conditions << extra_conditions[1..-1]
         end
         
-        search(search, page, joins, conditions, sort, filter, include)
+        options[:joins] = joins
+        options[:conditions] = conditions
+
+        search(search, options)
     end
   
     # by default - find all resources visible to user through clusters

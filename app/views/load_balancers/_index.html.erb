@@ -1,14 +1,17 @@
+Search: <%= will_paginate_search_field "provider_account_#{@provider_account.id}_load_balancers_search", nil, nil, :list %>
+
+<%= refresh_image 'Refresh', 'load_balancers', nil, :list, nil %>
+
+<span class="vr">&nbsp;</span>
+
 <%= add_provider_account_load_balancer_link('Add', @provider_account) %>
+
+<span class="vr">&nbsp;</span>
+
+<b>Total: <span id="provider_account_<%= @provider_account.id %>_load_balancers_total"><%= @load_balancers.total_entries %></span></b>
+
 <hr/>
-<table>
-  <tr>
-    <th>Name</th>
-    <th>DNS Name</th>
-    <th>Port Configuration</th>
-    <th>Zones</th>
-    <th>Action</th>
-  </tr>
-  <tbody id="provider_account_load_balancers">
-    <%= render :partial => 'list', :locals => { :load_balancers => @load_balancers } %>
-  </tbody>
-</table>
+
+<div id="provider_account_<%= @provider_account.id %>_load_balancers">
+  <%= render :partial => "load_balancers/list" %>
+</div>

@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111116035105) do
+ActiveRecord::Schema.define(:version => 20120108155142) do
 
   create_table "access_requests", :force => true do |t|
     t.string   "state"
@@ -177,8 +177,10 @@ ActiveRecord::Schema.define(:version => 20111116035105) do
     t.boolean  "no_device"
     t.integer  "storage_type_id"
     t.integer  "vm_os_type_id"
+    t.integer  "launch_configuration_id"
   end
 
+  add_index "block_device_mappings", ["launch_configuration_id"], :name => "index_block_device_mappings_on_launch_configuration_id"
   add_index "block_device_mappings", ["parent_type", "parent_id"], :name => "index_block_device_mappings_on_parent_type_and_parent_id"
   add_index "block_device_mappings", ["storage_type_id"], :name => "index_block_device_mappings_on_storage_type_id"
   add_index "block_device_mappings", ["vm_os_type_id"], :name => "index_block_device_mappings_on_vm_os_type_id"

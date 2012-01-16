@@ -247,11 +247,13 @@ class Instance < BaseModel
         find_all_by_server_id(server.id, options)
     end
 
-    def self.search_by_load_balancer(load_balancer, search, page, extra_joins, extra_conditions, sort=nil, filter=nil, include=nil)
+    def self.search_by_load_balancer(load_balancer, search, options={})
+        extra_joins = options[:joins]
+        extra_conditions = options[:conditions]
+
         joins = [
             'INNER JOIN load_balancer_instance_states ON load_balancer_instance_states.instance_id = instances.id',
         ] + [extra_joins].flatten.compact
-
         conditions = [ 'load_balancer_instance_states.load_balancer_id = ?', (load_balancer.is_a?(LoadBalancer) ? load_balancer.id : load_balancer) ]
         unless extra_conditions.blank?
             extra_conditions = [ extra_conditions ].flatten
@@ -259,90 +261,123 @@ class Instance < BaseModel
             conditions << extra_conditions[1..-1]
         end
   
-        search(search, page, joins, conditions, sort, filter, include)
+        options[:joins] = joins
+        options[:conditions] = conditions
+        
+        search(search, options)
     end
 
-    def self.search_by_owner(owner, search, page, extra_joins, extra_conditions, sort=nil, filter=nil, include=nil)
-        joins = []
-        joins = joins + extra_joins unless extra_joins.blank?
-
+    def self.search_by_owner(owner, search, options={})
+        extra_joins = options[:joins]
+        extra_conditions = options[:conditions]
+        
+        joins = extra_joins
         conditions = [ 'user_id = ?', (owner.is_a?(Owner) ? owner.id : owner) ]
         unless extra_conditions.blank?
             extra_conditions = [ extra_conditions ] if not extra_conditions.is_a? Array
             conditions[0] << ' AND ' + extra_conditions[0];
             conditions << extra_conditions[1..-1]
         end
-
-        sort = table_name()+'.launch_time DESC' if sort.blank?
-  
-        search(search, page, joins, conditions, sort, filter, include)
+        
+        options[:joins] = joins
+        options[:conditions] = conditions
+        options[:order] = table_name()+'.launch_time DESC' if options[:order].blank?
+        
+        search(search, options)
     end
 
-    def self.search_by_provider_account(provider_account, search, page, extra_joins, extra_conditions, sort=nil, filter=nil, include=nil)
-        joins = []
-        joins = joins + extra_joins unless extra_joins.blank?
+    def self.search_by_provider_account(provider_account, search, options={})
+        extra_joins = options[:joins]
+        extra_conditions = options[:conditions]
 
+        joins = extra_joins
         conditions = [ 'provider_account_id = ?', (provider_account.is_a?(ProviderAccount) ? provider_account.id : provider_account) ]
         unless extra_conditions.blank?
             extra_conditions = [ extra_conditions ] if not extra_conditions.is_a? Array
             conditions[0] << ' AND ' + extra_conditions[0];
             conditions << extra_conditions[1..-1]
         end
-  
-        search(search, page, joins, conditions, sort, filter, include)
+
+        options[:joins] = joins
+        options[:conditions] = conditions
+
+        search(search, options)
     end
 
-    def self.search_by_security_group(security_group, search, page, extra_joins, extra_conditions, sort=nil, filter=nil, include=nil)
+    def self.search_by_security_group(security_group, search, options={})
+        extra_joins = options[:joins]
+        extra_conditions = options[:conditions]
+
         joins = [
             'INNER JOIN instances_security_groups ON instances_security_groups.instance_id = instances.id',
         ] + [extra_joins].flatten.compact
-
         conditions = [ 'instances_security_groups.security_group_id = ?', (security_group.is_a?(SecurityGroup) ? security_group.id : security_group) ]
         unless extra_conditions.blank?
             extra_conditions = [ extra_conditions ].flatten
             conditions[0] << ' AND ' + extra_conditions[0];
             conditions << extra_conditions[1..-1]
         end
+        
+        options[:joins] = joins
+        options[:conditions] = conditions
   
-        search(search, page, joins, conditions, sort, filter, include)
+        search(search, options)
     end
 
-    def self.search_by_cluster(cluster, search, page, extra_joins, extra_conditions, sort=nil, filter=nil, include=nil)
+    def self.search_by_cluster(cluster, search, options={})
+        extra_joins = options[:joins]
+        extra_conditions = options[:conditions]
+
         joins = [
             'INNER JOIN servers ON servers.id = instances.server_id',
         ] + [extra_joins].flatten.compact
-
         conditions = [ 'servers.cluster_id = ?', (cluster.is_a?(Cluster) ? cluster.id : cluster) ]
         unless extra_conditions.blank?
             extra_conditions = [ extra_conditions ].flatten
             conditions[0] << ' AND ' + extra_conditions[0];
             conditions << extra_conditions[1..-1]
         end
-        search(search, page, joins, conditions, sort, filter, include)
+
+        options[:joins] = joins
+        options[:conditions] = conditions
+  
+        search(search, options)
     end
 
-    def self.search_by_server(server, search, page, extra_joins, extra_conditions, sort=nil, filter=nil, include=nil)
-        joins = [extra_joins].flatten.compact unless extra_joins.blank?
+    def self.search_by_server(server, search, options={})
+        extra_joins = options[:joins]
+        extra_conditions = options[:conditions]
 
+        joins = [extra_joins].flatten.compact unless extra_joins.blank?
         conditions = [ 'server_id = ?', (server.is_a?(Server) ? server.id : server) ]
         unless extra_conditions.blank?
             extra_conditions = [ extra_conditions ].flatten
             conditions[0] << ' AND ' + extra_conditions[0];
             conditions << extra_conditions[1..-1]
         end
-        search(search, page, joins, conditions, sort, filter, include)
+
+        options[:joins] = joins
+        options[:conditions] = conditions
+  
+        search(search, options)
     end
 
-    def self.search_by_auto_scaling_group(auto_scaling_group, search, page, extra_joins, extra_conditions, sort=nil, filter=nil, include=nil)
-        joins = [extra_joins].flatten.compact unless extra_joins.blank?
+    def self.search_by_auto_scaling_group(auto_scaling_group, search, options={})
+        extra_joins = options[:joins]
+        extra_conditions = options[:conditions]
 
+        joins = [extra_joins].flatten.compact unless extra_joins.blank?
         conditions = [ table_name()+'.auto_scaling_group_id = ?', (auto_scaling_group.is_a?(AutoScalingGroup) ? auto_scaling_group.id : auto_scaling_group) ]
         unless extra_conditions.blank?
             extra_conditions = [ extra_conditions ].flatten
             conditions[0] << ' AND ' + extra_conditions[0];
             conditions << extra_conditions[1..-1]
         end
-        search(search, page, joins, conditions, sort, filter, include)
+        
+        options[:joins] = joins
+        options[:conditions] = conditions
+
+        search(search, options)
     end
 
     # this method is used by find_all_by_user, count_all_by_user and search_by_user in the searchable behavior
