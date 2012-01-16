@@ -7,14 +7,14 @@ class PublishersController < ApplicationController
 	# GET /publishers.xml
 	# GET /publishers.js
 	def index
-        @provider_account = ProviderAccount.find(params[:provider_account_id])
-        @publishers = @provider_account.publishers
+    @provider_account = ProviderAccount.find(params[:provider_account_id])
+    @publishers = @provider_account.publishers
 
-        respond_to do |format|
-            format.html
-            format.xml  { render :xml => @publishers }
-            format.js   { render :partial => 'list', :layout => false }
-        end
+    respond_to do |format|
+      format.html
+      format.xml  { render :xml => @publishers }
+      format.js   { render :partial => 'list', :layout => false }
+    end
 	end
 	def list
 		index
@@ -25,9 +25,13 @@ class PublishersController < ApplicationController
 	def show
 		@publisher = Publisher.find(params[:id])
 		@users = User.find(:all, :order => :login)
-        joins = nil
-        conditions = [ 'publisher_id = ?', @publisher.id ]
-        @servers = Server.search(params[:search], params[:page], joins, conditions, params[:sort])
+    search = params[:search]
+    options ={
+      :page => params[:page],
+      :order => params[:sort] || 'created_at_reverse',
+      :filters => params[:filter]
+    }
+    @servers = Server.search_by_parent(@publisher, search, options)
 
 		respond_to do |format|
 			format.html # show.html.erb
@@ -35,19 +39,19 @@ class PublishersController < ApplicationController
 		end
 	end
 
-    # GET /publishers/new
-    # GET /publishers/new.xml
-    def new
-        @provider_account = ProviderAccount.find(params[:provider_account_id])
-        @class_type = 'Publisher::'+params[:class_type] unless params[:class_type].blank?
-        @publisher = Publisher.factory(@class_type)
+  # GET /publishers/new
+  # GET /publishers/new.xml
+  def new
+    @provider_account = ProviderAccount.find(params[:provider_account_id])
+    @class_type = 'Publisher::'+params[:class_type] unless params[:class_type].blank?
+    @publisher = Publisher.factory(@class_type)
 
-        respond_to do |format|
-            format.html # new.html.erb
-            format.xml  { render :xml => @publisher }
-            format.js
-        end
+    respond_to do |format|
+      format.html # new.html.erb
+      format.xml  { render :xml => @publisher }
+      format.js
     end
+  end
 
 	# GET /publishers/1/edit
 	# GET /publishers/1/edit.json
@@ -62,104 +66,104 @@ class PublishersController < ApplicationController
 		end
 	end
 
-    # POST /publishers
-    # POST /publishers.xml
-    def create
+  # POST /publishers
+  # POST /publishers.xml
+  def create
 		@provider_account = ProviderAccount.find(params[:provider_account_id])
-        redirect_url = provider_account_path(@provider_account, :anchor => :communication)
+    redirect_url = provider_account_path(@provider_account, :anchor => :communication)
 
-	    if params[:cancel_button]
+    if params[:cancel_button]
 			redirect_back_or_default(redirect_url)
-        else
+    else
 			@publisher = @provider_account.publishers.build(params[:publisher])
 
-	        respond_to do |format|
+      respond_to do |format|
 				if @provider_account && !current_user.has_provider_account_access?(@provider_account)
-	                flash[:error] = "You don't have permisson to add Publishers to #{@provider_account.name}"
-	                format.html { render :action => "new" }
-	                format.xml  { render :xml => @publisher.errors, :status => :unprocessable_entity }
-	            elsif @publisher.save
-	                flash[:notice] = 'Publisher was successfully created.'
-	                format.html { redirect_to redirect_url }
-	                format.xml  { render :xml => @publisher, :status => :created, :location => @publisher }
+          flash[:error] = "You don't have permisson to add Publishers to #{@provider_account.name}"
+          format.html { render :action => "new" }
+          format.xml  { render :xml => @publisher.errors, :status => :unprocessable_entity }
+        elsif @publisher.save
+          flash[:notice] = 'Publisher was successfully created.'
+          format.html { redirect_to redirect_url }
+          format.xml  { render :xml => @publisher, :status => :created, :location => @publisher }
 				else				
-	                format.html { render :action => "new" }
-	                format.xml  { render :xml => @publisher.errors, :status => :unprocessable_entity }
-	            end
+          format.html { render :action => "new" }
+          format.xml  { render :xml => @publisher.errors, :status => :unprocessable_entity }
+        end
 			end
-        end
     end
+  end
 
-    # PUT /publishers/1
-    # PUT /publishers/1.xml
-    # PUT /publishers/1.js
-    def update
-        @publisher = Publisher.find(params[:id])
-        @provider_account = @publisher.provider_account
-        redirect_url = provider_account_path(@provider_account, :anchor => :communication)
+  # PUT /publishers/1
+  # PUT /publishers/1.xml
+  # PUT /publishers/1.js
+  def update
+    @publisher = Publisher.find(params[:id])
+    @provider_account = @publisher.provider_account
+    redirect_url = provider_account_path(@provider_account, :anchor => :communication)
 
-	    if params[:cancel_button]
-            redirect_back_or_default(redirect_url)
+    if params[:cancel_button]
+      redirect_back_or_default(redirect_url)
+    else
+      respond_to do |format|
+        if @publisher.update_attributes(params[:publisher])
+          flash[:notice] = 'Publisher was successfully updated.'
+          format.html { redirect_to redirect_url }
+          format.xml  { head :ok }
+          format.js   { render :partial => 'publisher', :layout => false }
+					format.json { render :json => @publisher }
         else
-	        respond_to do |format|
-	            if @publisher.update_attributes(params[:publisher])
-	                flash[:notice] = 'Publisher was successfully updated.'
-	                format.html { redirect_to redirect_url }
-	                format.xml  { head :ok }
-	                format.js   { render :partial => 'publisher', :layout => false }
+          flash[:error] = 'There was a problem updating this Publisher.'
+          format.html { render :action => "edit" }
+          format.xml  { render :xml => @publisher.errors, :status => :unprocessable_entity }
+          format.js   { render :partial => 'publisher', :layout => false }
 					format.json { render :json => @publisher }
-	            else
-	                flash[:error] = 'There was a problem updating this Publisher.'
-	                format.html { render :action => "edit" }
-	                format.xml  { render :xml => @publisher.errors, :status => :unprocessable_entity }
-	                format.js   { render :partial => 'publisher', :layout => false }
-					format.json { render :json => @publisher }
-	            end
-	        end
         end
+      end
     end
+  end
     
-    def run
+  def run
 		@publisher = Publisher.find(params[:id])
 		@provider_account = @publisher.provider_account
     
 		redirect_url = provider_account_path(@provider_account, :anchor => :communication)
 		
-        respond_to do |format|
-            if @publisher.publish!
-                flash[:notice] = 'Publisher ran successfully.'
-                format.html { redirect_to redirect_url }
-                format.xml  { head :ok }
-                format.js
-            else
-                flash[:error] = 'There was a problem running this Publisher: '+@publisher.state_text
-                format.html { redirect_to redirect_url }
-                format.xml  { render :xml => @publisher.errors, :status => :unprocessable_entity }
-                format.js
-            end
-        end
+    respond_to do |format|
+      if @publisher.publish!
+        flash[:notice] = 'Publisher ran successfully.'
+        format.html { redirect_to redirect_url }
+        format.xml  { head :ok }
+        format.js
+      else
+        flash[:error] = 'There was a problem running this Publisher: '+@publisher.state_text
+        format.html { redirect_to redirect_url }
+        format.xml  { render :xml => @publisher.errors, :status => :unprocessable_entity }
+        format.js
+      end
     end
+  end
     
-    def verify
+  def verify
 		@publisher = Publisher.find(params[:id])
 		@provider_account = @publisher.provider_account
     
 		redirect_url = provider_account_path(@provider_account, :anchor => :communication)
 		
-        respond_to do |format|
-            if @publisher.is_configuration_good?
-                flash[:notice] = 'Publisher verified successfully.'
-                format.html { redirect_to redirect_url }
-                format.xml  { head :ok }
-                format.js
-            else
-                flash[:error] = 'There was a problem verifying this Publisher: '+@publisher.state_text
-                format.html { redirect_to redirect_url }
-                format.xml  { render :xml => @publisher.errors, :status => :unprocessable_entity }
-                format.js
-            end
-        end
+    respond_to do |format|
+      if @publisher.is_configuration_good?
+        flash[:notice] = 'Publisher verified successfully.'
+        format.html { redirect_to redirect_url }
+        format.xml  { head :ok }
+        format.js
+      else
+        flash[:error] = 'There was a problem verifying this Publisher: '+@publisher.state_text
+        format.html { redirect_to redirect_url }
+        format.xml  { render :xml => @publisher.errors, :status => :unprocessable_entity }
+        format.js
+      end
     end
+  end
     
 	def destroy
 		@publisher = Publisher.find(params[:id])
@@ -175,7 +179,7 @@ class PublishersController < ApplicationController
 		end
 	end
     
-  	def auto_complete_for_user_id
+  def auto_complete_for_user_id
 	  super
-  	end
+  end
 end

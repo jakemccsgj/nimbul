@@ -28,8 +28,8 @@ class ServersController < ApplicationController
   end
   
   def index
+    search = params[:search]
     options = {
-      :search => params[:search],
       :page => params[:page],
       :order => params[:sort],
       :filter => params[:filter],
@@ -44,7 +44,7 @@ class ServersController < ApplicationController
       ],
     }
 
-    @servers = Server.search_by_user(current_user, options)
+    @servers = Server.search_by_user(current_user, search, options)
   
     @parent_type = 'user'
     @parent = current_user

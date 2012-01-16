@@ -1,24 +1,27 @@
 class SecurityGroup::InstancesController < ApplicationController
-    before_filter :login_required
-    require_role  :admin,
-        :unless => "current_user.has_security_group_access?(SecurityGroup.find(params[:security_group_id])) "
+  before_filter :login_required
+  require_role  :admin,
+    :unless => "current_user.has_security_group_access?(SecurityGroup.find(params[:security_group_id])) "
 
-    def index
+  def index
 		@security_group = SecurityGroup.find(params[:security_group_id])
 
-        joins = nil
-	    conditions = nil
-	    @instances  = Instance.search_by_security_group(@security_group, params[:search], params[:page], joins, conditions, params[:sort])
+    search = params[:search]
+    options ={
+      :page => params[:page],
+      :filters => params[:filter]
+    }
+    @instances  = Instance.search_by_security_group(@security_group, search, options)
 
-	    @skip_server_column = true
-	    respond_to do |format|
-	        format.html
-	        format.xml  { render :xml => @instances }
-	        format.js
-	    end
+    @skip_server_column = true
+    respond_to do |format|
+      format.html
+      format.xml  { render :xml => @instances }
+      format.js
     end
-    def list
-        index
-    end
+  end
+  def list
+    index
+  end
 end
 

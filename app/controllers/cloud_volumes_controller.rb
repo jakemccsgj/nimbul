@@ -5,14 +5,14 @@ class CloudVolumesController < ApplicationController
         :unless => "current_user.has_cloud_resource_access?(CloudResource.find(params[:id]))"
 
     def index
+      search = params[:search]
         options = {
-            :search => params[:search],
             :page => params[:page],
             :order => params[:sort],
             :filter => params[:filter],
             :include => [ :clusters, :instance ],
         }
-        @volumes = CloudVolume.search_by_user(current_user, options)
+        @volumes = CloudVolume.search_by_user(current_user, search, options)
 
         @parent_type = 'user'
         @parent = current_user

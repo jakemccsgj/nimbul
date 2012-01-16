@@ -1,21 +1,24 @@
 class InMessagesController < ApplicationController
-    # GET /in_messages
-    # GET /in_messages.xml
-    def index
-        joins = nil
-        conditions = nil
-        params[:sort] = 'received_at_reverse' if params[:sort].blank?
-        @messages = InMessage.search(params[:search], params[:page], joins, conditions, params[:sort])
+  # GET /in_messages
+  # GET /in_messages.xml
+  def index
+    search = params[:search]
+    options ={
+      :page => params[:page],
+      :order => params[:sort] || 'received_at_reverse',
+      :filters => params[:filter]
+    }
+    @messages = InMessage.search(search, options)
         
-        respond_to do |format|
-            format.html
-            format.xml  { render :xml => @messages }
-            format.js   { render :partial => 'list', :layout => false }
-        end
+    respond_to do |format|
+      format.html
+      format.xml  { render :xml => @messages }
+      format.js   { render :partial => 'list', :layout => false }
     end
-    def list
-        index
-    end
+  end
+  def list
+    index
+  end
 
   # GET /in_messages/1
   # GET /in_messages/1.xml

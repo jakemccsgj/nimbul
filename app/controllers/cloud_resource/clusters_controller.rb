@@ -79,7 +79,7 @@ class CloudResource::ClustersController < ApplicationController
         options ={
           :order => 'name',
         }
-        @clusters = Cluster.search_by_provider_account(@provider_account, options)
+        @clusters = Cluster.search_by_provider_account(@provider_account, @search, options)
 
         tags = "<%= content_tag(:ul, @clusters.map{ |cluster| content_tag(:li, cluster_description(cluster, @search)) }) %>"
         render :inline => tags

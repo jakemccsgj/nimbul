@@ -92,24 +92,24 @@ module UsersHelper
 
 	# sorting helpers
 	def users_sort_link(text, param)
-        sort_link(text, param, :users, nil, :list)
-    end
+    sort_link(text, param, nil, nil, :list)
+  end
 
-    def user_name_login_email_id(user, search = nil)
-        return '' if user.nil?
-        result = ''
-        result << ('' + h(user.name) + ' (') unless user.name.blank?
-        result << (h(user.login))
-        result << (', &lt;' + h(user.email) + '&gt;') unless user.email.blank?
-        result << (')') unless user.name.blank?
-        result.gsub!(search, '<strong class="highlight">' + search + '</strong>') unless search.blank?
-        result << ( ' <snap class="user_id" style="display: none;">' + user.id.to_s + '</snap>' )
-        return result
-    end
+  def user_name_login_email_id(user, search = nil)
+    return '' if user.nil?
+    result = ''
+    result << ('' + h(user.name) + ' (') unless user.name.blank?
+    result << (h(user.login))
+    result << (', &lt;' + h(user.email) + '&gt;') unless user.email.blank?
+    result << (')') unless user.name.blank?
+    result.gsub!(search, '<strong class="highlight">' + search + '</strong>') unless search.blank?
+    result << ( ' <snap class="user_id" style="display: none;">' + user.id.to_s + '</snap>' )
+    return result
+  end
 
 	def activate_user_link(name, user)
 	  options = {
-		:url => activate_admin_user_path(user),
+      :url => activate_admin_user_path(user),
 	  }
 	  html_options = {}
 	  link_to_remote name, options, html_options
@@ -119,14 +119,14 @@ module UsersHelper
 	  # link_to(disable_name, admin_state_path(user), :method => :delete)
 	  # link_to(enable_name, admin_state_path(user), :method => :put)
 	  if user.enabled
-		url = disable_admin_user_path(user)
-		name = disable_name
+      url = disable_admin_user_path(user)
+      name = disable_name
 	  else
-		url = enable_admin_user_path(user)
-		name = enable_name
+      url = enable_admin_user_path(user)
+      name = enable_name
 	  end
 	  options = {
-		:url => url,
+      :url => url,
 	  }
 	  html_options = {}
 	  link_to_remote name, options, html_options

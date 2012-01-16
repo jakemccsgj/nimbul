@@ -1,21 +1,24 @@
 class OutMessagesController < ApplicationController
-    # GET /out_messages
-    # GET /out_messages.xml
-    def index
-        joins = nil
-        conditions = nil
-        params[:sort] = 'sent_at_reverse' if params[:sort].blank?
-        @messages = OutMessage.search(params[:search], params[:page], joins, conditions, params[:sort])
+  # GET /out_messages
+  # GET /out_messages.xml
+  def index
+    search = params[:search]
+    options ={
+      :page => params[:page],
+      :order => params[:sort] || 'sent_at_reverse',
+      :filters => params[:filter]
+    }
+    @messages = OutMessage.search(search, options)
 
-        respond_to do |format|
-            format.html # index.html.erb
-            format.xml  { render :xml => @messages }
-            format.js   { render :partial => 'list', :layout => false }
-        end
+    respond_to do |format|
+      format.html # index.html.erb
+      format.xml  { render :xml => @messages }
+      format.js   { render :partial => 'list', :layout => false }
     end
-    def list
-        index
-    end
+  end
+  def list
+    index
+  end
 
   # GET /out_messages/1
   # GET /out_messages/1.xml

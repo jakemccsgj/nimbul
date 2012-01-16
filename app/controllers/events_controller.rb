@@ -1,5 +1,5 @@
 class EventsController < ApplicationController
-    before_filter :login_required
+  before_filter :login_required
 
 	# GET /events
 	# GET /events.xml
@@ -32,19 +32,23 @@ class EventsController < ApplicationController
 			conditions = [ 'provider_account_id=?', @provider_account.id ]
 		end
 
-		joins = nil
-		params[:sort] ||= 'created_at_reverse'
-		@events = Event.search(params[:search], params[:page], joins, conditions, params[:sort])
+		search = params[:search]
+    options ={
+      :page => params[:page],
+      :order => params[:sort] || 'created_at_reverse',
+      :filters => params[:filter]
+    }
+    @events = Event.search(search, options)
 
-        respond_to do |format|
-            format.html # index.html.erb
-            format.xml  { render :xml => @events }
-            format.js   { render :partial => 'events/list', :layout => false }
-        end
+    respond_to do |format|
+      format.html # index.html.erb
+      format.xml  { render :xml => @events }
+      format.js   { render :partial => 'events/list', :layout => false }
     end
-    def list
-        index
-    end
+  end
+  def list
+    index
+  end
 
 	# GET /events/1
 	# GET /events/1.xml
