@@ -27,6 +27,7 @@ git 'https://github.com/Velir/open_id_authentication.git', :tag => 'v1.0.0' do
   gem 'open_id_authentication'
 end
 group :development do
+  gem 'ruby-debug'
 end
 
 group :test do

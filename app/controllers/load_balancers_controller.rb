@@ -139,7 +139,9 @@ class LoadBalancersController < ApplicationController
     else
       @load_balancer = LoadBalancer.find(params[:id])
       params[:load_balancer][:zone_ids] ||= []
-      params[:load_balancer][:zone_ids] += Instance.find(params[:load_balancer][:instance_ids]).collect{|i| i.zone_id}
+      if params[:load_balancer][:instance_ids]
+        params[:load_balancer][:zone_ids] += Instance.find(params[:load_balancer][:instance_ids]).collect{|i| i.zone_id}
+      end
       params[:load_balancer][:zone_ids].uniq
       
       respond_to do |format|
