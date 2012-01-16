@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120108155142) do
+ActiveRecord::Schema.define(:version => 20110913041746) do
 
   create_table "access_requests", :force => true do |t|
     t.string   "state"
@@ -165,25 +165,14 @@ ActiveRecord::Schema.define(:version => 20120108155142) do
   add_index "auto_scaling_triggers", ["provider_account_id"], :name => "index_pa_id_on_asgt"
 
   create_table "block_device_mappings", :force => true do |t|
+    t.integer  "launch_configuration_id"
     t.string   "virtual_name"
     t.string   "device_name"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "parent_type"
-    t.integer  "parent_id"
-    t.boolean  "delete_on_termination"
-    t.integer  "volume_size"
-    t.integer  "snapshot_id"
-    t.boolean  "no_device"
-    t.integer  "storage_type_id"
-    t.integer  "vm_os_type_id"
-    t.integer  "launch_configuration_id"
   end
 
   add_index "block_device_mappings", ["launch_configuration_id"], :name => "index_block_device_mappings_on_launch_configuration_id"
-  add_index "block_device_mappings", ["parent_type", "parent_id"], :name => "index_block_device_mappings_on_parent_type_and_parent_id"
-  add_index "block_device_mappings", ["storage_type_id"], :name => "index_block_device_mappings_on_storage_type_id"
-  add_index "block_device_mappings", ["vm_os_type_id"], :name => "index_block_device_mappings_on_vm_os_type_id"
 
   create_table "cloud_resources", :force => true do |t|
     t.string   "type"
@@ -327,9 +316,9 @@ ActiveRecord::Schema.define(:version => 20120108155142) do
   add_index "dns_leases", ["instance_id", "dns_hostname_assignment_id"], :name => "unique_instance_hostname_assignment_idx", :unique => true
 
   create_table "dns_requests", :force => true do |t|
-    t.enum     "request_type",               :limit => [:release, :acquire], :default => :acquire, :null => false
-    t.integer  "dns_hostname_assignment_id",                                                       :null => false
-    t.integer  "instance_id",                                                                      :null => false
+    t.string   "request_type",               :limit => 0, :default => "acquire", :null => false
+    t.integer  "dns_hostname_assignment_id",                                     :null => false
+    t.integer  "instance_id",                                                    :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -654,7 +643,7 @@ ActiveRecord::Schema.define(:version => 20120108155142) do
     t.datetime "created_time"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.enum     "state",                      :limit => [:disabled, :active], :default => :disabled
+    t.string   "state",                      :limit => 0, :default => "disabled"
     t.integer  "server_profile_revision_id"
     t.integer  "server_image_id"
     t.integer  "instance_vm_type_id"
@@ -1513,7 +1502,7 @@ ActiveRecord::Schema.define(:version => 20120108155142) do
   create_table "zones", :force => true do |t|
     t.integer  "provider_account_id"
     t.string   "name"
-    t.enum     "state",               :limit => [:unavailable, :available], :default => :available
+    t.string   "state",               :limit => 0, :default => "available"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "region_id"

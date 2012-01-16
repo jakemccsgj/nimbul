@@ -4,7 +4,7 @@
 
 <br/>
 
-<%= will_paginate_search_field "user_#{@user.id}_server_image_search", nil, nil, :list %>
+Search: <%= will_paginate_search_field "user_#{@user.id}_server_image_search", nil, nil, :list %>
 
 <%= refresh_image 'Refresh', 'server_images', nil, :list, nil %>
 
@@ -12,7 +12,7 @@
 
 <b>Total: <span id="user_<%= @user.id %>_server_images_total"><%= @server_images.total_entries %></span></b>
 
-<hr>
+<hr/>
 
 <div id="user_<%= @user.id %>_server_images">
 

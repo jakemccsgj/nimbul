@@ -1,7 +1,7 @@
 Groups are containers for launch configurations and triggers, and define an atomic auto-scaling vector.
 <br/>
 <br/>
-<%= will_paginate_search_field "provider_account_#{@provider_account.id}_auto_scaling_group_search",
+Search: <%= will_paginate_search_field "provider_account_#{@provider_account.id}_auto_scaling_group_search",
   nil, nil, :list, 'Search by ' + AutoScalingGroup.search_fields.collect{|f| f.titleize}.join(', ') %>
 
 <%= refresh_image 'Refresh', 'auto_scaling_groups', nil, :list, nil %>

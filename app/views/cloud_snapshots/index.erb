@@ -4,7 +4,7 @@
 
 <br/>
 
-<%= will_paginate_search_field "user_#{@user.id}_cloud_snapshot_search", nil, nil, :list %>
+Search: <%= will_paginate_search_field "user_#{@user.id}_cloud_snapshot_search", nil, nil, :list %>
 
 <%= refresh_image 'Refresh', nil, nil, :list, nil %>
 
@@ -12,7 +12,7 @@
 
 <b>Total: <span id="user_<%= @user.id %>_cloud_snapshots_total"><%= @snapshots.total_entries %></span></b>
 
-<hr>
+<hr/>
 
 <div id="user_<%= @user.id %>_cloud_snapshots">
 

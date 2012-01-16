@@ -1,7 +1,7 @@
 <% remote_form_for :volumes,
     :url => control_provider_account_volumes_path(@provider_account) do |f| %>
         
-<%= will_paginate_search_field "provider_account_#{@provider_account.id}_volume_search", nil, nil, :list %>
+Search: <%= will_paginate_search_field "provider_account_#{@provider_account.id}_volume_search", nil, nil, :list %>
 
 <%= refresh_image 'Refresh', 'volumes', nil, :list, nil %>
 

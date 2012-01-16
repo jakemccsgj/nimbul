@@ -1,7 +1,7 @@
 <% remote_form_for :servers,
     :url => control_cluster_servers_path(@cluster) do |f| %>
         
-<%= will_paginate_search_field "cluster_#{@cluster.id}_server_search", nil, nil, :list %>
+Search: <%= will_paginate_search_field "cluster_#{@cluster.id}_server_search", nil, nil, :list %>
 
 <%= refresh_image 'Refresh', 'servers', nil, :list, nil %>
 

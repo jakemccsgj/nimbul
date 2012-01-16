@@ -17,7 +17,7 @@ To add a new Task, select a type from the drop-down list. Then click the plus si
     :url => new_server_task_path(@server),
     :html => { :method => :get } do |f| -%>
 
-<%= will_paginate_search_field "server_#{@server.id}_task_search", nil, nil, :list %>
+Search: <%= will_paginate_search_field "server_#{@server.id}_task_search", nil, nil, :list %>
 
 <%= refresh_image 'Refresh', 'tasks', nil, :list, nil %>
 

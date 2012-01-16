@@ -2,7 +2,7 @@
 <% remote_form_for :instances,
     :url => control_auto_scaling_group_instances_path(@auto_scaling_group) do |f| %>
 
-<%= will_paginate_search_field "auto_scaling_group_#{@auto_scaling_group.id}_instance_search", nil, nil, :list %>
+Search: <%= will_paginate_search_field "auto_scaling_group_#{@auto_scaling_group.id}_instance_search", nil, nil, :list %>
 
 <%= refresh_image 'Refresh', 'instances', nil, :list, nil %>
 

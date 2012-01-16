@@ -1,7 +1,7 @@
 <% remote_form_for :instances,
     :url => control_provider_account_instances_path(@provider_account) do |f| %>
 
-<%= will_paginate_search_field "provider_account_#{@provider_account.id}_instance_search", nil, nil, :list %>
+Search: <%= will_paginate_search_field "provider_account_#{@provider_account.id}_instance_search", nil, nil, :list %>
 
 <%= refresh_image 'Refresh', 'instances', nil, :list, nil %>
 

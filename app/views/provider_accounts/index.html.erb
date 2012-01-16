@@ -7,7 +7,8 @@
 <% remote_form_for :provider_accounts,
     :url => control_provider_accounts_path do |f| %>
 
-<%= will_paginate_search_field 'provider_account_search', 'provider_accounts', nil, :list, 'Search on '+ProviderAccount.search_fields.collect{|f| f.titleize}.join(', ') %>
+Search: <%= will_paginate_search_field 'provider_account_search', 'provider_accounts', nil, :list, 'Search on '+ProviderAccount.search_fields.collect{|f| f.titleize}.join(', ') %>
+
 <%= refresh_image 'Refresh', 'provider_accounts', nil, :list %>
 
 <span class="vr">&nbsp;</span>

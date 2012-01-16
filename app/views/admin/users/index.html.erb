@@ -9,7 +9,8 @@
   <%= link_to 'Pending Beta Users', admin_invite_actions_path %></p>
 <% end %>
 
-<%= will_paginate_search_field "search", nil, nil, :list %>
+Search: <%= will_paginate_search_field "search", nil, nil, :list %>
+
 <%= refresh_image 'Refresh', 'users', nil, :list, nil %>
 
 <span class="vr">&nbsp;</span>

@@ -1,7 +1,8 @@
 These configurations can be used by Auto Scaling Groups.
 <br/>
 <br/>
-<%= will_paginate_search_field "provider_account_#{@provider_account.id}_launch_configuration_search",
+
+Search: <%= will_paginate_search_field "provider_account_#{@provider_account.id}_launch_configuration_search",
   nil, nil, :list, 'Search by ' + LaunchConfiguration.search_fields.collect{|f| f.titleize}.join(', ') %>
 
 <%= refresh_image 'Refresh', 'launch_configurations', nil, :list, nil %>

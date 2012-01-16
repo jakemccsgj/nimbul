@@ -1,4 +1,4 @@
-<%= will_paginate_search_field "system_logs_search", nil, nil, :list %>
+Search: <%= will_paginate_search_field "system_logs_search", nil, nil, :list %>
 
 <%= refresh_image 'Refresh', 'system_logs', nil, :list, nil %>
 
@@ -6,6 +6,6 @@
 
 <b>Total: <span id="system_logs_total"><%= @audit_logs.total_entries %></span></b>
 
-<hr>
+<hr/>
 
 <%= render :partial => 'system_logs/list' %>
