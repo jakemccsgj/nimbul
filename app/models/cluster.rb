@@ -62,13 +62,15 @@ class Cluster < BaseModel
   end
 
   def self.search_by_provider_account(provider_account, search, options={})
-    conditions = [ 'provider_account_id = ?', (provider_account.is_a?(ProviderAccount) ? provider_account.id : provider_account) ]
     extra_conditions = options[:conditions]
+
+    conditions = [ 'provider_account_id = ?', (provider_account.is_a?(ProviderAccount) ? provider_account.id : provider_account) ]
     unless extra_conditions.blank?
       extra_conditions = [ extra_conditions ] if not extra_conditions.is_a? Array
       conditions[0] << ' AND ' + extra_conditions[0]
       conditions << extra_conditions[1..-1]
     end
+
     options[:conditions] = conditions
   
     search(search, options)

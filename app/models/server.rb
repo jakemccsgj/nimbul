@@ -274,16 +274,17 @@ class Server < BaseModel
 
   def self.search_by_cluster(cluster, search, options={})
     extra_joins = options[:joins]
-    joins = [] + [extra_joins].flatten.compact
-    options[:joins] = joins
-        
-    conditions = [ 'cluster_id = ?', (cluster.is_a?(Cluster) ? cluster.id : cluster) ]
     extra_conditions = options[:conditions]
+
+    joins = [] + [extra_joins].flatten.compact
+    conditions = [ 'cluster_id = ?', (cluster.is_a?(Cluster) ? cluster.id : cluster) ]
     unless extra_conditions.blank?
       extra_conditions = [ extra_conditions ].flatten
       conditions[0] << ' AND ' + extra_conditions[0];
       conditions << extra_conditions[1..-1]
     end
+    
+    options[:joins] = joins
     options[:conditions] = conditions
 
     search(search, options)
@@ -291,18 +292,19 @@ class Server < BaseModel
   
   def self.search_by_security_group(security_group, search, options={})
     extra_joins = options[:joins]
+    extra_conditions = options[:conditions]
+
     joins = [
       'INNER JOIN security_groups_servers ON security_groups_servers.server_id = servers.id',
     ] + [extra_joins].flatten.compact
-    options[:joins] = joins
-
     conditions = [ 'security_groups_servers.security_group_id = ?', (security_group.is_a?(SecurityGroup) ? security_group.id : security_group) ]
-    extra_conditions = options[:conditions]
     unless extra_conditions.blank?
       extra_conditions = [ extra_conditions ].flatten
       conditions[0] << ' AND ' + extra_conditions[0];
       conditions << extra_conditions[1..-1]
     end
+
+    options[:joins] = joins
     options[:conditions] = conditions
   
     search(search, options)
