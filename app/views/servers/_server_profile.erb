@@ -90,8 +90,8 @@ Last Update: <%= time_ago_in_words @server_profile_revision.updated_at %>
           <br/>
           <%= link_to_function 'Show / Hide Server Script', "$$('.startup_script').each(function(d) { Effect.toggle(d, 'appear') });" %>
           &nbsp;|&nbsp;
-          <%= link_to 'Preview Full Script', show_server_server_user_data_path(@server),
-              :popup => [ "server_server_user_data_path_#{@server.id}", 'height=640,width=760' ] %>
+          <%= link_to 'Preview Full Script', server_user_data_path(@server),
+              :popup => [ "server_user_data_path_#{@server.id}", 'height=640,width=760' ] %>
           <br/>
           <br/>
           <%= f.text_area :startup_script, :size => '90x15', :class => :startup_script, :style => 'display:none' %>

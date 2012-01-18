@@ -13,14 +13,6 @@ ActionController::Routing::Routes.draw do |map|
       :only => [ :index, :list ]
   end
 
-  map.resources :load_balancers, :only => [] do |load_balancer|
-    load_balancer.resources :instances, :controller => 'parent/instances',
-      :collection => { :list => :any, :control => :any },
-      :only => [ :index, :list ]
-    load_balancer.resources :health_checks, :except => [], :member => { :update_target_path => :post }
-    load_balancer.resources :load_balancer_listeners, :except => [], :member => { :update_target_path => :post }
-  end
-
   map.resources :account_groups do |account_group|
     account_group.resources :apps, :collection => { :sort => :post }
     account_group.resources :stats,
@@ -89,7 +81,6 @@ ActionController::Routing::Routes.draw do |map|
             :only => [ :new, :create ]
         provider_account.resources :auto_scaling_groups, :controller => 'provider_account/auto_scaling_groups',
             :collection => { :list => :any }
-        provider_account.resources :load_balancers
         provider_account.resources :server_images, :controller => 'provider_account/server_images',
             :collection => { :list => :any, :control => :any },
             :only => [ :index, :list, :new, :create ]
@@ -391,13 +382,20 @@ ActionController::Routing::Routes.draw do |map|
     map.resources :server_parameters, :collection => { :sort => :post }
     map.resources :operations, :has_many => [ :operation_logs ]
 
-    map.show_server_server_user_data '/server/:id/user_data', :controller => 'server/user_data', :action => 'show'
+    map.server_bootstrap_user_data "server/:server_id/user_data/:auth.:format",
+                                   :controller => 'server/user_data',
+                                   :action => 'show',
+                                   :auth => nil
+    map.resources :server do |s|
+      s.resource :user_data, :controller => 'server/user_data', :only => [ :show ]
+    end
+
     map.show_server_server_script_data '/server/:id/user_script', :controller => 'server/user_script', :action => 'show'
 
     # server profiles
     map.resources :server_profiles, :has_many => [ :server_profile_revisions ]
     map.resources :server_profile_revisions, :has_many => [ :server_profile_revision_parameters ]
-    map.show_server_profile_revision_user_data '/server_profile_revision/:id/user_data', :controller => 'server_profile_revision/user_data', :action => 'show'
+    map.show_server_profile_revision_user_data '/server_profile_revision/:id/user_data', :controller => 'server_profile_revision/user_data', :format => nil, :action => 'show'
     map.resources :server_profile_revision_parameters, :collection => { :sort => :post }
 
     # handling instances
@@ -485,5 +483,6 @@ ActionController::Routing::Routes.draw do |map|
     # default routes, exceptions and 404s
     map.root :controller => 'dashboard', :action => 'index'
     map.logged_exceptions "logged_exceptions/:action/:id", :controller => "logged_exceptions"
+    map.connect ':controller/:action.:format'
     map.connect '*path', :controller => 'four_oh_fours'
 end

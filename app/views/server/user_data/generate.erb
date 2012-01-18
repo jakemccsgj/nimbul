@@ -1,9 +1,9 @@
 #!/bin/bash
 # No -e on purpose - otherwise things might break!!!
 
-# Account: <%= user_data.server.cluster.provider_account.name %> [<%= user_data.server.cluster.provider_account.id %>]
-# Cluster: <%= user_data.server.cluster.name %> [<%= user_data.server.cluster.id %>]
-# Server: <%= user_data.server.name %> [<%= user_data.server.id %>]
+# Account: <%= @user_data.server.cluster.provider_account.name %> [<%= @user_data.server.cluster.provider_account.id %>]
+# Cluster: <%= @user_data.server.cluster.name %> [<%= @user_data.server.cluster.id %>]
+# Server: <%= @user_data.server.name %> [<%= @user_data.server.id %>]
 
 # Make sure we deploy main key first
 if [ -x /etc/init.d/ec2-get-credentials ]; then
@@ -11,62 +11,35 @@ if [ -x /etc/init.d/ec2-get-credentials ]; then
 fi
 
 # Deploy user public keys
-<%
-instance_users = {}
-
-root_users = user_data.server.cluster.provider_account.users + user_data.server.cluster.users
-root_users.each do |user|
-    instance_user = 'root'
-    instance_users[instance_user] = [] if instance_users[instance_user].nil?
-    instance_users[instance_user] << user unless user.user_keys.size == 0
-end
-
-user_data.server.server_user_accesses.each do |sua|
-    user = sua.user
-    instance_user = sua.server_user
-    instance_users[instance_user] = [] if instance_users[instance_user].nil?
-    instance_users[instance_user] << user unless user.user_keys.size == 0
-end
-
-instance_users.each do |instance_user, users|
-	chars = ('A'..'Z').to_a
-	reol = (0...10).collect { chars[Kernel.rand(chars.length)] }.join
-	if instance_user == 'root'
-		user_home = '/root'
-	else
-		user_home = '/home/' + instance_user
-	end
--%>
-SSH_DIR="<%= user_home %>/.ssh"
+SSH_DIR="<%= @user_home %>/.ssh"
 mkdir -p $SSH_DIR
-cat <<'<%= reol %>' >> $SSH_DIR/authorized_keys
-<%
-    users.each do |user|
-        user.user_keys.each do |user_key|
-            unless user_key.public_key.blank? or user_key.public_key !~ /^ssh-/
+cat <<'EOLEOLEOL' >> $SSH_DIR/authorized_keys
+<% @instance_users.each_pair do |server_user, users|
+  users.each do |user|
+    user.user_keys.each do |key|
+      unless key.public_key.blank? or key.public_key !~ /^ssh-/
 -%>
-<%= user_key.public_key.delete("\C-M").delete("\r").delete("\n") %>
+<%= key.public_key.delete("\C-M").delete("\r").delete("\n") %>
 <%
-            end
-        end
+      end
     end
+  end
+end
 -%>
-<%= reol %>
+EOLEOLEOL
+
 chmod 700 $SSH_DIR
 chmod 600 $SSH_DIR/authorized_keys
-chown -R <%= instance_user %> $SSH_DIR
-<%
-end
--%>
+chown -R <%= @instance_user %> $SSH_DIR
 
 # Seed the /etc/hosts file
-<% account = user_data.server.cluster.provider_account -%>
+<% account = @user_data.server.cluster.provider_account -%>
 cat <<'EOL' > /etc/hosts
-127.0.0.1		localhost
-<%= DnsAdapter.static_dns_entries(user_data.server.cluster.provider_account).join("\n") %>
+127.0.0.1       localhost
+<%#= DnsAdapter.static_dns_entries(@user_data.server.cluster.provider_account).join("\n") %>
 EOL
 
-<%= user_data.cloudrc %>
+<%= @user_data.cloudrc %>
 
 # populate the hosts file by forcing an update
 # Note: this has to be done /after/ cloudrc is built
@@ -84,18 +57,14 @@ if [ -x /etc/init.d/ec2-extra-keys ]; then
 fi
 
 # startup scripts
-<% user_data.startup_scripts.collect{ |s| s unless s.body.blank? }.compact.each do |s| -%>
-<%
-	chars = ('A'..'Z').to_a
-	reol = (0...10).collect { chars[Kernel.rand(chars.length)] }.join
-%>
+<% @user_data.startup_scripts.collect{ |s| s unless s.body.blank? }.compact.each do |s| -%>
 # <%= s.name %>
 FILE="/tmp/$(basename $0).$RANDOM"
 touch $FILE
 chmod 700 $FILE
-cat <<'<%= reol %>' > $FILE
+cat <<'EOLEOLEOL' > $FILE
 <%= s.body.delete("\C-M") %>
-<%= reol %>
+EOLEOLEOL
 $FILE
 unlink $FILE
 <% end -%>
@@ -105,7 +74,7 @@ emissary stop
 # configure emissary
 mkdir -p /etc/emissary
 cat << 'EOF' > /etc/emissary/config.ini
-<%= emissary_config -%>
+<%= @emissary_config -%>
 EOF
 
 # restart emissary with the updated events configuration

@@ -1,4 +1,6 @@
-source :rubygems
+source 'http://rubygems.org'
+source 'http://gems.rubyforge.org'
+source 'http://gemcutter.org'
 
 gem 'aws'
 gem 'rails', '~> 2.3.0'
@@ -16,7 +18,11 @@ gem 'net-sftp', :require => 'net/sftp'
 gem 'net-ssh', :require => 'net/ssh'
 gem 'rufus-scheduler'
 gem 'work_queue', '~> 1.0.0'
-git 'https://github.com/nimbul/cloudmaster.git' do
+gem 'SysVIPC', '~> 0.9.0'
+#git 'git://github.com/mosta/sysvipc-0.8-rc1.git' do
+#  gem 'systemvipc', :require => 'sysvipc.so'
+#end
+git 'git://github.com/nimbul/cloudmaster.git' do
   gem 'cloudmaster'
 end
 git 'https://github.com/justinfrench/formtastic.git', :branch => '1.2-stable' do

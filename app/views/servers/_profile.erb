@@ -63,8 +63,8 @@
 	<% unless @server.new_record? %>
 		<li>
 		<b>Full Startup Script</b>
-		(<%= link_to 'preview', show_server_server_user_data_path(@server),
-			:popup => [ "server_server_user_data_path_#{@server.id}", 'height=640,width=760' ] %>)
+		(<%= link_to 'preview', server_user_data_path(@server),
+			:popup => [ "server_user_data_path_#{@server.id}", 'height=640,width=760' ] %>)
 		</li>
 	<% end %>
     </ul>
