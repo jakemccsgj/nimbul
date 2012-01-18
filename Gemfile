@@ -26,6 +26,7 @@ gem 'fastthread'
 #  You may need to change version numbers to match, and obviously the paths must be changed to match your environment.
 #
 gem 'mysql2', "~> 0.2.7"
+gem 'mysql'
 gem "query_reviewer", :git => "git://github.com/nesquena/query_reviewer.git"
 gem 'net-sftp', :require => 'net/sftp'
 gem 'net-ssh', :require => 'net/ssh'
