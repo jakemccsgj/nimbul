@@ -38,10 +38,5 @@ class Server::UserDataController < ApplicationController
         raise "No auth!"
       }
     end
-
-    respond_to do |fmt|
-      fmt.html
-      fmt.json { render :json => @server_user_data.to_json }
-    end
   end
 end
