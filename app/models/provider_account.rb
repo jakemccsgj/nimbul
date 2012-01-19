@@ -179,7 +179,7 @@ class ProviderAccount < BaseModel
     end
 
     def aws_access_key
-        TransientKeyStore.instance(ENV['RAILS_ENV']).reload.get(self.aws_access_key_attribute) || ''
+        TransientKeyStore.instance(:env => ENV['RAILS_ENV'])[self.aws_access_key_attribute] || ''
     end
 
     def aws_secret_key_attribute
