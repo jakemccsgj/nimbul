@@ -168,7 +168,7 @@ class ProviderAccount < BaseModel
 
     def aws_access_key_ui=(key)
         key.strip!
-        TransientKeyStore.instance(ENV['RAILS_ENV']).reload.set(self.aws_access_key_attribute, key) if name and !key.blank?
+        keystore[self.aws_access_key_attribute] = key if name and !key.blank?
     end
 
     def aws_access_key_ui
@@ -179,7 +179,7 @@ class ProviderAccount < BaseModel
     end
 
     def aws_access_key
-        TransientKeyStore.instance(:env => ENV['RAILS_ENV'])[self.aws_access_key_attribute] || ''
+        keystore[self.aws_access_key_attribute] || ''
     end
 
     def aws_secret_key_attribute
@@ -188,7 +188,7 @@ class ProviderAccount < BaseModel
 
     def aws_secret_key_ui=(key)
         key.strip!
-        TransientKeyStore.instance(ENV['RAILS_ENV']).reload.set(self.aws_secret_key_attribute, key) if name and !key.blank?
+        keystore[self.aws_secret_key_attribute] = key if name and !key.blank?
     end
 
     def aws_secret_key_ui
@@ -199,7 +199,7 @@ class ProviderAccount < BaseModel
     end
 
     def aws_secret_key
-        TransientKeyStore.instance(ENV['RAILS_ENV']).reload.get(self.aws_secret_key_attribute) || ''
+        keystore[self.aws_secret_key_attribute] || ''
     end
 
     def ssh_master_key_attribute
@@ -207,7 +207,7 @@ class ProviderAccount < BaseModel
     end
 
     def ssh_master_key_ui=(key)
-        TransientKeyStore.instance(ENV['RAILS_ENV']).reload.set(self.ssh_master_key_attribute, key) if name
+        keystore[self.ssh_master_key_attribute] = key if name
     end
 
     def ssh_master_key_ui
@@ -221,7 +221,7 @@ class ProviderAccount < BaseModel
     end
 
     def ssh_master_key
-        TransientKeyStore.instance(ENV['RAILS_ENV']).reload.get(self.ssh_master_key_attribute) || ''
+        keystore[self.ssh_master_key_attribute] || ''
     end
 
     def with_ssh_master_key(&block)
@@ -464,5 +464,9 @@ class ProviderAccount < BaseModel
 
     def class_type
         return self[:type]
+    end
+
+    def keystore
+      TransientKeyStore.instance ENV['RAILS_ENV']
     end
 end
