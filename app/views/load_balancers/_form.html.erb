@@ -78,7 +78,7 @@
         <%= render :partial => 'health_check', :locals => { :f => health_check_form } %>
       <% end %>
     </tbody>
-    <tbody id="add_health_check" <% unless @load_balancer.can_use_more_of?('HealthCheck') %>style="display:none;"<% end %>>
+    <tbody id="add_health_check" <% unless !@load_balancer.new_record? and @load_balancer.can_use_more_of?('HealthCheck') %>style="display:none;"<% end %>>
       <tr>
         <td colspan="4" align="right">
           <%= link_to 'Add a health check',

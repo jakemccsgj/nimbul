@@ -39,11 +39,13 @@ module LoadBalancersHelper
   def remove_provider_account_load_balancer_link(text, parent, load_balancer)
     url = provider_account_load_balancer_url(parent, load_balancer)
 
-    confirm = "Are you sure?"
+    message1 = '\nAre you sure?\n\nRemoving the load balancer will most likely cause a service disruption. It cannot be undone.\n'
+    answer = 'okidoki'
+    message2 = '\nPlease type '+answer+' in order to continue.\n'
     link_text = image_tag("trash.png", :class => 'control-icon', :alt => text)
 
     options = {
-      :confirm => confirm,
+      :condition => 'double_confirm("'+message1+'","'+message2+'","'+answer+'")',
       :url => url,
       :method => :delete,
     }

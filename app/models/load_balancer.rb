@@ -16,6 +16,8 @@ class LoadBalancer < BaseModel
     :message => 'you must specify at least one listener.'
   validates_presence_of :health_checks,
     :message => 'you must specify at least one health check.'
+  validates_presence_of :zones,
+    :message => 'you must specify at least one availability zone.'
   
   accepts_nested_attributes_for :load_balancer_listeners,
     :reject_if => proc { |a| a['load_balancer_port'].blank? and a['instance_port'].blank? },
@@ -24,6 +26,11 @@ class LoadBalancer < BaseModel
     :allow_destroy => true
 
   include TrackChanges # must follow any before filters
+  
+  attr_accessor :new_cloud_record
+  def new_cloud_record?
+    (new_cloud_record.nil? ? true : new_cloud_record)
+  end
 
   def name
     self.load_balancer_name

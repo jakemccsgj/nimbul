@@ -1,5 +1,11 @@
 <%-
 state = load_balancer_instance_state.state || ''
+state_title = ''
+unless state.blank?
+  state_title = "Reason: #{load_balancer_instance_state.reason_code};"
+  state_title += " #{load_balancer_instance_state.description}"
+  state_title = h(state_title)
+end
 instance = load_balancer_instance_state.instance
 -%>
 <% content_tag_for :tr, load_balancer_instance_state do %>
@@ -8,7 +14,9 @@ instance = load_balancer_instance_state.instance
     <%= remove_load_balancer_instance_link('Remove', @load_balancer, instance) %>
   </td>
   <td class="<%= state %>">
-    <%=h state.gsub('_',' ') %>
+    <small title="<%= state_title %>">
+      <%=h state.gsub('_',' ') %>
+    </small>
   </td>
   <%=  render :partial => 'load_balancer_instance_states/row',
     :locals => { :instance => load_balancer_instance_state.instance }

@@ -11,7 +11,7 @@ class LoadBalancersController < ApplicationController
       :page => params[:page],
       :order => params[:sort],
       :filter => params[:filter],
-      :include => [:load_balancer_listeners, :health_checks, :zones, :load_balancer_instance_states, :instances],
+      :include => [:load_balancer_listeners, :health_checks, :zones, {:load_balancer_instance_states => :instance}, {:instances => :zone}],
     }
     @load_balancers  = LoadBalancer.search_by_parent(parent, search, options)
 
@@ -89,12 +89,14 @@ class LoadBalancersController < ApplicationController
       redirect_to redirect_url
     else
       params[:load_balancer][:zone_ids] ||= []
-      params[:load_balancer][:zone_ids] += Instance.find(params[:load_balancer][:instance_ids]).collect{|i| i.zone_id}
+      if params[:load_balancer][:instance_ids]
+        params[:load_balancer][:zone_ids] += Instance.find(params[:load_balancer][:instance_ids]).collect{|i| i.zone_id}
+      end
       params[:load_balancer][:zone_ids].uniq
       @load_balancer = parent.load_balancers.build(params[:load_balancer])
 
       respond_to do |format|
-        if @load_balancer.save
+        if ElbAdapter.create_load_balancer(@load_balancer) and @load_balancer.save
           @load_balancer.reload
           p = @parent
           o = @load_balancer
@@ -145,6 +147,7 @@ class LoadBalancersController < ApplicationController
       params[:load_balancer][:zone_ids].uniq
       
       respond_to do |format|
+        #if ElbAdapter.update_load_balancer(params[:load_balancer]) and @load_balancer.update_attributes(params[:load_balancer])
         if @load_balancer.update_attributes(params[:load_balancer])
           @load_balancer.reload
           p = @parent
@@ -186,12 +189,33 @@ class LoadBalancersController < ApplicationController
     redirect_url = send("#{ parent_type }_url", parent, options)
 
     @load_balancer = LoadBalancer.find(params[:id])
-    @load_balancer.destroy
+    
 
     respond_to do |format|
-      format.html { redirect_to redirect_url }
-      format.xml  { head :ok }
-      format.js
+      if ElbAdapter.delete_load_balancer(@load_balancer) and @load_balancer.destroy
+        p = @parent
+        o = @load_balancer
+        AuditLog.create_for_parent(
+          :parent => p,
+          :auditable_id => nil,
+          :auditable_type => o.class.to_s,
+          :auditable_name => o.load_balancer_name,
+          :author_login => current_user.login,
+          :author_id => current_user.id,
+          :summary => "deleted '#{o.load_balancer_name}'",
+          :changes => o.tracked_changes,
+          :force => false
+        )
+        flash[:notice] = 'LoadBalancer was successfully deleted.'
+        format.html { redirect_to redirect_url }
+        format.xml  { head :ok }
+        format.js
+      else
+        @error_messages = @load_balancer.errors.collect{ |e| e[0].humanize+' - '+e[1] }
+        format.html { redirect_to redirect_url }
+        format.xml  { render :xml => @load_balancer.errors, :status => :unprocessable_entity }
+        format.js
+      end
     end
   end
 

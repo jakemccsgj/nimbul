@@ -435,6 +435,7 @@ class ProviderAccount < BaseModel
     def refresh(resources = nil)
         Ec2Adapter.refresh_account(self, resources)
         AsAdapter.refresh_account(self, resources)
+        ElbAdapter.refresh_account(self, resources)
         StatsAdapter.refresh_account(self) if resources.nil?
   
         now = Time.now

@@ -174,52 +174,39 @@ function confirm_delete_cluster() {
     msg1 += "This includes all Servers, Startup Scripts and Security metadata.\n\n";
     msg1 += "This cannot be undone.\n";
     var msg2 = "Type yes to confirm that you want to delete this Cluster:";
-    if (confirm(msg1)) {
-        var answer = prompt(msg2);
-        return (answer == "yes");
-    }
-    return false;
+    return double_confirm(msg1, msg2, "yes");
 }
 
 function confirm_delete_hostname(name) {
     var msg1 = "Are you sure?\n\nAll Leases associated with this Hostname will be deleted.\n\n";
     msg1 += "This cannot be undone.\n";
     var msg2 = "Type yes to confirm that you want to delete Hostname '" + name + "' :";
-    if (confirm(msg1)) {
-        var answer = prompt(msg2);
-        return (answer == "yes");
-    }
-    return false;
+    return double_confirm(msg1, msg2, "yes");
 }
 
 function confirm_delete_auto_scaling_group(name) {
     var msg1 = "Are you sure?\n\nAll Auto Scaling Triggers associated with this Group will be deleted.\n\n";
     msg1 += "This cannot be undone.\n";
     var msg2 = "Type yes to confirm that you want to delete Auto Scaling Group '" + name + "' :";
-    if (confirm(msg1)) {
-        var answer = prompt(msg2);
-        return (answer == "yes");
-    }
-    return false;
+    return double_confirm(msg1, msg2, "yes");
 }
 
 function confirm_delete_launch_configuration(name) {
     var msg1 = "Are you sure? This cannot be undone.\n";
     var msg2 = "Type yes to confirm that you want to delete Launch Configuration '" + name + "' :";
-    if (confirm(msg1)) {
-        var answer = prompt(msg2);
-        return (answer == "yes");
-    }
-    return false;
+    return double_confirm(msg1, msg2, "yes");
 }
 
 function confirm_task_run(message) {
     var msg1 = message + "\n\nAre you sure you want to run this task?\n\n";
     msg1 += "Please think about this before continuing.\n";
     var msg2 = "Type yes to confirm that you want to run this task:";
-    if (confirm(msg1)) {
-        var answer = prompt(msg2);
-        return (answer == "yes");
+    return double_confirm(msg1, msg2, "yes");
+}
+
+function double_confirm(message1, message2, answer) {
+    if (confirm(message1)) {
+        return (prompt(message2) == answer);
     }
     return false;
 }

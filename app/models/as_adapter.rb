@@ -33,27 +33,12 @@ class AsAdapter
     AWS::AS.new(*keys)
   end
 
-  def self.get_elb(account)
-    return if account.nil?
-    return if account.aws_access_key.blank? or account.aws_secret_key.blank?
-    keys = [ account.aws_access_key, account.aws_secret_key ]
-    AWS::ELB.new(*keys)
-  end
-
   def self.refresh_account(account, resources = nil)
     if get_as(account).nil?
       Rails.logger.error "Account [#{account.id} - #{account.name}] failed to refresh - unable to load AWS::AS object using account credentials."
       return
     end
       
-    if resources.nil? or resources == 'load_balancers'
-      begin
-        refresh_load_balancers(account)
-      rescue Exception => e
-        Rails.logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
-      end
-          
-    end
     if resources.nil? or resources == 'launch_configurations' or resources == 'auto_scaling_groups'
       begin
         refresh_launch_configurations(account)
@@ -223,16 +208,6 @@ class AsAdapter
     end
   end
 
-  def self.refresh_load_balancers(account)
-    elb = get_elb(account)
-    parsers = elb.describe_load_balancers({})
-    
-    parsers.each do |parser|
-      balancer = parse_load_balancer_info(account, parser)
-      balancer.save
-    end
-  end
-
   private
     
   def self.parse_launch_configuration_info(account, parser)
@@ -371,77 +346,5 @@ class AsAdapter
     end
 
     return auto_scaling_trigger
-  end
-    
-  def self.parse_load_balancer_info(account, parser)
-    load_balancer = account.load_balancers.detect{ |s| s.load_balancer_name == parser.load_balancer_name }
-    
-    # convert parser object into hash
-    attributes = parser.to_hash
-
-    zone_names = attributes['availability_zones'] || []
-    attributes.delete('availability_zones')
-
-    health_check_parser = attributes['health_check']
-    attributes.delete('health_check')
-
-    listener_parsers = attributes['listener_descriptions'] || []
-    attributes.delete('listener_descriptions')
-
-    instance_parsers = attributes['instances']
-    attributes.delete('instances')
-
-    # TODO add support for policies
-    policy_parser = attributes['policies']
-    attributes.delete('policies')
-
-    if load_balancer.nil?
-      load_balancer = account.load_balancers.build(attributes)
-    else
-      load_balancer.attributes = attributes
-    end
-
-    # get zones
-    load_balancer.zones = account.zones.collect{|z| z if zone_names.include?(z.name)}.compact
-
-    # get health check
-    unless health_check_parser.nil?
-      h = health_check_parser.to_hash
-      h = HealthCheck.parse(h)
-      check = HealthCheck.find_by_load_balancer_id_and_target_protocol_and_target_port(load_balancer.id, h[:target_protocol], h[:target_port])
-      check = load_balancer.health_checks.build(h) if check.nil?
-    end
-
-    # get listeners
-    listener_parsers.each do |l|
-      l = l.to_hash
-      l = l['listener'].to_hash
-      # elb's listeners don't have to have instance_protocol specified if it's the same as its elb's protocol
-      l['instance_protocol'] ||= l['protocol']
-      listener = nil
-      listener = LoadBalancerListener.find_by_load_balancer_id_and_load_balancer_port_and_instance_port_and_protocol(load_balancer.id, l['load_balancer_port'].to_i, l['instance_port'].to_i, l['protocol']) unless load_balancer.id.nil?
-      listener = load_balancer.load_balancer_listeners.build(l) if listener.nil?
-    end
-
-    # get instance states
-    unless instance_parsers.empty?
-      elb = get_elb(account)
-      instance_states = elb.describe_instance_states({:load_balancer_name => load_balancer.load_balancer_name})
-      instance_states.each do |i|
-        i = i.to_hash
-        instance = Instance.find_by_provider_account_id_and_instance_id(account.id, i['instance_id'])
-        unless instance.nil?
-          i['instance_id'] = instance.id
-          load_balancer_instance_state = load_balancer.load_balancer_instance_states.detect{|lbis| lbis.instance_id == i['instance_id']}
-          if load_balancer_instance_state.nil?
-            load_balancer_instance_state = load_balancer.load_balancer_instance_states.build(i)
-          else
-            load_balancer_instance_state.attributes = i
-          end
-        end
-      end
-    end
-
-    return load_balancer
   end
 end
