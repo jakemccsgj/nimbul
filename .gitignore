@@ -7,3 +7,4 @@ vendor/cache
 .htaccess
 .ctags
 app/tags
+.htaccess
