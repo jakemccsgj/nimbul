@@ -687,17 +687,26 @@ class Ec2Adapter
             reservation = ec2.run_instances(image_id, min_count, max_count, options)
             instance = nil
             reservation[:instances].each do |i|
-               
+                i.merge!({
+                    :user_id => user_id,
+                    :state => 'requested',
+                    :server_id => server.id,
+                    :server_name => server.name,
+                    :is_locked => account.auto_lock_instances || server.is_locked,
+                    :dns_active => dns_active,
+                })
+
                 # store information about pending launch configuration
                 i.merge!({ :pending_launch_configuration_id => rb.id }) unless rb.nil?
 
                 instance = parse_instance_info(account, reservation, i)
                 instance.save
                 instances << instance
+
                 Rails.logger.debug "#{msg_prefix} - started instance: #{instance.name} [#{instance.id}]"
             end
         end
-        
+
         return instances
     end
 

@@ -405,6 +405,9 @@ class Server < BaseModel
     end
 
   def user_data_auth
+    end
+
+  def user_data_auth
     MD5.hexdigest(id.to_s + Server::UserDataController::SALT)
   end
 end
