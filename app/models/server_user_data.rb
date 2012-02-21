@@ -2,9 +2,9 @@ require 'erb'
 
 # Class holding user-data info
 class ServerUserData
-  attr_accessor :server, :startup_scripts, :cloudrc, :emissary_config
+  attr_accessor :server, :startup_scripts, :cloudrc
   USERDATA_PATH     = File.join(RAILS_ROOT, 'app', 'views', 'server', 'user_data')
-  LOADER_TEMPLATE   = 'loader.erb'
+  LOADER_TEMPLATE   = 'loader'
   CLOUDRC_TEMPLATE  = 'cloudrc.erb'
   PAYLOAD_TEMPLATE  = 'generate.erb'
   EMISSARY_TEMPLATE = 'emissary.erb'
@@ -41,42 +41,18 @@ class ServerUserData
   end
 
   def emissary_config
-    @user_data = self
-    @emissary_config ||= self.class.template(:emissary).result binding
   end
 
-  def get_payload
-    @emissary_config = emissary_config
-
-    @instance_users = cluster.instance_users.merge(server.server_users)
-    @user_data = self
-  end
-
-  def get_payload
-    @emissary_config = emissary_config
-
-    @instance_users = cluster.instance_users.merge(server.server_users)
-    @user_data = self
+  def get_loader
+    @instance_users = server_data.cluster.instance_users
+    @instance_users = @instance_users.merge(server_data.server.server_users)
+    @user_data = server_data
     @instance_users.find do |instance_user, users|
       @user_home = instance_user == 'root' ? '/root' : File.join('home', instance_user)
       @instance_user = instance_user
     end
-    script = self.class.template(:payload).result binding
-  end
-
-  def get_loader compress=false
-    script = get_payload
-
-    if compress
-      loader = File.read(File.join(USERDATA_PATH, LOADER_TEMPLATE))
-      StringIO.open(loader, 'ab') do |f|
-        gz = Zlib::GzipWriter.new(f)
-        gz.write script
-        gz.close
-      end
-      script = loader
-    end
-    script
+    @emissary_config = get_erb(EMISSARY_TEMPLATE)
+    payload = get_erb(PAYLOAD_TEMPLATE)
   end
 
   class << self
