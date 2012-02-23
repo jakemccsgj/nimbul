@@ -27,12 +27,19 @@ class TransientKeyStore
 
   public
 
-  def initialize uopts={}
-    opts = {:env => DEFAULT_ENVIRONMENTS.first, :uri => DEFAULT_URI, :logger => DEFAULT_LOGGER}
-    opts.merge! uopts
+  def initialize *opts
+    begin
+      opts = opts.first.to_h
+    rescue
+      env, opts = opts[0], opts[1] || {}
+      opts.merge! :env => env
+    end
+
+    default_options = {:env => DEFAULT_ENVIRONMENTS.first, :uri => DEFAULT_URI, :logger => DEFAULT_LOGGER}
+    opts = default_options.merge(opts)
     # Set up attributes
     opts.each_pair { |opt, val|
-      self.send "#{opt}=".to_sym, val
+      self.send "#{opt.to_s}=".to_sym, val
     }
     DRb.start_service
   end
@@ -50,6 +57,7 @@ class TransientKeyStore
   def write key, value
     logger.debug "Sending #{key}, #{value} from write method"
     keystore.send("#{key.to_s}=".to_sym, value)
+    keystore.keys.add(key.to_sym) unless keystore.keys.include? key.to_sym
   end
   alias :put :write
   alias :set :write
@@ -59,7 +67,7 @@ class TransientKeyStore
 
   # returns the "keystore" DRbObject
   def keystore
-    return @drb if @drb
+    #return @drb if @drb
     logger.debug "Getting keystore for #{env}"
     @drb = DRbObject.new_with_uri uri
     logger.debug "#{@drb.__drburi} - #{@drb.__drbref}\n"
@@ -68,7 +76,24 @@ class TransientKeyStore
     obj
   end
 
+  def method_missing meth, *args, &block
+    begin
+      if keys.include? meth.to_sym
+        self.class.send(:define_method, meth.to_sym) { get meth.to_sym }
+      else
+        raise
+      end
+      send meth, *args, &block
+    rescue
+      raise
+    end
+  end
+
   public
+
+  def keys
+    keystore.keys.to_a
+  end
 
   ##
   # Run a server instance
@@ -77,11 +102,12 @@ class TransientKeyStore
     ##  Start the service, and wait
     def run_server uri=DEFAULT_URI, environments=DEFAULT_ENVIRONMENTS, logger=DEFAULT_LOGGER
       trap("INT") { self.stop_server; exit }
-
-      services = Hash[ environments.map { |env| [env.to_sym, KeyStore.new( :environment => env )] } ]
-      service = OpenStruct.new(services)
-      DRb.start_service uri, service
-      logger.info "Server started @ #{DRb.uri} serving front object: #{service}"
+      services = KeyStore.new()
+      environments.each { |env|
+        services.send "#{env}=".to_sym, KeyStore.new( :environment => env )
+      }
+      DRb.start_service uri, services
+      logger.info "Server started @ #{DRb.uri}"
       DRb.thread.join
     end
 
@@ -92,9 +118,27 @@ class TransientKeyStore
       logger.debug "Joining DRb thread"
       DRb.thread.join rescue nil
     end
+
+    def instance opts
+      new opts
+    end
+
+    # Initialize the object from YAML, and then have it store it's data to the keystore
+    def from_yaml str
+      ks = self.instance ENV['RAILS_ENV']
+      YAML::load(str).instance_eval { @data }.each_pair do |key, val|
+        ks.set key, val
+      end
+      ks
+    end
   end
 end
 
 class KeyStore < OpenStruct
   include DRbUndumped
+  attr_accessor :keys
+  def initialize *args
+    @keys = Set.new.extend(DRbUndumped)
+    super
+  end
 end

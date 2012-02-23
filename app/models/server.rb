@@ -1,4 +1,5 @@
 require 'erb'
+require 'digest/md5'
 
 class Server < BaseModel
   PARAMETER_PRIORITY = [
@@ -405,9 +406,6 @@ class Server < BaseModel
     end
 
   def user_data_auth
-  end
-
-  def user_data_auth
-    MD5.hexdigest(id.to_s + Server::UserDataController::SALT)
+    Digest::MD5.hexdigest(id.to_s + Server::UserDataController::SALT)
   end
 end

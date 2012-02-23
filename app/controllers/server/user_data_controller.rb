@@ -26,6 +26,7 @@ class Server::UserDataController < ApplicationController
         @server.parameters.each do |p|
           @server_user_data.sub!(p.value.sub("'","\'"),'[FILTERED]') if p.is_protected? and !p.value.blank?
         end
+<<<<<<< HEAD
 
         unless @provider_account.messaging_url.blank?
           @server_user_data.sub!(@provider_account.messaging_url, '[FILTERED]')
@@ -42,6 +43,19 @@ class Server::UserDataController < ApplicationController
     respond_to do |fmt|
       fmt.html
       fmt.json { render :json => @server_user_data.to_json }
+=======
+
+        unless @provider_account.messaging_url.blank?
+          @server_user_data.sub!(@provider_account.messaging_url, '[FILTERED]')
+        end
+        render
+      }
+      format.json { render :json => @server_user_data.to_json }
+      format.sh {
+        render :action => 'show.sh.erb' and return if @server.user_data_auth == params[:auth]
+        raise "No auth!"
+      }
+>>>>>>> 2.1
     end
   end
 end
