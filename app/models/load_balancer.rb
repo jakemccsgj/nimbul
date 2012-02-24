@@ -23,6 +23,7 @@ class LoadBalancer < BaseModel
     :reject_if => proc { |a| a['load_balancer_port'].blank? and a['instance_port'].blank? },
     :allow_destroy => true
   accepts_nested_attributes_for :health_checks,
+    :reject_if => proc { |a| a['target_protocol'].blank? },
     :allow_destroy => true
 
   include TrackChanges # must follow any before filters

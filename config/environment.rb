@@ -114,7 +114,8 @@ Rails::Initializer.run do |config|
   AS_TRIGGER_THRESHOLD_ACTIONS = [ 'increase', 'decrease' ]
   AS_TRIGGER_BREACH_SCALE_INCREMENT_UNITS = [ '%', 'instances' ]
   ELB_TARGET_PROTOCOL_NAMES = [ 'HTTP', 'TCP', 'HTTPS', 'SSL'  ]
-  ELB_TARGET_PROTOCOL_WITH_PATH_NAMES = [ 'HTTP', 'HTTPS' ]
+  ELB_HEALTH_CHECK_PROTOCOL_NAMES = [ 'HTTP', 'TCP' ]
+  ELB_HEALTH_CHECK_PROTOCOL_WITH_PATH_NAMES = [ 'HTTP' ]
   ELB_THRESHOLD_VALUES = [ 2, 3, 4, 5, 6, 7, 8, 9, 10 ]
   SERVER_VOLUME_MOUNT_TYPES_ARRAY = [ 'Mount Volume Mount Type', 'Restore Snapshot Mount Type', 'Restore Latest Snapshot Mount Type' ]
   SERVER_VOLUME_MOUNT_TYPES = SERVER_VOLUME_MOUNT_TYPES_ARRAY.map{ |t| LabelValue.new(t.gsub('Mount Type',''), t.gsub(' ','')) }

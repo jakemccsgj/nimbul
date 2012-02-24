@@ -96,32 +96,6 @@ class ElbAdapter
     return true
   end
 
-  def self.update_load_balancer(load_balancer)
-    account = load_balancer.provider_account
-
-    cloud_load_balancer = refresh_load_balancer(account, load_balancer.load_balancer_name)
-
-    elb = get_elb(account)
-    begin
-      result = elb.create_load_balancer(options)
-      load_balancer.d_n_s_name = (result.to_hash)['d_n_s_name']
-      unless load_balancer.instances.empty?
-        options = {
-          :load_balancer_name => load_balancer.load_balancer_name,
-          :instances => load_balancer.instances.collect{|i| { :instance_id => i.instance_id}}
-        }
-        result = elb.create_elb_instance(options)
-      end
-    rescue Exception => e
-      msg = "Failed to create load balancer '#{load_balancer.name}': #{e.message}"
-      Rails.logger.error msg+"\n\t#{e.backtrace.join("\n\t")}"
-      load_balancer.errors.add_to_base "#{msg}"
-      return false
-    end
-
-    return true
-  end
-
   def self.delete_load_balancer(load_balancer)
     elb = get_elb(load_balancer.provider_account)
     
@@ -140,6 +114,8 @@ class ElbAdapter
 
     return true
   end
+
+  private
 
   def self.parse_load_balancer_info(account, parser, account_load_balancers, account_instances)
     load_balancer = account_load_balancers.detect{ |s| s.load_balancer_name == parser.load_balancer_name }
@@ -224,7 +200,7 @@ class ElbAdapter
           )
           # new instance state record
         else
-          instance_state = load_balancer.instance_states.create({
+          instance_state = load_balancer.load_balancer_instance_states.build({
               :instance_id => instance.id,
               :state => cis.state,
               :reason_code => cis.reason_code,
@@ -240,8 +216,6 @@ class ElbAdapter
 
     return load_balancer
   end
-
-  private
 
   def self.load_balancer_to_options(load_balancer)
     options = {}

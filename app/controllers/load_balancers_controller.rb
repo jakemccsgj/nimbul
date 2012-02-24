@@ -147,9 +147,7 @@ class LoadBalancersController < ApplicationController
       params[:load_balancer][:zone_ids].uniq
       
       respond_to do |format|
-        #if ElbAdapter.update_load_balancer(params[:load_balancer]) and @load_balancer.update_attributes(params[:load_balancer])
-        if @load_balancer.update_attributes(params[:load_balancer])
-          @load_balancer.reload
+        if ElbAdapter.update_load_balancer(@load_balancer, params[:load_balancer]) and @load_balancer.update_attributes(params[:load_balancer])
           p = @parent
           o = @load_balancer
           AuditLog.create_for_parent(

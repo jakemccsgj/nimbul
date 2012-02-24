@@ -6,14 +6,14 @@ class HealthCheck < ActiveRecord::Base
     validates_presence_of :target_protocol, :target_port, :timeout, :interval, :unhealthy_threshold, :healthy_threshold
     validates_presence_of :target_path,
         :if => :support_target_path?,
-        :message => "must specify Ping Path when choosing #{ELB_TARGET_PROTOCOL_WITH_PATH_NAMES.join(' or ')}"
+        :message => "must specify Ping Path when choosing #{ELB_HEALTH_CHECK_PROTOCOL_WITH_PATH_NAMES.join(' or ')}"
     validates_length_of :target_path,
         :if => :support_target_path?,
         :within => 1..1024
     validates_inclusion_of :target_protocol,
-        :in => ELB_TARGET_PROTOCOL_NAMES,
+        :in => ELB_HEALTH_CHECK_PROTOCOL_NAMES,
         :allow_nil => false,
-        :message => "must be one of #{ELB_TARGET_PROTOCOL_NAMES.join(', ')}"
+        :message => "must be one of #{ELB_HEALTH_CHECK_PROTOCOL_NAMES.join(', ')}"
     validates_numericality_of :target_port,
         :integer_only => true,
         :allow_nil => false,
@@ -41,7 +41,7 @@ class HealthCheck < ActiveRecord::Base
     include TrackChanges # must follow any before filters
 
     def support_target_path?
-        ELB_TARGET_PROTOCOL_WITH_PATH_NAMES.include?(target_protocol)
+        ELB_HEALTH_CHECK_PROTOCOL_WITH_PATH_NAMES.include?(target_protocol)
     end
 
     def valid_timeout?

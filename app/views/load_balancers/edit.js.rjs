@@ -1,2 +1,2 @@
-page['xxlarge_redbox'].replace_html :partial => 'form'
+page['xxlarge_redbox'].replace_html :partial => 'edit'
 page['xxlarge_redbox'].appear
