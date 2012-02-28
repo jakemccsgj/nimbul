@@ -27,7 +27,6 @@ GEM
   specs:
     Ruby-MemCache (0.0.1)
       io-reactor (> 0.0.0)
-    SysVIPC (0.9.3)
     ZenTest (4.6.2)
     aasm (2.3.1)
       activerecord
@@ -45,9 +44,9 @@ GEM
       eventmachine (>= 0.12.4)
     autotest (4.4.6)
       ZenTest (>= 4.4.1)
-    aws-s3 (0.6.2)
-      builder
-      mime-types
+    aws (2.5.6)
+      http_connection
+      uuidtools
       xml-simple
     bert (1.1.2)
     builder (3.0.0)
@@ -73,16 +72,17 @@ GEM
       uuid (>= 2.3.0)
       work_queue (>= 1.0.0)
     eventmachine (0.12.10)
+    facter (1.6.5)
     fastthread (1.0.7)
     gherkin (2.4.18)
       json (>= 1.4.6)
+    http_connection (1.4.1)
     i18n (0.6.0)
     inifile (0.4.1)
     io-reactor (1.0.4)
     json (1.6.0)
     macaddr (1.4.0)
       systemu (~> 2.2.0)
-    mime-types (1.16)
     mysql (2.8.1)
     net-sftp (2.0.5)
       net-ssh (>= 2.0.9)
@@ -117,7 +117,8 @@ GEM
     tzinfo (0.3.29)
     uuid (2.3.4)
       macaddr (~> 1.0)
-    work_queue (2.0.0)
+    uuidtools (2.1.2)
+    work_queue (1.0.0)
     xml-simple (1.1.0)
 
 PLATFORMS
@@ -125,16 +126,16 @@ PLATFORMS
 
 DEPENDENCIES
   Ruby-MemCache
-  SysVIPC
   ZenTest
   aasm
   autotest
-  aws-s3
+  aws
   carrot
   chronic
   cloudmaster!
   cucumber
   emissary
+  facter
   fastthread
   formtastic!
   mysql (~> 2.8.1)
@@ -145,4 +146,4 @@ DEPENDENCIES
   rspec
   ruby-openid
   rufus-scheduler
-  work_queue
+  work_queue (~> 1.0.0)

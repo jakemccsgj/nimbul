@@ -1,3 +1,0 @@
-
-class ServerProfileParameters < BaseModel
-end

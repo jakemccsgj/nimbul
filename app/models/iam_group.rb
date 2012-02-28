@@ -1,2 +1,0 @@
-class IamGroup < IamResource
-end

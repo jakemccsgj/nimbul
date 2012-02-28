@@ -1,2 +1,0 @@
-class InstanceSnapshot < InstanceVolume
-end

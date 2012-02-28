@@ -1,2 +1,0 @@
-module InstanceKindCategoriesHelper
-end
