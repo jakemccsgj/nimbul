@@ -17,8 +17,11 @@ instance_users = {}
 root_users = user_data.server.cluster.provider_account.users + user_data.server.cluster.users
 root_users.each do |user|
     instance_user = 'root'
-    instance_users[instance_user] = [] if instance_users[instance_user].nil?
-    instance_users[instance_user] << user unless user.user_keys.size == 0
+    instance_users[instance_user] ||= []
+    begin
+      instance_users[instance_user] << user unless user.user_keys.size == 0
+    rescue
+    end
 end
 
 user_data.server.server_user_accesses.each do |sua|
