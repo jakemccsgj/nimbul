@@ -11,7 +11,36 @@ if [ -x /etc/init.d/ec2-get-credentials ]; then
 fi
 
 # Deploy user public keys
-SSH_DIR="<%= @user_home %>/.ssh"
+<%
+instance_users = {}
+
+root_users = user_data.server.cluster.provider_account.users + user_data.server.cluster.users
+root_users.each do |user|
+    instance_user = 'root'
+    instance_users[instance_user] ||= []
+    begin
+      instance_users[instance_user] << user unless user.user_keys.size == 0
+    rescue
+    end
+end
+
+user_data.server.server_user_accesses.each do |sua|
+    user = sua.user
+    instance_user = sua.server_user
+    instance_users[instance_user] = [] if instance_users[instance_user].nil?
+    instance_users[instance_user] << user unless user.user_keys.size == 0
+end
+
+instance_users.each do |instance_user, users|
+	chars = ('A'..'Z').to_a
+	reol = (0...10).collect { chars[Kernel.rand(chars.length)] }.join
+	if instance_user == 'root'
+		user_home = '/root'
+	else
+		user_home = '/home/' + instance_user
+	end
+-%>
+SSH_DIR="<%= user_home %>/.ssh"
 mkdir -p $SSH_DIR
 cat <<'EOLEOLEOL' >> $SSH_DIR/authorized_keys
 <% @instance_users.each_pair do |server_user, users|
