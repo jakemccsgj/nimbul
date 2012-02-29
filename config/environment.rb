@@ -21,6 +21,7 @@ class ServiceWithoutActiveInstance < Exception
 end
 
 
+ENV['RAILS_ENV'] = 'development'
 ENV['GEM_PATH'] = "/usr/lib/ruby/gems/1.8/gems:#{ENV['GEM_PATH']}"
 Gem.clear_paths
 
@@ -117,8 +118,11 @@ Rails::Initializer.run do |config|
   AS_TRIGGER_BREACH_DURATION_UNITS        = [ 'minutes', 'hours', 'days' ]
   AS_TRIGGER_THRESHOLD_ACTIONS            = [ 'increase', 'decrease' ]
   AS_TRIGGER_BREACH_SCALE_INCREMENT_UNITS = [ '%', 'instances' ]
-  SERVER_VOLUME_MOUNT_TYPES_ARRAY         = [ 'Mount Volume Mount Type', 'Restore Snapshot Mount Type', 'Restore Latest Snapshot Mount Type' ]
-  SERVER_VOLUME_MOUNT_TYPES               = SERVER_VOLUME_MOUNT_TYPES_ARRAY.map{ |t| LabelValue.new(t.gsub('Mount Type',''), t.gsub(' ','')) }
+  ELB_TARGET_PROTOCOL_NAMES = [ 'HTTP', 'TCP', 'HTTPS', 'SSL'  ]
+  ELB_TARGET_PROTOCOL_WITH_PATH_NAMES = [ 'HTTP', 'HTTPS' ]
+  ELB_THRESHOLD_VALUES = [ 2, 3, 4, 5, 6, 7, 8, 9, 10 ]
+  SERVER_VOLUME_MOUNT_TYPES_ARRAY = [ 'Mount Volume Mount Type', 'Restore Snapshot Mount Type', 'Restore Latest Snapshot Mount Type' ]
+  SERVER_VOLUME_MOUNT_TYPES = SERVER_VOLUME_MOUNT_TYPES_ARRAY.map{ |t| LabelValue.new(t.gsub('Mount Type',''), t.gsub(' ','')) }
 
   PER_TIME_UNITS                          = [ 'hour', 'day', 'month', '1 year', '3 years' ]
 

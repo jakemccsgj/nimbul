@@ -34,4 +34,10 @@ class BaseModel < ActiveRecord::Base
     options.merge!({:methods => :status_message}) if self.respond_to?(:status_message)
     super options
   end
+
+  def errors_to_s
+    errors.collect do |attr, msg|
+      attr.humanize + ': ' + msg
+    end.join ';'
+  end
 end
