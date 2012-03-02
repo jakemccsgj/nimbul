@@ -2,16 +2,16 @@ class CloudResource < BaseModel
     belongs_to :provider_account
     belongs_to :zone
     belongs_to :instance
-    
+
     has_and_belongs_to_many :clusters
-    
+
     has_many :server_resources, :dependent => :nullify
     has_many :instance_resources, :dependent => :nullify
     has_many :instance_addresses, :class_name => 'InstanceAddress'
     has_many :instance_volumes, :class_name => 'InstanceVolume'
 
     attr_accessor :should_destroy, :status_message, :destroyed
-    
+
     validates_presence_of :name, :provider_account_id
     validates_uniqueness_of :name, :scope => [ :provider_account_id, :type ]
 
@@ -28,9 +28,9 @@ class CloudResource < BaseModel
     end
 
     after_destroy :mark_as_destroyed
-    
+
     include TrackChanges # must follow any before filters
-    
+
     def class_type=(value) self[:type] = value; end
     def class_type() return self[:type]; end
     def short_type
@@ -61,7 +61,7 @@ class CloudResource < BaseModel
     def should_destroy?
         should_destroy.to_i == 1
     end
-    
+
     def self.search_by_provider_account(provider_account, search, page, extra_joins, extra_conditions, sort=nil, filter=nil, include=nil)
         joins = []
         joins = joins + extra_joins unless extra_joins.blank?
@@ -72,10 +72,10 @@ class CloudResource < BaseModel
             conditions[0] << ' AND ' + extra_conditions[0];
             conditions << extra_conditions[1..-1]
         end
-        
+
         search(search, page, joins, conditions, sort, filter, include)
     end
-  
+
     def self.search_by_cluster(cluster, search, page, extra_joins, extra_conditions, sort=nil, filter=nil, include=nil)
         joins = [
               'INNER JOIN cloud_resources_clusters ON cloud_resources_clusters.cloud_resource_id = cloud_resources.id',
@@ -88,10 +88,10 @@ class CloudResource < BaseModel
             conditions[0] << ' AND ' + extra_conditions[0];
             conditions << extra_conditions[1..-1]
         end
-        
+
         search(search, page, joins, conditions, sort, filter, include)
     end
-  
+
     # by default - find all resources visible to user through clusters
     def self.options_for_find_by_user(user, options={})
         extra_joins = options[:joins]
@@ -113,7 +113,7 @@ class CloudResource < BaseModel
             end
             conditions[0] = "(#{local_conditions.join(' OR ')})"
         end
-    
+
         joins = joins + extra_joins unless extra_joins.blank?
 
         unless extra_conditions.blank?
@@ -121,7 +121,7 @@ class CloudResource < BaseModel
             conditions[0] << ' AND ' + extra_conditions[0]
             conditions << extra_conditions[1..-1]
         end
-    
+
         order = table_name()+'.name' if order.blank?
 
         options.merge!({
@@ -130,7 +130,7 @@ class CloudResource < BaseModel
             :order => order,
         })
 
-        return options        
+        return options
     end
 
     def self.per_page
@@ -148,7 +148,7 @@ class CloudResource < BaseModel
     def self.filter_fields
         %w(state owner_id)
     end
-    
+
     def self.classes_and_resources(cloud_resources, mount_types=[])
         cloud_resources =  cloud_resources.is_a?(Array) ? cloud_resources : [ cloud_resources ]
         resource_classes = []
@@ -165,7 +165,7 @@ class CloudResource < BaseModel
                 end
             end
         end
-        
+
         cloud_resources.each do |resource_group|
             # flatten the structure
             if resource_group.is_a?(Array)
@@ -184,81 +184,79 @@ class CloudResource < BaseModel
                 end
             end
         end
-        
+
         # collect classes
         resources.each do |r|
             unless resource_classes.collect{|c| c.value}.include?(r.group)
                 resource_classes << LabelValue.new(r.group.gsub('Cloud',''), r.group)
             end
         end
-        
+
         yield resource_classes, resources
     end
-    
+
     def self.server_resource_type(cloud_resource_type=nil)
         cloud_resource_type ||= self.to_s
         cloud_resource_type.gsub('Cloud','Server')
     end
-    
+
     def self.default_mount_type
         raise "default_mount_type should be overwritten in subclasses of CloudResource"
     end
-    
+
     def available?
     end
 
     def allocate!
     end
-    
+
     def release!
     end
-    
+
     def snapshot!
     end
-    
+
     def delete!
     end
-    
+
     def attach!(instance, force_allocation=false, mount_point=nil)
         # check to see if this resource is already attached to the instance
         return true if instance.instance_id == self.cloud_instance_id
-        
+
         # check to see if this resource is attached to another instance
         unless self.instance_id.blank? or force_allocation
-            self.errors.add(:instance_id, "currently attached to #{instance.name}")
+            self.errors.add :instance_id, "currently attached to #{instance.name}"
             return false
         end
-        
+
         # detach the resource if required
-        if !self.instance_id.blank? and force_allocation
-            unless self.detach!(force_allocation)
-                self.errors.add(:instance_id, "failed to detach from #{self.instance.name}")
+        unless self.instance_id.blank? and not force_allocation
+            unless self.detach! force_allocation
+                self.errors.add :instance_id, "failed to detach from #{self.instance.name}"
                 return false
             end
         end
-        
+
         # attach the resource
         begin
             if Ec2Adapter.attach(self, instance, mount_point)
                 attrs = {
-                    :cloud_instance_id => instance.instance_id,
-                    :instance_id => instance.id,
-                    :state => 'in-use',
+                    :cloud_instance_id => instance.instance_id
+                  , :instance_id       => instance.id
+                  , :state             => 'in-use'
                 }
                 self.update_attributes(attrs)
-                return true
+                true
             else
                 self.errors.add(:state, "failed to attach #{self.cloud_id} to #{instance.instance_id} [#{instance.id}]")
-                return false
+                false
             end
         rescue
             self.errors.add(:state, "failed to attach #{self.cloud_id} to #{instance.instance_id} [#{instance.id}]: #{$!}")
-            return false
+            false
         end
-        
-        return true
     end
-    
+
     def detach!(force=false)
         # detach the resource
         begin
@@ -278,7 +276,7 @@ class CloudResource < BaseModel
             self.errors.add(:state, "failed to detach #{self.cloud_id} from #{instance.instance_id} [#{instance.id}]: #{$!}")
             return false
         end
-        
+
         return true
     end
 end

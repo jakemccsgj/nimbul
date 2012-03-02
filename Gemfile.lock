@@ -28,12 +28,6 @@ GIT
       activesupport (>= 2.3.7)
       i18n (~> 0.4)
 
-GIT
-  remote: https://github.com/nimbul/cloudmaster.git
-  revision: 0db6eef571518de1fa5369df7c49ba477ab89798
-  specs:
-    cloudmaster (1.0.0)
-
 GEM
   remote: http://rubygems.org/
   remote: http://gems.rubyforge.org/
@@ -100,6 +94,7 @@ GEM
     macaddr (1.5.0)
       systemu (>= 2.4.0)
     mysql (2.8.1)
+    mysql2 (0.2.18)
     net-sftp (2.0.5)
       net-ssh (>= 2.0.9)
     net-ssh (2.3.0)
@@ -159,6 +154,7 @@ DEPENDENCIES
   fastthread
   formtastic!
   mysql
+  mysql2 (~> 0.2.7)
   net-sftp
   net-ssh
   open_id_authentication!

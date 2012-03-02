@@ -5,7 +5,7 @@ class InstanceResource < ActiveRecord::Base
 
   named_scope :pending,
     :conditions => { :state => 'pending' },
-    :include    => [ :cloud_resource, :instance ]
+    :include    => { :cloud_resource => :instance }
 
   serialize :params, Hash
 
@@ -42,38 +42,40 @@ class InstanceResource < ActiveRecord::Base
   end
 
   def attach!
-    unless @instance.running?
+    unless instance.running?
       self.errors.add(:instance_id, "is not in the running state")
       return false
     end
 
     begin
-      @cloud_resource.attach! @instance, self.force_allocation, self.mount_point
-      @instance.attach! @cloud_resource
-      if @cloud_resource.errors.empty? and @instance.errors.empty?
+      RAILS_DEFAULT_LOGGER.info('Attaching cloud resource id %s to instance id %s' % [cloud_resource.id, instance.id])
+      cloud_resource.attach! instance, self.force_allocation, self.mount_point
+      RAILS_DEFAULT_LOGGER.info('Attaching instance id %s to cloud resource id %s' % [instance.id, cloud_resource.id])
+      instance.attach! cloud_resource
+      if cloud_resource.errors.empty? and instance.errors.empty?
         self.update_attributes({
           :state => 'attached',
-          :state_description => "Attached #{@cloud_resource.short_type} '#{@cloud_resource.name}' to #{@instance.name}",
+          :state_description => "Attached #{cloud_resource.short_type} '#{cloud_resource.name}' to #{instance.name}",
           :force_allocation => false,
         })
         return true
       else
         # collect errors
-        unless @cloud_resource.errors.empty?
-          self.errors.add(:cloud_resource_id, @cloud_resource.errors.collect{ |attr,msg| attr.humanize + ': ' + msg}.join(';'))
+        unless cloud_resource.errors.empty?
+          self.errors.add(:cloud_resource_id, cloud_resource.errors.collect{ |attr,msg| attr.humanize + ': ' + msg}.join(';'))
         end
-        unless @instance.errors.empty?
-          self.errors.add(:instance_id, @instance.errors.collect{ |attr,msg| attr.humanize + ': ' + msg}.join(';'))
+        unless instance.errors.empty?
+          self.errors.add(:instance_id, instance.errors.collect{ |attr,msg| attr.humanize + ': ' + msg}.join(';'))
         end
         # update attributes
         msg = self.errors.collect{ |attr,msg| attr.humanize + ': ' + msg}.join('\n')
         self.update_attributes({
-          :state_description => "Failed to attach #{@cloud_resource.short_type} '#{@cloud_resource.name}' to #{@instance.name}: #{msg}",
+          :state_description => "Failed to attach #{cloud_resource.short_type} '#{cloud_resource.name}' to #{instance.name}: #{msg}",
         })
         return false
       end
     rescue
-      msg = "Failed to attach #{@cloud_resource.short_type} '#{@cloud_resource.name}' to #{@instance.name}: #{$!}"
+      msg = "Failed to attach #{cloud_resource.short_type} '#{cloud_resource.name}' to #{instance.name}: #{$!}"
       self.errors.add(:state, msg)
       self.update_attributes({
         :state_description => msg,
