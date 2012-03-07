@@ -14,7 +14,7 @@ fi
 <%
 instance_users = {}
 
-root_users = user_data.server.cluster.provider_account.users + user_data.server.cluster.users
+root_users = @user_data.server.cluster.provider_account.users + @user_data.server.cluster.users
 root_users.each do |user|
     instance_user = 'root'
     instance_users[instance_user] ||= []
@@ -24,7 +24,7 @@ root_users.each do |user|
     end
 end
 
-user_data.server.server_user_accesses.each do |sua|
+@user_data.server.server_user_accesses.each do |sua|
     user = sua.user
     instance_user = sua.server_user
     instance_users[instance_user] = [] if instance_users[instance_user].nil?
@@ -110,3 +110,4 @@ EOF
 emissary start -d
 
 exit 0
+<% end %>

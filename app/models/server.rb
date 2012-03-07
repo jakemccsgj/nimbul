@@ -392,7 +392,8 @@ class Server < BaseModel
       server_user_accesses.each do |sua|
         u = sua.user
         keys = u.user_keys
-        users[u.server_user] << u if keys.size > 0
+        users[u.login] ||= []
+        users[u.login] << u if keys.size > 0
       end
       users
     end

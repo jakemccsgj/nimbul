@@ -35,7 +35,6 @@ GEM
   specs:
     Ruby-MemCache (0.0.1)
       io-reactor (> 0.0.0)
-    SysVIPC (0.9)
     ZenTest (4.6.2)
     aasm (3.0.3)
       activerecord
@@ -94,7 +93,6 @@ GEM
     macaddr (1.5.0)
       systemu (>= 2.4.0)
     mysql (2.8.1)
-    mysql2 (0.2.18)
     net-sftp (2.0.5)
       net-ssh (>= 2.0.9)
     net-ssh (2.3.0)
@@ -139,7 +137,6 @@ PLATFORMS
 
 DEPENDENCIES
   Ruby-MemCache
-  SysVIPC (~> 0.9.0)
   ZenTest
   aasm
   autotest
@@ -154,7 +151,6 @@ DEPENDENCIES
   fastthread
   formtastic!
   mysql
-  mysql2 (~> 0.2.7)
   net-sftp
   net-ssh
   open_id_authentication!

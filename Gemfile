@@ -26,14 +26,14 @@ gem 'fastthread'
 #
 #  You may need to change version numbers to match, and obviously the paths must be changed to match your environment.
 #
-gem 'mysql2', "~> 0.2.7"
+#gem 'mysql2', "~> 0.2.7"
 gem 'mysql'
 gem "query_reviewer", :git => "git://github.com/nesquena/query_reviewer.git"
 gem 'net-sftp', :require => 'net/sftp'
 gem 'net-ssh', :require => 'net/ssh'
 gem 'rufus-scheduler'
 gem 'work_queue', '~> 1.0.0'
-gem 'SysVIPC', '~> 0.9.0'
+#gem 'SysVIPC', '~> 0.9.0'
 #git 'git://github.com/mosta/sysvipc-0.8-rc1.git' do
 #  gem 'systemvipc', :require => 'sysvipc.so'
 #end
