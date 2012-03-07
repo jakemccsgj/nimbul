@@ -241,8 +241,8 @@ class CloudResource < BaseModel
         begin
             if Ec2Adapter.attach(self, instance, mount_point)
                 attrs = {
-                    :cloud_instance_id => instance.instance_id
-                  , :instance_id       => instance.id
+                    :cloud_instance_id => instance.instance_id \
+                  , :instance_id       => instance.id \
                   , :state             => 'in-use'
                 }
                 self.update_attributes(attrs)

@@ -39,7 +39,7 @@
         ) %>
     </li>
     <li class="tab-unselected" id="load_balancers_tab">
-        <%= link_to_function(
+        <%# %= link_to_function(
             'Load Balancers',
             "loadDiv($('provider_account_#{@provider_account.id}_load_balancers_index'), '" + provider_account_load_balancers_url(@provider_account) + "');
             tabselect($('load_balancers_tab'));
@@ -182,9 +182,6 @@
         }
         if (anchor == 'auto_scaling') {
             loadPane($('auto_scaling_pane'), '#{provider_account_auto_scaling_index_url(@provider_account)}');
-        }
-        if (anchor == 'load_balancers') {
-            loadDiv($('provider_account_#{@provider_account.id}_load_balancers_index'), '" + provider_account_load_balancers_url(@provider_account) + "');
         }
         if (anchor == 'images') {
             loadDiv($('provider_account_#{@provider_account.id}_server_images_index'), '" + provider_account_server_images_url(@provider_account) + "');
