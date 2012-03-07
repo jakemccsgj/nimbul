@@ -2,7 +2,14 @@ require 'AWS/EC2'
 require 'md5'
 
 class Ec2Adapter
-  include ActionController::UrlWriter
+  extend Erby
+
+  BASE_TEMPLATE = 'base.erb'
+  USERDATA_PATH = File.join(RAILS_ROOT, 'app', 'views', 'server', 'user_data')
+
+  class Ec2AdapterHelper
+    include ActionView::Helpers::UrlHelper
+  end
 
     def self.get_ec2(account)
         return if account.nil?
@@ -646,17 +653,21 @@ class Ec2Adapter
 
         compress_user_data = true # false by default
         i = self.new
+        seed_hosts = seed_hosts cluster.provider_account
+        udata_url = user_data server
+        udata_script = self.template(USERDATA_PATH, :base).result(binding)
         options = {
             :key_name => key_name,
             :instance_type => server.instance_type,
-            :user_data => i.send(
-                'server_bootstrap_user_data_url',
-                :host => Rails.configuration.action_mailer.default_url_options[:host],
-                :port => Rails.configuration.action_mailer.default_url_options[:port],
-                :server_id => server.id,
-                :format => :sh,
-                :auth => server.user_data_auth
-              ),
+            :user_data => udata_script,
+           # :user_data => "bash -s stable <(curl " + i.send(
+           #     'server_bootstrap_user_data_url',
+           #     :host => Rails.configuration.action_mailer.default_url_options[:host],
+           #     :port => Rails.configuration.action_mailer.default_url_options[:port],
+           #     :server_id => server.id,
+           #     :format => :sh,
+           #     :auth => server.user_data_auth
+           #   ) + ")",
             :security_groups => security_groups,
         }
 
@@ -1040,6 +1051,22 @@ class Ec2Adapter
         ec2 = get_ec2(account)
         ec2.deregister_image(server_image.image_id)
         return true
+    end
+
+    def self.user_data server
+      ActionController::Integration::Session.new.url_for \
+              :action     => 'show',
+              :controller => 'server/user_data',
+              :protocol   => 'https',
+              :format     => 'sh',
+              :only_path  => false,
+              :server_id  => server.id,
+              :auth       => server.user_data_auth,
+              :host       => Rails.configuration.action_mailer.default_url_options[:host]
+    end
+
+    def self.seed_hosts provider_account
+      DnsAdapter.static_dns_entries(provider_account).join("\n")
     end
 end
 

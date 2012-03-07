@@ -12,7 +12,8 @@ config.log_level = :info
 config.action_controller.consider_all_requests_local = false
 config.action_controller.perform_caching             = true
 config.action_view.cache_template_loading            = true
-config.action_mailer.default_url_options             = { :host => "nimbul.prd.use1.nytimes.com", :port => 443 }
+config.action_mailer.default_url_options             = { :host => "nimbul.prd.use1.nytimes.com", :port => 443, :protocol => 'https' }
+
 
 # Use a different cache store in production
 # config.cache_store = :mem_cache_store

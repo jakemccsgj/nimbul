@@ -1,7 +1,7 @@
-require 'erb'
-
 # Class holding user-data info
 class ServerUserData
+  extend Erby
+
   attr_accessor :server, :startup_scripts, :cloudrc, :emissary_config
   USERDATA_PATH     = File.join(RAILS_ROOT, 'app', 'views', 'server', 'user_data')
   LOADER_TEMPLATE   = 'loader.erb'
@@ -37,12 +37,12 @@ class ServerUserData
 
   def cloudrc_config
     @user_data = self
-    @cloudrc ||= self.class.template(:cloudrc).result binding
+    @cloudrc ||= self.class.template(USERDATA_PATH, :cloudrc).result binding
   end
 
   def emissary_config
     @user_data = self
-    @emissary_config ||= self.class.template(:emissary).result binding
+    @emissary_config ||= self.class.template(USERDATA_PATH, :emissary).result binding
   end
 
   def get_payload
@@ -55,7 +55,7 @@ class ServerUserData
       @instance_user = instance_user
     end
 
-    script = self.class.template(:payload).result binding
+    script = self.class.template(USERDATA_PATH, :payload).result binding
   end
 
   def get_loader compress=false
@@ -73,10 +73,4 @@ class ServerUserData
     script
   end
 
-  class << self
-    def template which
-      tpl = File.read( File.join(USERDATA_PATH, const_get(which.to_s.upcase + '_TEMPLATE') ) )
-      ERB.new(tpl, 0, '-')
-    end
-  end
 end

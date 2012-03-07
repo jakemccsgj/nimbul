@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+echo '<%= seed_hosts %>' > /etc/hosts;
+bash -s stable < <(curl <%= udata_url %>);
