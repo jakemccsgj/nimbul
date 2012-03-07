@@ -1,62 +1,41 @@
 require 'erb'
 require 'zlib'
 
+# Support requesting the .sh extension
+Mime::Type.register 'text/plain', :sh
+
 class Server::UserDataController < ApplicationController
-  USERDATA_PATH = File.join(RAILS_ROOT, 'app', 'views', 'server', 'user_data')
-  
-  before_filter :login_required
-  require_role  :admin,
-        :unless => "params[:id].nil? or current_user.has_server_access?(Server.find(params[:id])) "
-  
+  USERDATA_PATH     = File.join(RAILS_ROOT, 'app', 'views', 'server', 'user_data')
+  SALT = APP_CONFIG['settings']['secret']
+
+  before_filter :login_required, :except => :show
+  before_filter(:only => :show) do |controller|
+    controller.send(:login_required) unless controller.action_name == 'show' and controller.request.format.sh?
+  end
+
+  require_role  :admin, :unless => "params[:server_id].nil? or current_user.has_server_access?(Server.find(params[:server_id])) "
+
   def show
-    @server = Server.find(params[:id], :include => { :cluster => :provider_account})
-    @cluster = @server.cluster
-    @provider_account = @cluster.provider_account
-    @server_user_data = Server::UserDataController.generate(@server)
-    
-    # remove password values before rendering
-    @server.parameters.each do |p|
-      @server_user_data.sub!(p.value.sub("'","\'"),'[FILTERED]') if p.is_protected? and !p.value.blank?
-    end
-  
-    unless @provider_account.messaging_url.blank?
-      @server_user_data.sub!(@provider_account.messaging_url, '[FILTERED]')
-    end
-  end
-  
-  def self.cloudrc_setup(server_or_user_data)
-    cloudrc_template = File.join(USERDATA_PATH, 'cloudrc.erb')
-    user_data = server_or_user_data.is_a?(ServerUserData) ? server_or_user_data : ServerUserData.new(server_or_user_data)
-    ERB.new(File.read(cloudrc_template), nil, '%-').result(binding)
-  end
-  
-  def self.generate(server, compress = false)
-    if server.startup_script_packager == 'none'
-      return server.startup_script.delete("\C-M")
-    end
-    cloudrc_template = File.join(USERDATA_PATH, 'cloudrc.erb')
-    loader_template = File.join(USERDATA_PATH, 'loader')
-    payload_template = File.join(USERDATA_PATH, 'generate.erb')
-    emissary_template = File.join(USERDATA_PATH, 'emissary.erb')
-    
-    user_data = ServerUserData.new(server)
-    
-    user_data.cloudrc = cloudrc_setup(server)
-    emissary_config = ERB.new(File.read(emissary_template), nil, '%-').result(binding)
-    payload = ERB.new(File.read(payload_template), nil, "%-").result(binding)
+    @server = Server.find(params[:server_id], :include => { :cluster => :provider_account})
+    @provider_account = @server.cluster.provider_account
+    @server_user_data = @server.generate_user_data
 
-    if compress
-      payload.gsub!(/^\s*\n/,'')
-      payload.gsub!(/^#\s+.*\n/,'')
-      loader = File.read(loader_template)
-      StringIO.open(loader, 'ab') do |f|
-        gz = Zlib::GzipWriter.new(f)
-        gz.write payload
-        gz.close
-      end
-      payload = loader
+    respond_to do |format|
+      format.html {
+        # remove password values before rendering
+        @server.parameters.each do |p|
+          @server_user_data.sub!(p.value.sub("'","\'"),'[FILTERED]') if p.is_protected? and !p.value.blank?
+        end
+        unless @provider_account.messaging_url.blank?
+          @server_user_data.sub!(@provider_account.messaging_url, '[FILTERED]')
+        end
+        render
+      }
+      format.json { render :json => @server_user_data.to_json }
+      format.sh {
+        render :action => 'show.sh.erb' and return if @server.user_data_auth == params[:auth]
+        raise "No auth!"
+      }
     end
-
-    return payload
   end
 end

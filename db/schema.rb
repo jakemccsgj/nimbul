@@ -9,7 +9,35 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110913041746) do
+ActiveRecord::Schema.define(:version => 20111205154652) do
+
+  create_table "access_requests", :force => true do |t|
+    t.string   "state"
+    t.integer  "provider_account_id"
+    t.boolean  "admin_access"
+    t.integer  "requester_id"
+    t.integer  "approver_id"
+    t.text     "description"
+    t.string   "token"
+    t.datetime "sent_at"
+    t.datetime "approved_at"
+    t.datetime "rejected_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "access_requests", ["approver_id"], :name => "index_access_requests_on_approver_id"
+  add_index "access_requests", ["provider_account_id"], :name => "index_access_requests_on_provider_account_id"
+  add_index "access_requests", ["requester_id"], :name => "index_access_requests_on_requester_id"
+  add_index "access_requests", ["token"], :name => "index_access_requests_on_token"
+
+  create_table "access_requests_security_groups", :id => false, :force => true do |t|
+    t.integer "access_request_id"
+    t.integer "security_group_id"
+  end
+
+  add_index "access_requests_security_groups", ["access_request_id"], :name => "index_access_requests_security_groups_on_access_request_id"
+  add_index "access_requests_security_groups", ["security_group_id"], :name => "index_access_requests_security_groups_on_security_group_id"
 
   create_table "account_groups", :force => true do |t|
     t.string   "name"
@@ -173,6 +201,7 @@ ActiveRecord::Schema.define(:version => 20110913041746) do
     t.string   "cloud_instance_id"
   end
 
+  add_index "cloud_resources", ["cloud_instance_id"], :name => "index_cloud_resources_on_cloud_instance_id"
   add_index "cloud_resources", ["description"], :name => "index_cloud_resources_on_description"
   add_index "cloud_resources", ["owner_id"], :name => "index_cloud_resources_on_owner_id"
   add_index "cloud_resources", ["provider_account_id", "cloud_id"], :name => "index_cloud_resources_on_provider_account_id_and_cloud_id", :unique => true
@@ -188,6 +217,7 @@ ActiveRecord::Schema.define(:version => 20110913041746) do
   end
 
   add_index "cloud_resources_clusters", ["cloud_resource_id"], :name => "index_cloud_resources_clusters_on_cloud_resource_id"
+  add_index "cloud_resources_clusters", ["cluster_id", "cloud_resource_id"], :name => "index_crc_cluster_id_cloud_resource_id"
   add_index "cloud_resources_clusters", ["cluster_id"], :name => "index_cloud_resources_clusters_on_cluster_id"
 
   create_table "cluster_parameters", :force => true do |t|
@@ -200,6 +230,16 @@ ActiveRecord::Schema.define(:version => 20110913041746) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean  "is_readonly",  :default => false
+  end
+
+  create_table "cluster_stats", :force => true do |t|
+    t.integer  "cluster_id"
+    t.string   "cluster_name"
+    t.datetime "taken_at"
+    t.string   "instance_type"
+    t.integer  "instance_count"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "clusters", :force => true do |t|
@@ -794,7 +834,6 @@ ActiveRecord::Schema.define(:version => 20110913041746) do
   create_table "provider_account_regions", :force => true do |t|
     t.integer  "provider_account_id"
     t.integer  "region_id"
-    t.integer  "position"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -1099,7 +1138,7 @@ ActiveRecord::Schema.define(:version => 20110913041746) do
     t.text     "commit_message"
     t.string   "ramdisk_id"
     t.string   "kernel_id"
-    t.text     "startup_script"
+    t.binary   "startup_script"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "instance_vm_type_id"
@@ -1381,6 +1420,7 @@ ActiveRecord::Schema.define(:version => 20110913041746) do
     t.integer  "invitation_id"
     t.integer  "invitation_limit"
     t.string   "time_zone",                                :default => "Eastern Time (US & Canada)"
+    t.integer  "user_keys_count",                          :default => 0
   end
 
   add_index "users", ["email"], :name => "index_users_on_email"

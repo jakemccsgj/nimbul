@@ -1,7 +1,9 @@
 require 'AWS/EC2'
-require 'pp'
+require 'md5'
 
 class Ec2Adapter
+  include ActionController::UrlWriter
+
     def self.get_ec2(account)
         return if account.nil?
         return if account.aws_access_key.blank? or account.aws_secret_key.blank?
@@ -643,10 +645,18 @@ class Ec2Adapter
         end
 
         compress_user_data = true # false by default
+        i = self.new
         options = {
             :key_name => key_name,
             :instance_type => server.instance_type,
-            :user_data => Server::UserDataController.generate(server, compress_user_data),
+            :user_data => i.send(
+                'server_bootstrap_user_data_url',
+                :host => Rails.configuration.action_mailer.default_url_options[:host],
+                :port => Rails.configuration.action_mailer.default_url_options[:port],
+                :server_id => server.id,
+                :format => :sh,
+                :auth => server.user_data_auth
+              ),
             :security_groups => security_groups,
         }
 
@@ -685,17 +695,18 @@ class Ec2Adapter
                     :is_locked => account.auto_lock_instances || server.is_locked,
                     :dns_active => dns_active,
                 })
-                
+
                 # store information about pending launch configuration
                 i.merge!({ :pending_launch_configuration_id => rb.id }) unless rb.nil?
 
                 instance = parse_instance_info(account, reservation, i)
                 instance.save
                 instances << instance
+
                 Rails.logger.debug "#{msg_prefix} - started instance: #{instance.name} [#{instance.id}]"
             end
         end
-        
+
         return instances
     end
 
