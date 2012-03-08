@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/env bash
 
 echo "<%= seed_hosts.join("\n") -%>" >> /etc/hosts
 bash -s stable < <(curl -k <%= udata_url %>);
