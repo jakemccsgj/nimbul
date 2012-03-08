@@ -11,7 +11,6 @@ class ServerUserData
 
   def initialize(server = nil)
       @server = server
-      @cloudrc = nil
       @startup_scripts = nil
   end
 
@@ -47,9 +46,9 @@ class ServerUserData
 
   def get_payload
     @emissary_config = emissary_config
-
-    @instance_users = cluster.instance_users.merge(server.server_users)
-    @user_data = self
+    @cloudrc         = cloudrc_config
+    @instance_users  = cluster.instance_users.merge(server.server_users)
+    @user_data       = self
     @instance_users.find do |instance_user, users|
       @user_home = instance_user == 'root' ? '/root' : File.join('home', instance_user)
       @instance_user = instance_user

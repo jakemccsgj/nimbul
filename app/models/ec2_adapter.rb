@@ -1,5 +1,6 @@
 require 'AWS/EC2'
 require 'md5'
+require 'base64'
 
 class Ec2Adapter
   extend Erby
@@ -657,17 +658,9 @@ class Ec2Adapter
         udata_url = user_data server
         udata_script = self.template(USERDATA_PATH, :base).result(binding)
         options = {
-            :key_name => key_name,
-            :instance_type => server.instance_type,
-            :user_data => udata_script,
-           # :user_data => "bash -s stable <(curl " + i.send(
-           #     'server_bootstrap_user_data_url',
-           #     :host => Rails.configuration.action_mailer.default_url_options[:host],
-           #     :port => Rails.configuration.action_mailer.default_url_options[:port],
-           #     :server_id => server.id,
-           #     :format => :sh,
-           #     :auth => server.user_data_auth
-           #   ) + ")",
+            :key_name        => key_name,
+            :instance_type   => server.instance_type,
+            :user_data       => Base64.encode64(udata_script),
             :security_groups => security_groups,
         }
 
@@ -1066,7 +1059,7 @@ class Ec2Adapter
     end
 
     def self.seed_hosts provider_account
-      DnsAdapter.static_dns_entries(provider_account).join("\n")
+      DnsAdapter.static_dns_entries(provider_account)
     end
 end
 

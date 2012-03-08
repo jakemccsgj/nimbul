@@ -65,10 +65,10 @@ chown -R <%= @instance_user %> $SSH_DIR
 <% account = @user_data.server.cluster.provider_account -%>
 cat <<'EOL' > /etc/hosts
 127.0.0.1       localhost
-<%#= DnsAdapter.static_dns_entries(@user_data.server.cluster.provider_account).join("\n") %>
+<%= DnsAdapter.static_dns_entries(@user_data.server.cluster.provider_account).join("\n") %>
 EOL
 
-<%= @user_data.cloudrc %>
+<%= @cloudrc %>
 
 # populate the hosts file by forcing an update
 # Note: this has to be done /after/ cloudrc is built
@@ -98,7 +98,17 @@ $FILE
 unlink $FILE
 <% end -%>
 
+yum install -y gcc
+
+gem update --system --no-ri --no-rdoc
+gem install bundler --no-ri --no-rdoc
+
 emissary stop
+gem install emissary && gem update emisssary
+
+yum erase -y gcc
+
+#bundle exec `which emissary` stop
 
 # configure emissary
 mkdir -p /etc/emissary
