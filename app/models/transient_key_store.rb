@@ -58,7 +58,6 @@ class TransientKeyStore
     logger.debug "Sending #{key}, #{value} from write method"
     keystore.send("#{key.to_s}=".to_sym, value)
     keystore.keys.add(key.to_sym) unless keystore.keys.include? key.to_sym
-    @data[key.to_s] = value
   end
   alias :put :write
   alias :set :write
@@ -130,6 +129,7 @@ class TransientKeyStore
       YAML::load(str).each_pair do |k, v|
         inst[k] = v
       end
+      inst
     end
 
     def to_yaml env
