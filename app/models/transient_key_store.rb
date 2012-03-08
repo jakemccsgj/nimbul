@@ -18,7 +18,7 @@ class TransientKeyStore
   at_exit { self.class.stop_service rescue nil; exit }
 
   private
-  attr_accessor :uri, :env, :logger, :drb
+  attr_accessor :uri, :env, :logger, :drb, :data
 
   DEFAULT_URI    = 'druby://localhost:55534'
   DEFAULT_LOGGER = Logger.new($stderr)
@@ -124,12 +124,21 @@ class TransientKeyStore
     end
 
     # Initialize the object from YAML, and then have it store it's data to the keystore
-    def from_yaml str
-      ks = self.instance ENV['RAILS_ENV']
-      YAML::load(str).instance_eval { @data }.each_pair do |key, val|
-        ks.set key, val
+    def from_yaml env, str
+      inst = self.instance env
+      YAML::load(str).each_pair do |k, v|
+        inst[k] = v
       end
-      ks
+      inst
+    end
+
+    def to_yaml env
+      keys = Hash.new
+      inst = self.instance(env)
+      inst.keys.each do |k|
+        keys[k] = inst[k]
+      end
+      YAML::dump(k)
     end
   end
 end
