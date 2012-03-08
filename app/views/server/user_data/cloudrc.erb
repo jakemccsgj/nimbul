@@ -2,7 +2,7 @@
 touch /etc/cloudrc.private
 chmod 600 /etc/cloudrc.private
 cat <<'EOL' > /etc/cloudrc.private
-<% @user_data.server.parameters.collect{ |p| p if p.is_protected? }.compact.each do |p| %>
+<% @server.parameters.collect{ |p| p if p.is_protected? }.compact.each do |p| %>
 export <%= p.name %>='<%= p.value.delete("\n").delete("\C-M").sub("'","\'") %>'
 <% end -%>
 EOL
@@ -32,13 +32,13 @@ function INSTANCE_NAME {
 }
 
 export -f INSTANCE_NAME
-export ACCOUNT_ID="<%= @user_data.server.cluster.provider_account.id -%>"
-export CLUSTER_ID="<%= @user_data.server.cluster.id -%>"
-export SERVER_ID="<%= @user_data.server.id -%>"
+export ACCOUNT_ID="<%= @server.cluster.provider_account.id -%>"
+export CLUSTER_ID="<%= @server.cluster.id -%>"
+export SERVER_ID="<%= @server.id -%>"
 export INSTANCE_ID="$(/usr/local/bin/ec2-metadata -i | awk '{ print $2 }')"
 
-export CLUSTER_NAME="<%= @user_data.server.cluster.name.gsub(/[^\w\d]+/, '_').downcase -%>"
-export SERVER_NAME="<%= @user_data.server.name.gsub(/[^\w\d]+/, '_').downcase -%>"
+export CLUSTER_NAME="<%= @server.cluster.name.gsub(/[^\w\d]+/, '_').downcase -%>"
+export SERVER_NAME="<%= @server.name.gsub(/[^\w\d]+/, '_').downcase -%>"
 
 PS1="\n-[\u@$(INSTANCE_NAME)]- -[\d - \A]-\n-[\w]-\n\$ "
 PS2="--- "
@@ -48,7 +48,7 @@ if [ -r /etc/cloudrc.private ]; then
 	source /etc/cloudrc.private
 fi
 
-<% @user_data.server.parameters.collect{ |p| p unless p.is_protected? }.compact.each do |p| -%>
+<% @server.parameters.collect{ |p| p unless p.is_protected? }.compact.each do |p| -%>
 export <%= p.name %>='<%= p.value.delete("\n").delete("\C-M").sub("'","\'") %>'
 <% end -%>
 EOL

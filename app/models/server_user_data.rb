@@ -48,7 +48,9 @@ class ServerUserData
     @emissary_config = emissary_config
     @cloudrc         = cloudrc_config
     @instance_users  = cluster.instance_users.merge(server.server_users)
-    @user_data       = self
+    @server          = server
+    @startup_scripts = startup_scripts
+
     @instance_users.find do |instance_user, users|
       @user_home = instance_user == 'root' ? '/root' : File.join('home', instance_user)
       @instance_user = instance_user

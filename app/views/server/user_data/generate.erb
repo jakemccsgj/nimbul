@@ -1,9 +1,9 @@
 #!/bin/bash
 # No -e on purpose - otherwise things might break!!!
 
-# Account: <%= @user_data.server.cluster.provider_account.name %> [<%= @user_data.server.cluster.provider_account.id %>]
-# Cluster: <%= @user_data.server.cluster.name %> [<%= @user_data.server.cluster.id %>]
-# Server: <%= @user_data.server.name %> [<%= @user_data.server.id %>]
+# Account: <%= @server.cluster.provider_account.name %> [<%= @server.cluster.provider_account.id %>]
+# Cluster: <%= @server.cluster.name %> [<%= @server.cluster.id %>]
+# Server: <%= @server.name %> [<%= @server.id %>]
 
 # Make sure we deploy main key first
 if [ -x /etc/init.d/ec2-get-credentials ]; then
@@ -14,7 +14,7 @@ fi
 <%
 instance_users = {}
 
-root_users = @user_data.server.cluster.provider_account.users + @user_data.server.cluster.users
+root_users = @server.cluster.provider_account.users + @server.cluster.users
 root_users.each do |user|
     instance_user = 'root'
     instance_users[instance_user] ||= []
@@ -24,7 +24,7 @@ root_users.each do |user|
     end
 end
 
-@user_data.server.server_user_accesses.each do |sua|
+@server.server_user_accesses.each do |sua|
     user = sua.user
     instance_user = sua.server_user
     instance_users[instance_user] = [] if instance_users[instance_user].nil?
@@ -62,10 +62,10 @@ chmod 600 $SSH_DIR/authorized_keys
 chown -R <%= @instance_user %> $SSH_DIR
 
 # Seed the /etc/hosts file
-<% account = @user_data.server.cluster.provider_account -%>
+<% account = @server.cluster.provider_account -%>
 cat <<'EOL' > /etc/hosts
 127.0.0.1       localhost
-<%= DnsAdapter.static_dns_entries(@user_data.server.cluster.provider_account).join("\n") %>
+<%= DnsAdapter.static_dns_entries(@server.cluster.provider_account).join("\n") %>
 EOL
 
 <%= @cloudrc %>
@@ -86,7 +86,7 @@ if [ -x /etc/init.d/ec2-extra-keys ]; then
 fi
 
 # startup scripts
-<% @user_data.startup_scripts.collect{ |s| s unless s.body.blank? }.compact.each do |s| -%>
+<% @startup_scripts.collect{ |s| s unless s.body.blank? }.compact.each do |s| -%>
 # <%= s.name %>
 FILE="/tmp/$(basename $0).$RANDOM"
 touch $FILE

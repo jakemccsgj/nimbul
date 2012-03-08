@@ -1,6 +1,5 @@
 require 'AWS/EC2'
 require 'md5'
-require 'base64'
 
 class Ec2Adapter
   extend Erby
@@ -660,7 +659,8 @@ class Ec2Adapter
         options = {
             :key_name        => key_name,
             :instance_type   => server.instance_type,
-            :user_data       => Base64.encode64(udata_script),
+            #:user_data       => Base64.encode64(udata_script),
+            :user_data       => udata_script,
             :security_groups => security_groups,
         }
 
