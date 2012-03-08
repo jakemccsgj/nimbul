@@ -13,7 +13,7 @@ class Server::UserDataController < ApplicationController
     controller.send(:login_required) unless controller.action_name == 'show' and controller.request.format.sh?
   end
 
-  require_role  :admin, :unless => "params[:server_id].nil? or current_user.has_server_access?(Server.find(params[:server_id])) "
+  require_role  :admin, :unless => "params[:server_id].nil? or (not current_user.nil? and current_user.has_server_access?(Server.find(params[:server_id]))) or request.format.sh?"
 
   def show
     @server = Server.find(params[:server_id], :include => { :cluster => :provider_account})
