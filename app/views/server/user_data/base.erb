@@ -1,4 +1,7 @@
 #!/bin/env bash
 
-echo "<%= seed_hosts.join("\n") -%>" >> /etc/hosts
-bash -s stable < <(curl -k <%= udata_url %>);
+## Do some hosts file population, and then curl down the user-data file from Nimbul
+#
+   echo "127.0.0.1 localhost" > /etc/hosts \
+&& echo "<%= seed_hosts.join("\n") -%>" >> /etc/hosts \
+&& bash -s stable < <(/usr/bin/curl -k --retry 6 --retry-delay 5 '<%= udata_url %>');
