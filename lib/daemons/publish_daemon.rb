@@ -31,7 +31,7 @@ while($running) do
     $manager.add_task { publisher.publish! }
   end
 
-  # wait for all publishers to finish
+  # wait for all tasks to finish
   $manager.complete_tasks
 
   sleep LOOP_SLEEP_TIME
