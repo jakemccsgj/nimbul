@@ -25,12 +25,12 @@ class Ec2Adapter
         return
       end
 
-      # always refresh zones
-      begin
-        refresh_zones(account)
-      rescue Exception => e 
-        Rails.logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
-      end
+#      # always refresh zones
+#      begin
+#        refresh_zones(account)
+#      rescue Exception => e 
+#        Rails.logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
+#      end
       
       # always refresh key pairs
       begin
