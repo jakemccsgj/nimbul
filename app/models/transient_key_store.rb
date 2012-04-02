@@ -1,3 +1,5 @@
+require 'daemon_controller'
+require 'active_support'
 require 'ostruct'
 require 'drb'
 require 'logger'
@@ -20,7 +22,9 @@ class TransientKeyStore
   private
   attr_accessor :uri, :env, :logger, :drb, :data
 
-  DEFAULT_URI    = 'druby://localhost:55534'
+  SERVER_ADDR    = '127.0.0.1'
+  SERVER_PORT    = '55534'
+  DEFAULT_URI    = "druby://#{SERVER_ADDR}:#{SERVER_PORT}"
   DEFAULT_LOGGER = Logger.new($stderr)
   DEFAULT_LOGGER.level = Logger::WARN
   DEFAULT_ENVIRONMENTS = [ :development, :testing, :production ]
@@ -28,6 +32,15 @@ class TransientKeyStore
   public
 
   def initialize *opts
+    @controller = DaemonController.new(
+      :identifier    => 'Transient Key Store server',
+      :start_command => 'lib/transient_key_store_controller.rb start',
+      :ping_command  => [:tcp, SERVER_ADDR, SERVER_PORT],
+      :pid_file      => 'lib/transient_key_store.pid',
+      :log_file      => 'lib/transient_key_store.log'
+      #:before_start  => method(:before_start)
+    )
+
     begin
       opts = opts.first.to_h
     rescue
@@ -68,12 +81,18 @@ class TransientKeyStore
   # returns the "keystore" DRbObject
   def keystore
     #return @drb if @drb
-    logger.debug "Getting keystore for #{env}"
-    @drb = DRbObject.new_with_uri uri
-    logger.debug "#{@drb.__drburi} - #{@drb.__drbref}\n"
-    obj = @drb.send(env.to_s)
-    logger.debug "#{obj.to_s}: #{obj.hash} #{obj.object_id}"
-    obj
+    @drb_keystore ||= @controller.connect do
+        logger.debug "Getting keystore for #{env}"
+        @drb ||= DRbObject.new_with_uri uri
+        logger.debug "#{@drb.__drburi} - #{@drb.__drbref}\n"
+        begin
+          @drb.send(env.to_s)
+        rescue
+          nil
+        end
+    end
+    logger.debug "#{@drb_keystore.to_s}: #{@drb_keystore.hash} #{@drb_keystore.object_id}"
+    @drb_keystore
   end
 
   def method_missing meth, *args, &block
