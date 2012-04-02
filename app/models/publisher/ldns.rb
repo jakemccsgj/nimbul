@@ -1,6 +1,8 @@
 require 's3_adapter'
 
 class Publisher::Ldns < Publisher
+  @queue = :publishers
+
   URL_PARAM_NAME = 'HOSTS_FILE_URL'
   
   before_destroy :remove_url_parameter
@@ -48,6 +50,7 @@ class Publisher::Ldns < Publisher
 
   def publish!
     account = ProviderAccount.find(self.provider_account_id, :include => { :clusters => :servers } )
+    return unless account.aws_access_key and account.aws_secret_key
     bucket = parameter_value('s3_bucket_name')
     base_path = parameter_value('s3_object_name')
 
@@ -109,4 +112,5 @@ class Publisher::Ldns < Publisher
     param = ProviderAccount.find(self.provider_account_id).provider_account_parameters.detect { |p| p.name == URL_PARAM_NAME }
     param.destroy unless param.nil?
   end
+
 end

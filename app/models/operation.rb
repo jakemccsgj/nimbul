@@ -165,19 +165,35 @@ protected
   def initiate_timeout(); end
   def initiate_failure(); end
   def initiate_success(); end
+
+  public
+  class << self
+    def process
+      # move each operation in proceed state to it's next step
+      # and handle operations that need to timeout
+
+      find_all_by_state(:proceed).each do |operation|
+        operation.step!
+      end
+
+      find_all_by_state(:waiting, :conditions => [ 'timeout_at <= ?', Time.zone.now ]).each do |operation|
+        operation.reentrant_timeout!
+      end
+    end
+  end
 end
 
 class Operation::Step
-	attr_reader :name
-	attr_accessor :result_code, :result_message
+    attr_reader :name
+    attr_accessor :result_code, :result_message
 
-	def initialize name, &block
+    def initialize name, &block
     @name  = name
-		@block = block
-	end
+        @block = block
+    end
 
-	def execute
-		@block.call
-	end
+    def execute
+        @block.call
+    end
 end
 

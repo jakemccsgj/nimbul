@@ -3,13 +3,14 @@ source 'http://gems.rubyforge.org'
 source 'http://gemcutter.org'
 
 gem 'aws'
-gem 'daemons'
+gem 'daemons', '= 1.0.10'
+gem 'statemachine'
 gem 'rails', '~> 2.3.0'
 gem 'Ruby-MemCache', :require => 'memcache'
 gem 'ruby-openid'
 gem 'facter'
 gem 'aasm'
-gem 'carrot'
+gem 'carrot', :git => 'http://github.com/rabbitt/carrot'
 gem 'chronic'
 gem 'emissary'
 gem 'fastthread'
@@ -33,10 +34,6 @@ gem 'net-sftp', :require => 'net/sftp'
 gem 'net-ssh', :require => 'net/ssh'
 gem 'rufus-scheduler'
 gem 'work_queue', '~> 1.0.0'
-#gem 'SysVIPC', '~> 0.9.0'
-#git 'git://github.com/mosta/sysvipc-0.8-rc1.git' do
-#  gem 'systemvipc', :require => 'sysvipc.so'
-#end
 git 'git://github.com/nimbul/cloudmaster.git' do
   gem 'cloudmaster'
 end
@@ -59,3 +56,7 @@ end
 
 group :production do
 end
+
+gem 'daemon_controller', :git => 'https://github.com/FooBarWidget/daemon_controller.git'
+gem 'resque'
+gem 'spawn', :git => 'https://github.com/nimbul/spawn.git'

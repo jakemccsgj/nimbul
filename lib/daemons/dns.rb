@@ -13,6 +13,6 @@ end
 
 while($running) do
     # process any dns acquire/release requests
-    DnsRequest.process_requests
+    DnsRequest.process
     sleep 10
 end

@@ -168,7 +168,7 @@ class ProviderAccount < BaseModel
 
     def aws_access_key_ui=(key)
         key.strip!
-        keystore[self.aws_access_key_attribute] = key if name and !key.blank?
+        @aws_secret_key_ui ||= keystore[self.aws_access_key_attribute] = key if name and !key.blank?
     end
 
     def aws_access_key_ui
@@ -179,7 +179,7 @@ class ProviderAccount < BaseModel
     end
 
     def aws_access_key
-        keystore[self.aws_access_key_attribute] || ''
+        @aws_access_key ||= keystore[self.aws_access_key_attribute] || ''
     end
 
     def aws_secret_key_attribute
@@ -188,7 +188,7 @@ class ProviderAccount < BaseModel
 
     def aws_secret_key_ui=(key)
         key.strip!
-        keystore[self.aws_secret_key_attribute] = key if name and !key.blank?
+        @aws_secret_key_ui ||= keystore[self.aws_secret_key_attribute] = key if name and !key.blank?
     end
 
     def aws_secret_key_ui
@@ -199,7 +199,7 @@ class ProviderAccount < BaseModel
     end
 
     def aws_secret_key
-        keystore[self.aws_secret_key_attribute] || ''
+        @aws_secret_key ||= keystore[self.aws_secret_key_attribute] || ''
     end
 
     def ssh_master_key_attribute
@@ -207,7 +207,7 @@ class ProviderAccount < BaseModel
     end
 
     def ssh_master_key_ui=(key)
-        keystore[self.ssh_master_key_attribute] = key if name
+        @ssh_master_key_ui ||= keystore[self.ssh_master_key_attribute] = key if name
     end
 
     def ssh_master_key_ui
@@ -221,7 +221,7 @@ class ProviderAccount < BaseModel
     end
 
     def ssh_master_key
-        keystore[self.ssh_master_key_attribute] || ''
+        @ssh_master_key ||= keystore[self.ssh_master_key_attribute] || ''
     end
 
     def with_ssh_master_key(&block)
@@ -430,16 +430,17 @@ class ProviderAccount < BaseModel
 
     # refresh
     def refresh(resources = nil)
-        Ec2Adapter.refresh_account(self, resources)
-        AsAdapter.refresh_account(self, resources)
-        StatsAdapter.refresh_account(self) if resources.nil?
+      e = Ec2Adapter.new(:account => self)
+      e.refresh_account resources
+      AsAdapter.refresh_account(self, resources)
+      StatsAdapter.refresh_account(self) if resources.nil?
   
-        now = Time.now
-        refresh_attr = {
-            :refreshed_at => now,
-            :refresh_at => (now + 10.seconds),
-        }
-        update_attributes(refresh_attr)
+      now = Time.now
+      refresh_attr = {
+        :refreshed_at => now,
+        :refresh_at => (now + 10.seconds),
+      }
+      update_attributes(refresh_attr)
     end
 
     # Factory to create instances of subclasses
@@ -467,6 +468,6 @@ class ProviderAccount < BaseModel
     end
 
     def keystore
-      TransientKeyStore.instance ENV['RAILS_ENV']
+      @keystore ||= TransientKeyStore.instance ENV['RAILS_ENV']
     end
 end

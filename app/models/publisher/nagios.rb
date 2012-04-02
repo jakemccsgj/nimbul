@@ -1,4 +1,6 @@
 class Publisher::Nagios < Publisher
+  @queue = :publishers
+
   def description
     'Publishes list of instances with DNS information and roles.'
   end

@@ -1,3 +1,5 @@
+require 'daemons'
+
 class Publisher < BaseModel
   belongs_to :provider_account
   has_many :publisher_parameters, :dependent => :destroy
@@ -82,7 +84,19 @@ class Publisher < BaseModel
     return false
   end
 
+  def self.process
+    self.all.each { |p|
+      Resque.enqueue(p.class, p.id)
+    }
+  end
+
   def self.label
     "Publisher"
   end
+
+  def self.perform *args
+    self[args.first].publish!
+  end
 end
+
+

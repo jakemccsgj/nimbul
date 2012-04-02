@@ -70,7 +70,7 @@ class Task < BaseModel
     end
 
     def get_parameter(name)
-		self.initialize_parameters.detect{|p| p.name == name}
+        self.initialize_parameters.detect{|p| p.name == name}
     end
 
     def parameter_value(name)
@@ -98,11 +98,11 @@ class Task < BaseModel
         run!
     end
 
-	def get_operation
-		op = Operation.factory(self.operation)
-		op.task_id = self.id
-		return op
-	end
+    def get_operation
+        op = Operation.factory(self.operation)
+        op.task_id = self.id
+        return op
+    end
 
     def self.search_by_server(server, search, page, extra_joins, extra_conditions, sort=nil, filter=nil, include=nil)
         search_by_taskable(server, search, page, extra_joins, extra_conditions, sort, filter, include)
@@ -140,8 +140,8 @@ class Task < BaseModel
     end
     
     def run!
-		instances = Instance.find_all_by_parent(self.taskable)
-		
+        instances = Instance.find_all_by_parent(self.taskable)
+        
         begin
             instances.each do |instance|
                 next if not instance.running?
@@ -156,5 +156,63 @@ class Task < BaseModel
             return false
         end
         return true
+    end
+
+    class << self
+      def process
+        # unschedule all non-active tasks
+        unschedule_tasks = self.find_all_by_is_active_and_is_scheduled( false, true )
+        unschedule_tasks.each do |t|
+          $scheduler.find_by_tag(t.scheduler_tag).each do |job|
+            job.unschedule
+          end
+          t.update_attribute( :is_scheduled, false )
+          ActiveRecord::Base.logger.info "Unscheduled Task #{t.name} [#{t.id}]\n"
+          # Rails.logger.info "Unscheduled Task #{t.name} [#{t.id}]\n"
+        end
+
+        # unschedule all one-time tasks with run_at in the past
+        unschedule_tasks = self.find_all_by_is_active_and_is_scheduled_and_is_repeatable( true, true, false )
+        unschedule_tasks.each do |t|
+          if t.run_at < Time.now.utc
+            $scheduler.find_by_tag(t.scheduler_tag).each do |job|
+              job.unschedule
+            end
+            t.update_attributes( { :is_active => false, :is_scheduled => false } )
+            ActiveRecord::Base.logger.info "Unscheduled Task #{t.name} [#{t.id}]\n"
+            # Rails.logger.info "Unscheduled Task #{t.name} [#{t.id}]\n"
+          end
+        end
+
+        # schedule all active tasks
+        schedule_tasks = self.find_all_by_is_active_and_is_scheduled( true, false )
+        schedule_tasks.each do |t|
+          # make sure we haven't scheduled the task already
+          if $scheduler.find_by_tag(t.scheduler_tag).length == 0
+            if t.is_repeatable?
+              # repeatable tasks - make sure first_at is in the future
+              # otherwise scheduler will schedule all the "missed" runs
+              first_at = t.run_at
+              while first_at < Time.now.utc
+                first_at = first_at + Rufus.parse_time_string(t.run_every)
+              end
+              $scheduler.every t.run_every, :first_at => first_at, :tags => t.scheduler_tag do |job|
+                t.call(job)
+              end
+            else
+              # non-repeatable tasks - only schedule if the run_at time is in the future
+              if t.run_at > Time.now.utc
+                $scheduler.at t.run_at, :tags => t.scheduler_tag do |job|
+                  t.call(job)
+                end
+              end
+            end
+          end
+          # mark the task as scheduled
+          t.update_attribute( :is_scheduled, true )
+          ActiveRecord::Base.logger.info "Scheduled Task #{t.name} [#{t.id}]\n"
+          #Rails.logger.info "Scheduled Task #{t.name} [#{t.id}]\n"
+        end
+      end
     end
 end
