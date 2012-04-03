@@ -27,7 +27,7 @@ end
 @server.server_user_accesses.each do |sua|
     user = sua.user
     instance_user = sua.server_user
-    instance_users[instance_user] = [] if instance_users[instance_user].nil?
+    instance_users[instance_user] ||= []
     instance_users[instance_user] << user unless user.user_keys.size == 0
 end
 
@@ -43,7 +43,7 @@ instance_users.each do |instance_user, users|
 SSH_DIR="<%= user_home %>/.ssh"
 mkdir -p $SSH_DIR
 cat <<'EOLEOLEOL' >> $SSH_DIR/authorized_keys
-<% @instance_users.each_pair do |server_user, users|
+<%
   users.each do |user|
     user.user_keys.each do |key|
       unless key.public_key.blank? or key.public_key !~ /^ssh-/
@@ -120,4 +120,3 @@ EOF
 emissary start -d
 
 exit 0
-<% end %>
