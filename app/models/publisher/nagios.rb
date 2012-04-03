@@ -1,5 +1,6 @@
 class Publisher::Nagios < Publisher
-  @queue = :publishers
+  include Resque::Plugins::UniqueJob
+  @queue = :nagios_publishers
 
   def description
     'Publishes list of instances with DNS information and roles.'

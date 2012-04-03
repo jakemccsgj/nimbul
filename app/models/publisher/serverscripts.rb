@@ -1,6 +1,8 @@
 require 's3_adapter'
 
 class Publisher::Serverscripts < Publisher
+  include Resque::Plugins::UniqueJob
+  @queue = :serverscripts_publishers
   def description
     'Publishes server user data information to an S3 bucket.'
   end

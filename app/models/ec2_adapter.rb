@@ -11,8 +11,8 @@ class Ec2Adapter
     include ActionView::Helpers::UrlHelper
   end
 
-  def initialize account = nil
-    @account = account
+  def initialize args
+    @account = args[:account]
   end
 
   def get_ec2 account = nil
@@ -23,13 +23,10 @@ class Ec2Adapter
     @ec2
   end
 
-    def refresh_account(args = {})
-      resources = args[:resources] || nil
-      multiprocess = args[:multiprocess] || false
-
+    def refresh_account resources = nil
       # don't proceed if we can't get the ec2 account object
       if get_ec2.nil?
-        Rails.logger.error "Account [#{account.id} - #{account.name}] failed to refresh - unable to load AWS::EC2 object using account credentials."
+        Rails.logger.error "Account [#{@account.id} - #{@account.name}] failed to refresh - unable to load AWS::EC2 object using account credentials."
         return
       end
 

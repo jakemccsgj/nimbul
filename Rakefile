@@ -74,11 +74,5 @@ rescue LoadError
   STDERR.puts "The query_reviewer gem could not be found!"
 end
 
-begin
-  gem 'delayed_job', '~>2.0.4'
-  require 'delayed/tasks'
-rescue LoadError
-  STDERR.puts 'Run `bundle install` to install delayed_job'
-end
-
 require 'resque/tasks'
+require 'resque_scheduler/tasks'

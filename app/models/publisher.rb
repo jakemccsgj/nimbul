@@ -1,6 +1,8 @@
 require 'daemons'
 
 class Publisher < BaseModel
+  include Resque::Plugins::UniqueJob
+
   belongs_to :provider_account
   has_many :publisher_parameters, :dependent => :destroy
 
@@ -84,19 +86,29 @@ class Publisher < BaseModel
     return false
   end
 
-  def self.process
-    self.all.each { |p|
-      Resque.enqueue(p.class, p.id)
-    }
-  end
-
   def self.label
     "Publisher"
   end
 
-  def self.perform *args
-    self[args.first].publish!
+  class << self
+    def queue
+      :publishers
+    end
+
+    def publish_delayed
+      self.all.each { |p|
+        Resque.enqueue(p.class, p.id)
+      }
+    end
+
+    def perform *args
+      if !args.empty?
+        args.each do |a|
+          self[a].publish!
+        end
+      else
+        publish_delayed
+      end
+    end
   end
 end
-
-

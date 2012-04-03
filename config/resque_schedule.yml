@@ -1,0 +1,11 @@
+publishers:
+  cron: "* * * * *"
+  queue: publisher_jobs
+  class: Publisher
+  description: "This job will auto-create published files"
+
+provider_accounts:
+  cron: "* * * * *"
+  queue: "provider_account_refresh_jobs"
+  class: 'ProviderAccountRefresh::Accounts'
+
