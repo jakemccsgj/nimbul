@@ -59,3 +59,6 @@ end
 
 group :production do
 end
+
+gem 'log4r'
+gem 'daemon_controller'

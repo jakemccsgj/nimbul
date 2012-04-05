@@ -2,6 +2,7 @@ require 'AWS/EC2'
 require 'md5'
 
 class Ec2Adapter
+  extend Loggable
   extend Erby
 
   BASE_TEMPLATE = 'base.erb'
@@ -21,7 +22,7 @@ class Ec2Adapter
     def self.refresh_account(account, resources = nil)
       # don't proceed if we can't get the ec2 account object
       if get_ec2(account).nil?
-        Rails.logger.error "Account [#{account.id} - #{account.name}] failed to refresh - unable to load AWS::EC2 object using account credentials."
+        logger.error "Account [#{account.id} - #{account.name}] failed to refresh - unable to load AWS::EC2 object using account credentials."
         return
       end
 
@@ -29,63 +30,71 @@ class Ec2Adapter
 #      begin
 #        refresh_zones(account)
 #      rescue Exception => e 
-#        Rails.logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
+#        logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
 #      end
       
       # always refresh key pairs
       begin
         refresh_key_pairs(account)
       rescue Exception => e 
-        Rails.logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
+        logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
       end
 
+      logger.debug "test"
       if resources.nil? or resources == 'server_images' 
         begin
+          logger.debug "Refreshing server images"
           refresh_server_images(account)
         rescue Exception => e 
-          Rails.logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
+          logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
         end
       end
       if resources.nil? or resources == 'security_groups' or resources == 'instances' 
         begin
+          logger.debug "Refreshing security_groups"
           refresh_security_groups(account)
         rescue Exception => e 
-          Rails.logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
+          logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
         end
       end
       if resources.nil? or resources == 'instances'
         begin
+          logger.debug "Refreshing instances"
           refresh_instances(account)
         rescue Exception => e 
-          Rails.logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
+          logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
         end
       end
       if resources.nil? or resources == 'volumes'
         begin
+          logger.debug "Refreshing volumes"
           refresh_volumes(account)
         rescue Exception => e 
-          Rails.logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
+          logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
         end
       end
       if resources.nil? or resources == 'snapshots'
         begin
+          logger.debug "Refreshing snapshots"
           refresh_snapshots(account)
         rescue Exception => e 
-          Rails.logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
+          logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
         end
       end
       if resources.nil? or resources == 'addresses' 
         begin
+          logger.debug "Refreshing addresses"
           refresh_addresses(account)
         rescue Exception => e 
-          Rails.logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
+          logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
         end
       end
       if resources.nil? or resources == 'reserved_instances'
         begin
+          logger.debug "Refreshing reserved instances"
           refresh_reserved_instances(account)
         rescue Exception => e 
-          Rails.logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
+          logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
         end
       end
     end
@@ -383,7 +392,7 @@ class Ec2Adapter
             account_firewall_rules << fr if account_firewall_rules.detect{ |r| r.protocol == grant[:protocol] and r.from_port == grant[:from_port] and r.to_port == grant[:to_port] and r.ip_range == grant[:ip_range]}.nil?
           rescue ActiveRecord::RecordInvalid => e
             # only log the error for now
-            Rails.logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
+            logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
           end
         end
 
@@ -417,7 +426,7 @@ class Ec2Adapter
               account_firewall_rules << fr if account_firewall_rules.detect{ |r| r.group_user_id == grant[:group_user_id] and r.group_name == grant[:group_name] }.nil?
             rescue ActiveRecord::RecordInvalid => e
               # only log the error for now
-              Rails.logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
+              logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
             end
           end
         end
@@ -675,7 +684,7 @@ class Ec2Adapter
                 rb = server.next_available_resource_bundle if rb.nil?
                 if rb.nil?
                     msg = "Not enough launch configurations configured and no default launch configuration for this server. #{c} instances started."
-                    Rails.logger.error "#{msg_prefix} - #{msg}"
+                    logger.error "#{msg_prefix} - #{msg}"
                     raise msg
                 end
             end
@@ -707,7 +716,7 @@ class Ec2Adapter
                 instance.save
                 instances << instance
 
-                Rails.logger.debug "#{msg_prefix} - started instance: #{instance.name} [#{instance.id}]"
+                logger.debug "#{msg_prefix} - started instance: #{instance.name} [#{instance.id}]"
             end
         end
 
