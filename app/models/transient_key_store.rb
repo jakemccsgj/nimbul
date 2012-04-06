@@ -28,6 +28,7 @@ class TransientKeyStore
   DEFAULT_LOGGER = Logger.new($stderr)
   DEFAULT_LOGGER.level = Logger::WARN
   DEFAULT_ENVIRONMENTS = [ :development, :testing, :production ]
+  DEFAULT_TIMEOUT      = 2 #seconds
 
   public
 
@@ -36,10 +37,11 @@ class TransientKeyStore
       :identifier    => 'Transient Key Store server',
       :start_command => 'lib/transient_key_store_controller.rb start',
       :ping_command  => [:tcp, SERVER_ADDR, SERVER_PORT],
-      :pid_file      => 'lib/transient_key_store.pid',
-      :log_file      => 'lib/transient_key_store.log'
+      :pid_file      => 'log/transient_key_store.pid',
+      :log_file      => 'log/transient_key_store.log'
       #:before_start  => method(:before_start)
     )
+    @timeout = DEFAULT_TIMEOUT
 
     begin
       opts = opts.first.to_h
@@ -86,9 +88,12 @@ class TransientKeyStore
         @drb ||= DRbObject.new_with_uri uri
         logger.debug "#{@drb.__drburi} - #{@drb.__drbref}\n"
         begin
-          @drb.send(env.to_s)
-        rescue
-          nil
+          #  Drb has deadlocked on me - ugh
+          Timeout.timeout(@timeout) {
+            @drb.send(env.to_s)
+          }
+        rescue Timeout::Error
+          retry
         end
     end
     logger.debug "#{@drb_keystore.to_s}: #{@drb_keystore.hash} #{@drb_keystore.object_id}"
