@@ -19,7 +19,7 @@ root_users.each do |user|
     instance_user = 'root'
     instance_users[instance_user] ||= []
     begin
-      instance_users[instance_user] << user unless user.user_keys.size == 0
+      instance_users[instance_user] << user unless user.user_keys.length == 0
     rescue
     end
 end
@@ -28,7 +28,7 @@ end
     user = sua.user
     instance_user = sua.server_user
     instance_users[instance_user] ||= []
-    instance_users[instance_user] << user unless user.user_keys.size == 0
+    instance_users[instance_user] << user unless user.user_keys.length == 0
 end
 
 instance_users.each do |instance_user, users|
