@@ -35,10 +35,10 @@ class TransientKeyStore
   def initialize *opts
     @controller = DaemonController.new(
       :identifier    => 'Transient Key Store server',
-      :start_command => 'lib/transient_key_store_controller.rb start',
+      :start_command => File.join(RAILS_ROOT, 'lib/transient_key_store_controller.rb start'),
       :ping_command  => [:tcp, SERVER_ADDR, SERVER_PORT],
-      :pid_file      => 'log/transient_key_store.pid',
-      :log_file      => 'log/transient_key_store.log'
+      :pid_file      => File.join(RAILS_ROOT, 'log/transient_key_store.pid'),
+      :log_file      => File.join(RAILS_ROOT, 'log/transient_key_store.log')
       #:before_start  => method(:before_start)
     )
     @timeout = DEFAULT_TIMEOUT
