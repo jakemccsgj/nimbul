@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
-LOOP_SLEEP_TIME = 300
+LOOP_SLEEP_TIME = 60
+TIMEOUT         = 180
 
 require 'rubygems'
 
@@ -30,7 +31,16 @@ while($running) do
 
   ProviderAccount.all.each do |account|
     unless Ec2Adapter.get_ec2(account).nil?
-      $manager.add_task { account.refresh }
+      $manager.add_task {
+        begin
+          Timeout.timeout(TIMEOUT) {
+            account.refresh
+          }
+        rescue Timeout::Error
+          RAILS_DEFAULT_LOGGER.error("Timeout error refreshing account #{account.name}")
+          retry
+        end
+      }
     end
   end
 
