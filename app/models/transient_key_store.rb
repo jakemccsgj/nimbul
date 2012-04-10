@@ -84,15 +84,16 @@ class TransientKeyStore
   def keystore
     #return @drb if @drb
     @drb_keystore ||= @controller.connect do
-        logger.debug "Getting keystore for #{env}"
-        @drb ||= DRbObject.new_with_uri uri
-        logger.debug "#{@drb.__drburi} - #{@drb.__drbref}\n"
         begin
           #  Drb has deadlocked on me - ugh
           Timeout.timeout(@timeout) {
+            logger.debug "Getting keystore for #{env}"
+            @drb ||= DRbObject.new_with_uri uri
+            logger.debug "#{@drb.__drburi} - #{@drb.__drbref}\n"
             @drb.send(env.to_s)
           }
         rescue Timeout::Error
+          logger.debug("Timeout in keystore!")
           retry
         end
     end
