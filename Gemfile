@@ -59,3 +59,5 @@ end
 
 group :production do
 end
+
+gem 'daemon_controller'

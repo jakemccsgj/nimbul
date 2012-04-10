@@ -162,7 +162,7 @@ class TransientKeyStore
       inst.keys.each do |k|
         keys[k] = inst[k]
       end
-      YAML::dump(k)
+      YAML::dump(keys)
     end
   end
 end
