@@ -901,7 +901,7 @@ class Ec2Adapter
         # get / build the instance model
         instance = account_instances.detect{ |s| s.instance_id == attributes[:instance_id] }
         if instance.nil?
-            instance = account.instances.build(attributes)
+            instance = @account.instances.build(attributes)
         else
             instance.attributes = attributes
         end
