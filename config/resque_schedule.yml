@@ -13,3 +13,8 @@ dns:
   cron: "* * * * *"
   queue: dns_jobs
   class: DnsRequest
+
+operations:
+  cron: "*/10 * * * * *"
+  queue: operations
+  class: Operation

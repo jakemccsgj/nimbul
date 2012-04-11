@@ -180,6 +180,7 @@ protected
         operation.reentrant_timeout!
       end
     end
+    alias :perform :process
   end
 end
 
