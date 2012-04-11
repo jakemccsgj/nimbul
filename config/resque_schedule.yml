@@ -18,3 +18,8 @@ operations:
   cron: "*/10 * * * * *"
   queue: operations
   class: Operation
+
+resources:
+  cron: "*/30 * * * * *"
+  queue: resources
+  class: InstanceResource

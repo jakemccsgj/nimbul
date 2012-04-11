@@ -144,5 +144,6 @@ class InstanceResource < ActiveRecord::Base
         end
       end
     end
+    alias :perform :process
   end
 end
