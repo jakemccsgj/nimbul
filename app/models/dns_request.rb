@@ -10,7 +10,11 @@ class DnsRequest < BaseModel
         (DnsRequest.find(:all) || []).sort!{ |a,b| a.id <=> b.id }.each { |request| request.run }
         true
     end
-        
+
+    def self.perform
+      self.process_requests
+    end
+
     def run 
         case request_type.to_sym
             when :acquire

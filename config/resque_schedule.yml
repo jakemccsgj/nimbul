@@ -9,3 +9,7 @@ provider_accounts:
   queue: "provider_account_refresh_jobs"
   class: 'ProviderAccountRefresh::Accounts'
 
+dns:
+  cron: "* * * * *"
+  queue: dns_jobs
+  class: DnsRequest
