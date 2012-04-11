@@ -1,4 +1,5 @@
 require 'resque'
+require 'yaml'
 Resque.redis = 'localhost:6379'
 
 require 'resque_scheduler'

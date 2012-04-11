@@ -19,7 +19,7 @@ root_users.each do |user|
     instance_user = 'root'
     instance_users[instance_user] ||= []
     begin
-      instance_users[instance_user] << user unless user.user_keys.size == 0
+      instance_users[instance_user] << user unless user.user_keys.length == 0
     rescue
     end
 end
@@ -27,8 +27,8 @@ end
 @server.server_user_accesses.each do |sua|
     user = sua.user
     instance_user = sua.server_user
-    instance_users[instance_user] = [] if instance_users[instance_user].nil?
-    instance_users[instance_user] << user unless user.user_keys.size == 0
+    instance_users[instance_user] ||= []
+    instance_users[instance_user] << user unless user.user_keys.length == 0
 end
 
 instance_users.each do |instance_user, users|
@@ -43,7 +43,7 @@ instance_users.each do |instance_user, users|
 SSH_DIR="<%= user_home %>/.ssh"
 mkdir -p $SSH_DIR
 cat <<'EOLEOLEOL' >> $SSH_DIR/authorized_keys
-<% @instance_users.each_pair do |server_user, users|
+<%
   users.each do |user|
     user.user_keys.each do |key|
       unless key.public_key.blank? or key.public_key !~ /^ssh-/
@@ -53,13 +53,15 @@ cat <<'EOLEOLEOL' >> $SSH_DIR/authorized_keys
       end
     end
   end
-end
 -%>
 EOLEOLEOL
 
 chmod 700 $SSH_DIR
 chmod 600 $SSH_DIR/authorized_keys
 chown -R <%= @instance_user %> $SSH_DIR
+<%
+end
+-%>
 
 # Seed the /etc/hosts file
 <% account = @server.cluster.provider_account -%>
@@ -120,4 +122,3 @@ EOF
 emissary start -d
 
 exit 0
-<% end %>
