@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 LOOP_SLEEP_TIME = 60
-TIMEOUT         = 180
+TIMEOUT         = 300
 
 require 'rubygems'
 
@@ -37,7 +37,7 @@ while($running) do
             account.refresh
           }
         rescue Timeout::Error
-          RAILS_DEFAULT_LOGGER.error("Timeout error refreshing account #{account.name}")
+          Rails.logger.error("Timeout error refreshing account #{account.name}")
           retry
         end
       }
