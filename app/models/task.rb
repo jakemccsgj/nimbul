@@ -214,5 +214,6 @@ class Task < BaseModel
           #Rails.logger.info "Scheduled Task #{t.name} [#{t.id}]\n"
         end
       end
+      alias :perform :process
     end
 end

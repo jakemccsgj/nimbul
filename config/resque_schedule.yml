@@ -23,3 +23,8 @@ resources:
   cron: "*/30 * * * * *"
   queue: resources
   class: InstanceResource
+
+tasks:
+  cron: "* * * * *"
+  queue: tasks
+  class: Task
