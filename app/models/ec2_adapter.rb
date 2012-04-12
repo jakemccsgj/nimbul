@@ -30,8 +30,8 @@ class Ec2Adapter
 
     def refresh_account resources = nil
       # don't proceed if we can't get the ec2 account object
-      if get_ec2.nil?
-        logger.error "Account [#{@account.id} - #{@account.name}] failed to refresh - unable to load AWS::EC2 object using account credentials."
+      if get_ec2(account).nil?
+        logger.error "Account [#{account.id} - #{account.name}] failed to refresh - unable to load AWS::EC2 object using account credentials."
         return
       end
 
@@ -78,7 +78,6 @@ class Ec2Adapter
           ]
         end
       methods.each { |m| m.call }
-      #Process.waitall
     end
 
     def self.refresh_addresses(account)

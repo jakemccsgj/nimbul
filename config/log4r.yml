@@ -1,0 +1,44 @@
+log4r_config:
+  loggers:
+    - name: Ec2Adapter
+      level: DEBUG
+      outputters:
+        - ec2_adapter
+        - default
+
+    - name: default
+      level: DEBUG
+      additive: false
+      trace: 'true'
+      outputters:
+        - default
+
+  standard_formatter: &STANDARD
+    type: PatternFormatter
+    name: standard
+    date_format: '%y%m%d %H:%M:%S'
+    pattern: '%d %l [%C - %x]: %m'
+
+  outputters:
+    - type: DateFileOutputter
+      name: Ec2Adapter
+      dirname: log
+      filename: ec2_adapter.log
+      formatter: *STANDARD
+
+    - type: DateFileOutputter
+      name: ec2_adapter
+      dirname: log
+      filename: ec2_adapter.log
+      formatter: *STANDARD
+
+    - type: DateFileOutputter
+      name: default
+      dirname: log
+      filename: nimbul.log
+      formatter: *STANDARD
+
+    - type: StderrOutputter
+      name: stderr
+      formatter: *STANDARD
+
