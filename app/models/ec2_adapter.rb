@@ -2,6 +2,7 @@ require 'AWS/EC2'
 require 'md5'
 
 class Ec2Adapter
+  extend Loggable
   extend Erby
 
   BASE_TEMPLATE = 'base.erb' unless const_defined? :BASE_TEMPLATE
@@ -11,22 +12,26 @@ class Ec2Adapter
     include ActionView::Helpers::UrlHelper
   end
 
-  def initialize args
+  def initialize args = {}
     @account = args[:account]
   end
 
   def get_ec2 account = nil
     account ||= @account
-    return if account.nil?
-    return if account.aws_access_key.blank? or account.aws_secret_key.blank?
+    logger.info "Have account?"
+    raise AccountError.new if account.nil?
+    logger.info "Have access keys?"
+    raise AccountError.new if account.aws_access_key.blank? or account.aws_secret_key.blank?
+    logger.info "Get an AWS::EC2 object then"
     @ec2 ||= AWS::EC2.new(account.aws_access_key, account.aws_secret_key)
+    logger.info "Got an AWS::EC2 object: #{@ec2}"
     @ec2
   end
 
     def refresh_account resources = nil
       # don't proceed if we can't get the ec2 account object
       if get_ec2.nil?
-        Rails.logger.error "Account [#{@account.id} - #{@account.name}] failed to refresh - unable to load AWS::EC2 object using account credentials."
+        logger.error "Account [#{@account.id} - #{@account.name}] failed to refresh - unable to load AWS::EC2 object using account credentials."
         return
       end
 
@@ -34,7 +39,7 @@ class Ec2Adapter
 #      begin
 #        refresh_zones
 #      rescue Exception => e 
-#        Rails.logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
+#        logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
 #      end
       
       # always refresh key pairs
@@ -76,8 +81,8 @@ class Ec2Adapter
       #Process.waitall
     end
 
-    def refresh_addresses
-        ec2 = get_ec2
+    def self.refresh_addresses(account)
+        ec2 = get_ec2(account)
         cloud_addresses = ec2.describe_addresses
         account_addresses = CloudAddress.find_all_by_provider_account_id(@account.id, :include => :instance_addresses)
         account_instances = Instance.find_all_by_provider_account_id(@account.id, :include => :addresses)
@@ -265,7 +270,7 @@ class Ec2Adapter
 
     def self.create_volume(volume, size_or_snapshot, zone)
         account = volume.provider_account
-        adapter = self.new account
+        adapter = self.new :account => account
         ec2 = adapter.get_ec2
         zone = zone.is_a?(Zone) ? zone.name : zone
         if size_or_snapshot =~ /snap/
@@ -278,7 +283,8 @@ class Ec2Adapter
 
     def self.delete_volume(volume)
         return nil if volume.nil?
-        ec2 = get_ec2(volume.provider_account)
+        adapter = self.new :account => volume.provider_account
+        ec2 = adapter.get_ec2(volume.provider_account)
         ec2.delete_volume(volume.cloud_id)
     end
     
@@ -370,7 +376,7 @@ class Ec2Adapter
             account_firewall_rules << fr if account_firewall_rules.detect{ |r| r.protocol == grant[:protocol] and r.from_port == grant[:from_port] and r.to_port == grant[:to_port] and r.ip_range == grant[:ip_range]}.nil?
           rescue ActiveRecord::RecordInvalid => e
             # only log the error for now
-            Rails.logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
+            logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
           end
         end
 
@@ -404,7 +410,7 @@ class Ec2Adapter
               account_firewall_rules << fr if account_firewall_rules.detect{ |r| r.group_user_id == grant[:group_user_id] and r.group_name == grant[:group_name] }.nil?
             rescue ActiveRecord::RecordInvalid => e
               # only log the error for now
-              Rails.logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
+              logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
             end
           end
         end
@@ -613,9 +619,13 @@ class Ec2Adapter
     end
 
     def self.run_instances(server, count, p)
+        logger.info "Starting instance of server: #{server}"
         cluster = Cluster.find(server.cluster_id, :include => [ :provider_account ])
         account = cluster.provider_account
-        ec2 = get_ec2(account)
+        adapter = self.new :account => account
+        logger.info "Getting adapter for account: #{account}"
+        ec2 = adapter.get_ec2(account)
+        logger.info "Got adapter for account: #{account}"
         
         # if a launch configuration was specified - find it
         rb = server.resource_bundles.detect{ |rb| rb.id == p[:resource_bundle_id] } unless p[:resource_bundle_id].blank?
@@ -662,7 +672,7 @@ class Ec2Adapter
                 rb = server.next_available_resource_bundle if rb.nil?
                 if rb.nil?
                     msg = "Not enough launch configurations configured and no default launch configuration for this server. #{c} instances started."
-                    Rails.logger.error "#{msg_prefix} - #{msg}"
+                    logger.error "#{msg_prefix} - #{msg}"
                     raise msg
                 end
             end
@@ -694,7 +704,7 @@ class Ec2Adapter
                 instance.save
                 instances << instance
 
-                Rails.logger.debug "#{msg_prefix} - started instance: #{instance.name} [#{instance.id}]"
+                logger.debug "#{msg_prefix} - started instance: #{instance.name} [#{instance.id}]"
             end
         end
 
@@ -717,7 +727,8 @@ class Ec2Adapter
         a = account.addresses.find_by_cloud_id(address.cloud_id)
         raise "address '#{address.cloud_id}' is no longer available" if a.nil?
         raise "address '#{a.cloud_id}' is already attached to #{instance.instance_id}" if a.cloud_instance_id == instance.instance_id
-           ec2 = get_ec2(account)
+        adapter = self.new :account => account
+        ec2 = adapter.get_ec2(account)
         ec2.associate_address(instance.instance_id, a.cloud_id)
         return true
     end
@@ -728,7 +739,8 @@ class Ec2Adapter
         v = account.volumes.find_by_cloud_id(volume.cloud_id)
         raise "volume '#{volume.cloud_id}' is no longer available" if v.nil?
         raise "volume '#{v.cloud_id}' is already attached to #{instance.instance_id}" if v.cloud_instance_id == instance.instance_id
-           ec2 = get_ec2(account)
+        adapter = self.new :account => account
+        ec2 = adapter.get_ec2(account)
         ec2.attach_volume(v.cloud_id, instance.instance_id, mount_point)
         return true
     end
@@ -745,14 +757,16 @@ class Ec2Adapter
     
     def self.detach_address(address, force=false)
         account = address.provider_account
-           ec2 = get_ec2(account)
+        adapter = self.new :account => account
+        ec2 = adapter.get_ec2(account)
         ec2.disassociate_address(address.cloud_id)
         return true
     end
     
     def self.detach_volume(volume, force=false)
         account = volume.provider_account
-           ec2 = get_ec2(account)
+        adapter = self.new :account => account
+        ec2 = adapter.get_ec2(account)
         ec2.detach_volume(volume.cloud_id, nil, nil, force)
         return true
     end
@@ -760,16 +774,21 @@ class Ec2Adapter
     def self.stop_instance(instance)
         return nil if instance.nil?
         account = instance.provider_account
-        ec2 = get_ec2(account)
+        adapter = self.new :account => account
+        ec2 = adapter.get_ec2(account)
         # returns {:state=>"stopping", :previous_state=>"running", :id=>"i-1392c97a"}
         result = ec2.stop_instances([instance.instance_id])
         return true
     end
 
     def self.start_instance(instance)
+        logger.info "Starting instance #{instance}"
         return nil if instance.nil?
         account = instance.provider_account
-        ec2 = get_ec2(account)
+        adapter = self.new :account => account
+        logger.info "Getting ec2 adapter"
+        ec2 = adapter.get_ec2(account)
+        logger.info "Got ec2 adapter"
         # returns {:state=>"starting", :previous_state=>"stopped", :id=>"i-1392c97a"}
         result = ec2.start_instances([instance.instance_id])
         return true
@@ -778,14 +797,16 @@ class Ec2Adapter
     def self.reboot_instance(instance)
         return nil if instance.nil?
         account = instance.provider_account
-        ec2 = get_ec2(account)
+        adapter = self.new :account => account
+        ec2 = adapter.get_ec2(account)
         result = ec2.reboot_instances([instance.instance_id])
     end
 
     def self.terminate_instance(instance)
         return nil if instance.nil?
         account = instance.provider_account
-        ec2 = get_ec2(account)
+        adapter = self.new :account => account
+        ec2 = adapter.get_ec2(account)
         # returns {:state=>"shutting-down", :previous_state=>"running", :id=>"i-1392c97a"}
         ec2.terminate_instances([instance.instance_id])
     end
@@ -793,7 +814,8 @@ class Ec2Adapter
     def self.get_console_output(instance)
         return nil if instance.nil?
         account = instance.provider_account
-        ec2 = get_ec2(account)
+        adapter = self.new :account => account
+        ec2 = adapter.get_ec2(account)
         out = {}
         begin
             out = ec2.get_console_output(instance.instance_id)
@@ -941,32 +963,37 @@ class Ec2Adapter
     def self.create_snapshot(volume)
         return false if volume.nil?
         account = volume.provider_account
-        ec2 = get_ec2(volume.provider_account)
+        adapter = self.new :account => account
+        ec2 = adapter.get_ec2(volume.provider_account)
         res = ec2.create_snapshot(volume.cloud_id)
         return parse_snapshot_info(account, res)
     end
 
     def self.delete_snapshot(snapshot)
         return nil if snapshot.nil?
-        ec2 = get_ec2(snapshot.provider_account)
+        adapter = self.new :account => account
+        ec2 = adapter.get_ec2(snapshot.provider_account)
         ec2.delete_snapshot(snapshot.cloud_id)
     end
 
     def self.create_security_group(group, vpc_api_name=nil)
         return false if group.nil?
-        ec2 = get_ec2(group.provider_account)
+        adapter = self.new :account => account
+        ec2 = adapter.get_ec2(group.provider_account)
         security_group = ec2.create_security_group(group.name, group.description, vpc_api_name)
     end
 
     def self.delete_security_group(group)
         return false if group.nil?
-        ec2 = get_ec2(group.provider_account)
+        adapter = self.new :account => account
+        ec2 = adapter.get_ec2(group.provider_account)
         ec2.delete_security_group(group.name)
     end
 
     def self.add_security_group_firewall_rule(security_group, firewall_rule)
         return false if security_group.nil? or firewall_rule.nil?
-        ec2 = get_ec2(security_group.provider_account)
+        adapter = self.new :account => account
+        ec2 = adapter.get_ec2(security_group.provider_account)
         if !firewall_rule.group_name.blank? and !firewall_rule.group_user_id.blank?
             ec2.authorize_ingress_by_group(security_group.name, firewall_rule.group_name, firewall_rule.group_user_id)
         else
@@ -980,7 +1007,8 @@ class Ec2Adapter
 
     def self.remove_security_group_firewall_rule(security_group, firewall_rule)
         return false if security_group.nil? or firewall_rule.nil?
-        ec2 = get_ec2(security_group.provider_account)
+        adapter = self.new :account => account
+        ec2 = adapter.get_ec2(security_group.provider_account)
         if !firewall_rule.group_name.blank? and !firewall_rule.group_user_id.blank?
             ec2.revoke_ingress_by_group(security_group.name, firewall_rule.group_name, firewall_rule.group_user_id)
         else
@@ -993,19 +1021,22 @@ class Ec2Adapter
     end
 
     def self.allocate_address(address)
-        ec2 = get_ec2(address.provider_account)
+      adapter = self.new :account => account
+        ec2 = adapter.get_ec2(address.provider_account)
         address.cloud_id = ec2.allocate_address
         return true
     end
     
     def self.release_address(address)
-        ec2 = get_ec2(address.provider_account)
+      adapter = self.new :account => account
+        ec2 = adapter.get_ec2(address.provider_account)
         ec2.release_address(address.cloud_id)
         return true
     end
     
     def self.register_server_image(server_image)
-        ec2 = get_ec2(server_image.provider_account)
+      adapter = self.new :account => account
+        ec2 = adapter.get_ec2(server_image.provider_account)
         image_id = ec2.register_image(server_image.location)
         return image_id
     end
@@ -1028,7 +1059,8 @@ class Ec2Adapter
         end
 
         # deregister the image
-        ec2 = get_ec2(account)
+        adapter = self.new :account => account
+        ec2 = adapter.get_ec2(account)
         ec2.deregister_image(server_image.image_id)
         return true
     end
@@ -1057,5 +1089,8 @@ class Ec2Adapter
         end
       end
     end
+
 end
 
+  class AccountError < StandardError
+  end
