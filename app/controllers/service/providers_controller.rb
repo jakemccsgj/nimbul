@@ -9,7 +9,7 @@ class Service::ProvidersController < ApplicationController
   end
 
   def index
-    @service_providers = ServiceProvider.all
+    @service_providers = ServiceProvider.find(:all, :include => [:server, :service_type])
   end
   
   def show
