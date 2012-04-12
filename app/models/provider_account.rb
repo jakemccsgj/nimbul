@@ -75,6 +75,9 @@ class ProviderAccount < BaseModel
   
     include TrackChanges # must follow any before filters
 
+    default_scope :conditions => ["account_id is not null and account_id not in (?)", YAML.load(File.read(File.join(RAILS_ROOT, 'config', 'skip_accounts.yml')))]
+    #default_scope :conditions => { :id => 3 }
+
     def instance_vm_types
         provider.instance_vm_types
     end
@@ -87,7 +90,8 @@ class ProviderAccount < BaseModel
     end
 
   def messaging_valid?
-    if service(:events).nil? or service(:events).first_active_instance.nil?
+    service = service(:events)
+    if service.nil? or service.empty? or service.first.first_active_instance.nil?
       errors.add(:messaging_uri, 'Events Service does not appear to be created. Please go to Admin Controls -> Services and create an Events service, and provider.')
     else
       unless messaging_can_connect?

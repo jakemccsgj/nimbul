@@ -2,7 +2,7 @@ require 'AWS/EC2'
 require 'md5'
 
 class Ec2Adapter
-  extend Loggable
+  include Loggable
   extend Erby
 
   BASE_TEMPLATE = 'base.erb' unless const_defined? :BASE_TEMPLATE
@@ -17,20 +17,21 @@ class Ec2Adapter
   end
 
   def get_ec2 account = nil
-    account ||= @account
-    logger.info "Have account?"
-    raise AccountError.new if account.nil?
-    logger.info "Have access keys?"
-    raise AccountError.new if account.aws_access_key.blank? or account.aws_secret_key.blank?
-    logger.info "Get an AWS::EC2 object then"
-    @ec2 ||= AWS::EC2.new(account.aws_access_key, account.aws_secret_key)
-    logger.info "Got an AWS::EC2 object: #{@ec2}"
+    if @ec2.nil?
+      account ||= @account
+      logger.info "Have account?"
+      raise AccountError.new if account.nil?
+      logger.info "Have access keys #{account.name}?"
+      raise AccountError.new if account.aws_access_key.blank? or account.aws_secret_key.blank?
+      logger.info "Get an AWS::EC2 object then"
+      @ec2 ||= AWS::EC2.new(account.aws_access_key, account.aws_secret_key)
+    end
     @ec2
   end
 
     def refresh_account resources = nil
       # don't proceed if we can't get the ec2 account object
-      if get_ec2(account).nil?
+      if get_ec2(@account).nil?
         logger.error "Account [#{account.id} - #{account.name}] failed to refresh - unable to load AWS::EC2 object using account credentials."
         return
       end

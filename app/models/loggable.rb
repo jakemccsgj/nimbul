@@ -2,6 +2,10 @@ require 'log4r'
 require 'log4r/outputter/datefileoutputter'
 require 'log4r/formatter/patternformatter'
 module Loggable
+  def self.included base
+    base.extend Loggable
+  end
+
   def logger
     name = self.class == Class ? self.to_s : self.class.to_s
     begin
