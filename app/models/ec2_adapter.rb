@@ -168,7 +168,7 @@ class Ec2Adapter
             account_volume = account_volumes.detect{ |volume| volume.cloud_id == cloud_volume[:cloud_id] }
             if account_volume.nil?
                 cloud_volume[:name] = cloud_volume[:cloud_id]
-                account_volume = account.volumes.build(cloud_volume)
+                account_volume = @account.volumes.build(cloud_volume)
             else
                 account_volume.attributes = cloud_volume
                 account_volume.should_destroy = 0
