@@ -61,3 +61,11 @@ group :production do
 end
 
 gem 'daemon_controller'
+gem 'resque'
+gem 'spawn', :git => 'https://github.com/nimbul/spawn.git'
+gem 'grit'
+gem 'resque-scheduler', :git => 'https://github.com/bvandenbos/resque-scheduler.git', :branch => 'v2.0'
+gem 'resque-loner', :git => 'https://github.com/jayniz/resque-loner.git'
+gem 'god'
+gem 'log4r'
+gem 'activemessaging'

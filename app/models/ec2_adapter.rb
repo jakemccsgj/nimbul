@@ -638,13 +638,13 @@ class Ec2Adapter
         image_id = server.image_id
 
         security_groups = server.security_groups.collect{|g| g.name}
-        unless @account.default_security_group.blank?
-            security_groups << @account.default_security_group unless security_groups.include?(@account.default_security_group)
+        unless account.default_security_group.blank?
+            security_groups << account.default_security_group unless security_groups.include?(@account.default_security_group)
         end
         
         key_name = server.key_name
-        unless @account.default_main_key.blank?
-            key_name = @account.default_main_key
+        unless account.default_main_key.blank?
+            key_name = account.default_main_key
         end
 
         compress_user_data = true # false by default
