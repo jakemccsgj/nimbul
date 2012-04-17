@@ -49,13 +49,6 @@ GIT
     formtastic (1.2.4)
       i18n (~> 0.4.0)
 
-GIT
-  remote: https://github.com/nimbul/spawn.git
-  revision: 3eaf699324b2e619b2883f694f9a402975f3e4b7
-  specs:
-    spawn (1.0.1.1)
-      rails (= 2.3.14)
-
 GEM
   remote: http://rubygems.org/
   remote: http://gems.rubyforge.org/
@@ -216,7 +209,6 @@ DEPENDENCIES
   rspec
   ruby-openid
   rufus-scheduler
-  spawn!
   statemachine
   wirble
   work_queue (~> 1.0.0)

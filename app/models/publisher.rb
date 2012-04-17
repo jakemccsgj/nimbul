@@ -12,6 +12,8 @@ class Publisher < BaseModel
 
   attr_accessor :should_destroy
 
+  default_scope :conditions => ["provider_account_id is not null and provider_account_id not in (select ID from provider_accounts where account_id in (?))", YAML.load(File.read(File.join(RAILS_ROOT, 'config', 'skip_accounts.yml')))]
+
   def should_destroy?
     should_destroy.to_i == 1
   end

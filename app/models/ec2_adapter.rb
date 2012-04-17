@@ -81,8 +81,8 @@ class Ec2Adapter
       methods.each { |m| m.call }
     end
 
-    def self.refresh_addresses(account)
-        ec2 = get_ec2(account)
+    def refresh_addresses
+        ec2 = get_ec2(@account)
         cloud_addresses = ec2.describe_addresses
         account_addresses = CloudAddress.find_all_by_provider_account_id(@account.id, :include => :instance_addresses)
         account_instances = Instance.find_all_by_provider_account_id(@account.id, :include => :addresses)
@@ -114,7 +114,7 @@ class Ec2Adapter
             aa = account_addresses.detect{ |a| a.cloud_id == ca[:cloud_id] }
             if aa.nil?
                 ca[:name] = ca[:cloud_id]
-                aa = account.addresses.build(ca)
+                aa = @account.addresses.build(ca)
             else
                 aa.attributes = ca
                 aa.should_destroy = 0
@@ -639,13 +639,13 @@ class Ec2Adapter
         image_id = server.image_id
 
         security_groups = server.security_groups.collect{|g| g.name}
-        unless @account.default_security_group.blank?
-            security_groups << @account.default_security_group unless security_groups.include?(@account.default_security_group)
+        unless account.default_security_group.blank?
+            security_groups << account.default_security_group unless security_groups.include?(account.default_security_group)
         end
         
         key_name = server.key_name
-        unless @account.default_main_key.blank?
-            key_name = @account.default_main_key
+        unless account.default_main_key.blank?
+            key_name = account.default_main_key
         end
 
         compress_user_data = true # false by default
@@ -700,7 +700,8 @@ class Ec2Adapter
                 # store information about pending launch configuration
                 i.merge!({ :pending_launch_configuration_id => rb.id }) unless rb.nil?
 
-                instance = parse_instance_info(account, reservation, i)
+                obj = self.new :account => account
+                instance = obj.parse_instance_info(reservation, i)
                 instance.save
                 instances << instance
 
@@ -859,6 +860,7 @@ class Ec2Adapter
         return Zone.find(zone_id)
     end
 
+    public
     # also used by AsAdapter to process info about AS Group's instances
     def parse_instance_info(reservation, attributes, account_instances=nil, account_zones=nil, account_security_groups=nil, account_instance_vm_types=nil, cpu_profiles=nil, account_storage_types=nil)
         as_lifecycle_state_to_ec2_state = {}
@@ -992,8 +994,9 @@ class Ec2Adapter
 
     def self.add_security_group_firewall_rule(security_group, firewall_rule)
         return false if security_group.nil? or firewall_rule.nil?
+        account = security_group.provider_account
         adapter = self.new :account => account
-        ec2 = adapter.get_ec2(security_group.provider_account)
+        ec2 = adapter.get_ec2(account)
         if !firewall_rule.group_name.blank? and !firewall_rule.group_user_id.blank?
             ec2.authorize_ingress_by_group(security_group.name, firewall_rule.group_name, firewall_rule.group_user_id)
         else

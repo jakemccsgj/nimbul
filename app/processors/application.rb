@@ -16,7 +16,7 @@ class ApplicationProcessor < ActiveMessaging::Processor
     super(message)
 
     if @operation.nil?
-      text = "Message #{stored_message.message_id} has no Operation waiting for it"
+      text = "Message #{stored_message.message_id} has no Operation waiting for it for #{message.headers[:operation]}"
       puts text
       Rails.logger.error text
       @stored_message.message = text
