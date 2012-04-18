@@ -10,11 +10,6 @@ if ENV['MY_RUBY_HOME'] && ENV['MY_RUBY_HOME'].include?('rvm')
     raise "RVM ruby lib is currently unavailable."
   end
 end
+require 'rubygems'
 require 'bundler'
-STDERR.puts "HOME = " + ENV['HOME'].inspect
-STDERR.puts "gem user home = " + Gem.user_home
-STDERR.puts "BUNDLE_PATH = " + ENV['BUNDLE_PATH'].inspect
-STDERR.puts "Bundler.requires_sudo? = #{Bundler.requires_sudo?}"
-STDERR.puts "Bundler.user_bundle_path = " + Bundler.user_bundle_path.inspect
-STDERR.puts "Bundler.install_path = " + Bundler.install_path.inspect
 Bundler.setup
