@@ -1,5 +1,6 @@
 require 'resque/tasks'
 require 'resque_scheduler/tasks'
+require File.join(RAILS_ROOT, 'config', 'resque_web')
 
 namespace :resque do
   task :setup do
@@ -8,7 +9,7 @@ namespace :resque do
     require 'resque/scheduler'
 
     # you probably already have this somewhere
-    Resque.redis = 'localhost:6379'
+    #Resque.redis = 'localhost:6379'
 
     # If you want to be able to dynamically change the schedule,
     # uncomment this line.  A dynamic schedule can be updated via the

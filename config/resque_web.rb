@@ -1,6 +1,6 @@
 require 'resque'
 require 'yaml'
-Resque.redis = 'localhost:6379'
+Resque.redis = 'nimbul-db.nytimes.com:6379'
 
 require 'resque_scheduler'
 require 'resque_scheduler/server'

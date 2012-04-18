@@ -4,6 +4,7 @@
     @volumes = @provider_account.volumes.collect{|a| a if a.is_enabled?}.compact.sort{ |a,b| a.name.downcase <=> b.name.downcase }
     @addresses = @provider_account.addresses.collect{|a| a if a.is_enabled?}.compact.sort{ |a,b| a.name.downcase <=> b.name.downcase }
 %>
+<%= pp @provider_account %>
 <% form_for :server,
     :url => server_path(@server),
     :html => { :method => 'put' } do |f| %>

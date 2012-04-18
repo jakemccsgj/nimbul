@@ -38,7 +38,7 @@ class ProviderAccount < BaseModel
     has_many :addresses, :class_name => 'CloudAddress', :dependent => :destroy
     has_many :volumes, :class_name => 'CloudVolume', :dependent => :destroy
     has_many :snapshots, :class_name => 'CloudSnapshot', :dependent => :destroy
-    has_many :storage_types, :through => :provider, :order => :name
+    delegate :storage_types, :to => :provider
     has_many :server_profiles, :order => :name, :dependent => :destroy
     has_many :server_image_categories, :order => :position, :dependent => :destroy
     has_many :server_image_groups, :order => 'server_image_category_id, position', :dependent => :destroy
