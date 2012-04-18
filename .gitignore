@@ -6,3 +6,4 @@ pki
 .ctags
 app/tags
 tags
+.bundle/ruby

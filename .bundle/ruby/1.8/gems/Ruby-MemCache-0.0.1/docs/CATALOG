@@ -1,9 +1,0 @@
-#
-# Title:  Ruby MemCache Client Library
-# Main:   README
-# Upload: ssh://yhaliwell/usr/local/www/devEiate.org/4.0/code/Ruby-MemCache/
-# Webcvs: http://svn.faeriemud.org/index.cgi/RMemCache/log/trunk/
-#
-lib/memcache.rb
-README
-TODO
