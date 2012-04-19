@@ -1,0 +1,1 @@
+page["#{@parent_type}_#{@parent.id}_apps_index"].replace_html :partial => "apps/index"

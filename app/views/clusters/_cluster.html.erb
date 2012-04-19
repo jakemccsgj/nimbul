@@ -1,0 +1,15 @@
+<% content_tag_for :tr, cluster, :class => cluster.state do %>
+  <td><%= link_to cluster.name, cluster %></td>
+  <td><%=h cluster.description %></td>
+  <td><%= link_to cluster.instances.length, cluster_path(cluster, :anchor => :instances) %></td>
+  <td class="<%=h cluster.state %>"><%=h cluster.state %></td>
+  <td id="cluster_<%= cluster.id %>_total">&nbsp;</td>
+  <td id="cluster_<%= cluster.id %>_projection">&nbsp;</td>
+  <% if current_user.has_provider_account_access?(cluster.provider_account_id) %>
+    <td>
+      <%= remove_cluster_link 'Delete', cluster %>
+      <%= parent_stats_link('Cost Details', cluster) %>
+    </td>
+  <% end %>
+<% end %>
+<%= javascript_tag(remote_function(:url => total_cluster_stats_url(cluster), :method => :get) ) %>

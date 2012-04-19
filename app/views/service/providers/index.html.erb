@@ -1,0 +1,38 @@
+<% subtitle 'Service Providers' %>
+
+<h1><%= link_to 'Admin Controls', admin_controls_path %> / Service Providers</h1>
+
+<br/>
+
+Here you can define Servers that provide Services used by different parts of your infrastructure.<br/>
+For example, you can designate one of your SVN Servers to be a Source Control Service Provider.<br/>
+Once a Server is designated as a Service Provider, Nimbul starts monitoring the Server for<br/>
+'ready' instances. If there is a 'ready' instance of this Server, the instance's IP address<br/>
+is used to resolve the Service's DNS name.
+
+<br/><br/>
+
+To add a new Service Provider, click here: 
+<%= link_to image_tag('add.png', { :alt => "Add", :class => 'control-icon', :title => 'Add New Service Provider' }), new_service_provider_path %>
+
+<table>
+  <tr>
+    <th>Service Name</th>
+    <th>Service Type</th>
+    <th>Server</th>
+    <th>Service Description</th>
+    <th>Actions</th>
+  </tr>
+  <% for service_provider in @service_providers %>
+    <tr>
+      <td><%=h service_provider.name %></td>
+      <td><%=h (service_provider.service_type.nil? ? '' : service_provider.service_type.name) %></td>
+      <td><%=h service_provider.server.name %></td>
+      <td><%=h service_provider.description %></td>
+      <td>
+        <%= link_to image_tag('verify.png', { :alt => "Edit", :class => 'control-icon' }), edit_service_provider_path(service_provider) -%>
+        <%= link_to image_tag('trash.png', { :alt => "Delete", :class => 'control-icon' }), service_provider, :confirm => 'Are you sure?', :method => :delete -%>
+      </td>
+    </tr>
+  <% end %>
+</table>

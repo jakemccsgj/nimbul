@@ -1,0 +1,8 @@
+if @error_messages.empty?
+    page["edit_app"].hide
+    page["add_app"].appear if @parent.can_use_more_of?('App')
+    page.insert_html :bottom, params[:update], :partial => "app", :object => @app
+else
+    page['error_redbox'].replace_html :partial => 'shared/error_redbox'
+    page['error_redbox'].appear
+end

@@ -1,0 +1,21 @@
+    <% fields_for "server_profile_revision", server_profile_revision do |f| %>
+    <% content_tag_for :tr, server_profile_revision, :readonly => false, :class => cycle("even", "odd") do %>
+        <td>
+          <% if server_profile_revision.servers.empty? %>None<% else %>
+            <%= server_profile_revision_server_links(server_profile_revision) %>
+          <% end %>
+        </td>
+        <td>
+          <%= server_profile_revision.instance_type %>
+        </td>
+        <td>
+          <%= server_profile_revision.creator.login_and_name %>
+        </td>
+        <!--td>
+          <%= server_profile_revision.commit_message %>
+        </td-->
+        <td>
+          <%= remove_server_profile_revision_link('Delete', @parent, server_profile_revision) %>
+        </td>
+    <% end %>
+    <% end %>

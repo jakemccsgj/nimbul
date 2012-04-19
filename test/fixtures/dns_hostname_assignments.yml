@@ -1,0 +1,9 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  dns_hostname_id: 1
+  server_id: 1
+
+two:
+  dns_hostname_id: 2
+  server_id: 2

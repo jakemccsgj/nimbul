@@ -1,0 +1,36 @@
+<% semantic_form_for @cluster do |f| %>
+  <%= f.error_messages %>
+  <% f.inputs do %>
+      <%= f.input :provider_account,
+        :collection => ProviderAccount.find(:all, :order => 'name'),
+        :input_html => { :disabled => !@cluster.new_record? }
+      %>
+    <%= f.input :name, :hint => 'Name the Cluster, for example, Corporate Web Site' %>
+    <%= f.input :description,
+      :input_html => { :class => 'autogrow', :warp => 'soft', :size => '40x2' },
+      :required => false
+    %>
+    <%= f.input :state, :as => :radio, :collection => ['maintenance', 'active'], :label => 'Maintenance Mode',
+      :hint => "If 'maintenance' is checked, ALL cluster hosts are removed from Nagios",
+      :required => false
+    %>
+  <% end %>
+  <% if !@cluster.new_record? and current_user.has_access?(@cluster.provider_account) %>
+    <h1>Available Instance Types</h1>
+    <br/>
+    <fieldset class="inputs">
+      <ol>
+      <%= swapselect :cluster,
+        @cluster,
+        :instance_vm_types,
+        @cluster.provider_account.instance_vm_types.map{ |instance_vm_type| ["#{instance_vm_type.api_name} - #{instance_vm_type.name}", instance_vm_type.id] }
+      %>
+    </ol>
+    </fieldset>
+  <% end %>
+  <br/>
+  <% f.buttons do %>
+    <%= f.submit %>
+    <%= submit_tag 'Cancel', :name => 'cancel_button' %>
+  <% end %>
+<% end %>

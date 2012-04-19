@@ -1,0 +1,11 @@
+<% subtitle "Edit Instance Type" %>
+
+<h1>
+  <%= link_to 'Admin Controls', admin_controls_path %>
+  / <%= link_to 'Instance Types', send("#{ @parent_type }_instance_vm_types_path", @parent) %>
+  / Edit Instance Type 
+</h1>
+
+<br/>
+
+<%= render :partial => 'form' %>

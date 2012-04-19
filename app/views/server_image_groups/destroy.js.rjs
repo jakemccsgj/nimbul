@@ -1,0 +1,7 @@
+if @error_messages.empty?
+    page["server_image_group_#{@server_image_group.id}"].remove
+    page["add_server_image_group"].appear if @parent.can_use_more_of?('ServerImageGroup')
+else
+    page['error_redbox'].replace_html :partial => 'shared/error_redbox'
+    page['error_redbox'].appear
+end

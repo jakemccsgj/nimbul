@@ -1,0 +1,26 @@
+<% semantic_remote_form_for [@parent, @app], :remote => true do |f| %>
+    <%= hidden_field_tag :anchor, 'apps' %>
+    <%= hidden_field_tag :update, 'account_group_apps' %>
+    <%= f.error_messages %>
+    <% f.inputs do %>
+      <%= f.input :api_name,
+        :class => 'short'
+      %>
+      <%= f.input :name,
+        :class => 'short'
+      %>
+      <%= f.input :description,
+        :input_html => { :class => 'autogrow', :warp => 'soft', :size => '40x2' },
+        :required => false
+      %>
+      <%= f.input :clusters,
+          :as => :select,
+          :collection => @parent.clusters.select{|cluster| cluster.app_id.nil? or (cluster.app_id == @app.id)},
+          :required => false
+      %>
+    <% end %>
+    <% f.buttons do %>
+      <%= f.submit %>
+      <%= cancel_add_account_group_app_button 'Cancel', @account_group %>
+    <% end %>
+<% end %>

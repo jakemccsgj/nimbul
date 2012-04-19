@@ -1,0 +1,23 @@
+<table>
+  <tr>
+    <th>&nbsp;</th>
+    <th>API Name</th>
+    <th>API URL</th>
+    <th>Name</th>
+    <th>Description</th>
+    <th>State</th>
+    <th>Actions</th>
+  </tr>
+  <tbody id="provider_regions">
+    <%= render :partial => 'list', :locals => { :regions => @regions } %>
+  </tbody>
+</table>
+<%= sortable_element("provider_regions", :url => send("sort_#{ @parent_type }_regions_path", @parent), :tag => "tr", :handle => "handle" ) %>
+
+<hr>
+
+<div id="add_region" <% unless @provider.can_use_more_of?('Region') %>style="display:none;"<% end %>>
+  <%= new_provider_region_button 'add', @provider %>
+</div>
+
+<div id="edit_region" style="display:none;overflow:auto;"></div>

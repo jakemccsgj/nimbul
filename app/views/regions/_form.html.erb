@@ -1,0 +1,28 @@
+<% semantic_remote_form_for [@parent, @region], :remote => true do |f| %>
+    <%= hidden_field_tag :anchor, 'regions' %>
+    <%= hidden_field_tag :update, 'provider_regions' %>
+    <%= f.error_messages %>
+    <% f.inputs do %>
+      <%= f.input :api_name,
+        :class => 'short'
+      %>
+      <%= f.input :endpoint_url, :label => 'API URL',
+        :class => 'short'
+      %>
+      <%= f.input :name,
+        :class => 'short'
+      %>
+      <%= f.input :description,
+        :input_html => { :class => 'autogrow', :warp => 'soft', :size => '40x2' },
+        :required => false
+      %>
+      <%= f.input :state,
+        :class => 'short',
+        :required => false
+      %>
+    <% end %>
+    <% f.buttons do %>
+      <%= f.submit %>
+      <%= cancel_add_provider_region_button 'Cancel', @provider %>
+    <% end %>
+<% end %>

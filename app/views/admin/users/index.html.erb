@@ -1,0 +1,22 @@
+<% subtitle 'Users' %>
+
+<h1><%= link_to 'Admin Controls', admin_controls_path %> / Users</h1>
+
+<br />
+
+<% if_in_beta? do %>
+  <p><%= link_to 'Manage Beta Invitations for All Users', admin_invites_path %> |
+  <%= link_to 'Pending Beta Users', admin_invite_actions_path %></p>
+<% end %>
+
+<%= will_paginate_search_field "search", nil, nil, :list %>
+<%= refresh_image 'Refresh', 'users', nil, :list, nil %>
+
+<span class="vr">&nbsp;</span>
+
+<b>Total: <span id="users_total"><%= @users.total_entries %></span></b>
+
+<hr/>
+
+<%= render :partial => "shared/users_list", :object => @users %>
+

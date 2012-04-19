@@ -1,0 +1,8 @@
+if @error_messages.empty?
+    page["edit_vm_price_type"].hide
+    page["add_vm_price_type"].appear if @parent.can_use_more_of?('VmPriceType')
+    page.insert_html :bottom, params[:update], :partial => "vm_price_type", :object => @vm_price_type
+else
+    page['error_redbox'].replace_html :partial => 'shared/error_redbox'
+    page['error_redbox'].appear
+end

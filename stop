@@ -1,0 +1,25 @@
+#!/bin/bash
+
+NIMBUL_HOME=$(dirname $0)
+
+echo "Stopping Nimbul and daemons, please wait..."
+
+# source /etc/cloudrc if it exists
+if [ -f /etc/cloudrc ]; then
+    source /etc/cloudrc
+fi
+
+cd "${NIMBUL_HOME}"
+mongrel_rails stop -P tmp/pids/mongrel.pid
+script/daemons stop
+sleep 10
+killall -9 ruby mongrel_rails
+
+# make sure to cleanup the pid file if it's there
+rm -f tmp/pids/mongrel.pid
+
+rake keystore:reset_lock
+
+echo "Done"
+
+exit 0

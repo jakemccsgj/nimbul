@@ -1,0 +1,7 @@
+<% subtitle h(@provider_account.nil? ? '' : @provider_account.name + ': ') + 'New Cluster' %>
+
+<h1><%= pagetitle h(@provider_account.nil? ? '' : @provider_account.name + ': ') + 'New Cluster' %></h1>
+
+<br />
+
+<%= render :partial => 'form' %>

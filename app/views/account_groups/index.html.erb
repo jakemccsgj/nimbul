@@ -1,0 +1,23 @@
+<% subtitle 'Available Account Groups' %>
+
+<h1><%= link_to 'Admin Controls', admin_controls_path %> / Available Account Groups</h1>
+<br/>
+
+<table class="sortable" id="account_groups_table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+<% for account_group in @account_groups %>
+  <tr>
+    <td><%= link_to h(account_group.name), account_group_path(account_group) %></td>
+    <td><%=h account_group.description %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New Account Group', new_account_group_path %>

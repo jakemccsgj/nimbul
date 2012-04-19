@@ -1,0 +1,21 @@
+    <% fields_for "app", app do |f| %>
+    <% content_tag_for :tr, app, :readonly => false, :class => cycle("even", "odd") do %>
+        <%= f.hidden_field :id, :index => nil %>
+        <!--<td class="handle">[drag]</td>-->
+        <td>
+          <%= link_to_remote h(app.api_name), :url => send("edit_#{ @parent_type }_app_url", @parent, app), :method => :get %>
+        </td>
+        <td><%=h app.name %></td>
+        <td><%=h app.description %></td>
+        <td class="nowrap">
+            <%= app.clusters.collect{ |sp| h(sp.name) }.join('<br/>') %>
+        </td>
+        <td id="app_<%= app.id %>_total">&nbsp;</td>
+        <td id="app_<%= app.id %>_projection">&nbsp;</td>
+        <td>
+          <%= remove_account_group_app_link('Delete', @parent, app) %>
+          <%= parent_stats_link('Cost Details', app) %>
+          <%= javascript_tag(remote_function(:url => total_app_stats_url(app), :method => :get) ) %>
+       </td>
+    <% end %>
+    <% end %>

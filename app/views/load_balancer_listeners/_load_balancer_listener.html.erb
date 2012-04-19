@@ -1,0 +1,14 @@
+    <% fields_for "load_balancer_listener", load_balancer_listener do |f| %>
+    <% content_tag_for :tr, load_balancer_listener, :readonly => false, :class => '' do %>
+        <%= f.hidden_field :id, :index => nil %>
+        <td><%= load_balancer_listener.target %></td>
+        <td><%= load_balancer_listener.timeout %></td>
+        <td><%= load_balancer_listener.interval %></td>
+        <td><%= load_balancer_listener.unhealthy_threshold %></td>
+        <td><%= load_balancer_listener.healthy_threshold %></td>
+        <td>
+          <%= edit_load_balancer_load_balancer_listener_link('Edit', @parent, load_balancer_listener) %>
+          <%= remove_load_balancer_load_balancer_listener_link('Delete', @parent, load_balancer_listener) %>
+        </td>
+    <% end %>
+    <% end %>

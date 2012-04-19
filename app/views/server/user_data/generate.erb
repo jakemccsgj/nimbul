@@ -1,0 +1,124 @@
+#!/bin/bash
+# No -e on purpose - otherwise things might break!!!
+
+# Account: <%= @server.cluster.provider_account.name %> [<%= @server.cluster.provider_account.id %>]
+# Cluster: <%= @server.cluster.name %> [<%= @server.cluster.id %>]
+# Server: <%= @server.name %> [<%= @server.id %>]
+
+# Make sure we deploy main key first
+if [ -x /etc/init.d/ec2-get-credentials ]; then
+    /etc/init.d/ec2-get-credentials
+fi
+
+# Deploy user public keys
+<%
+instance_users = {}
+
+root_users = @server.cluster.provider_account.users + @server.cluster.users
+root_users.each do |user|
+    instance_user = 'root'
+    instance_users[instance_user] ||= []
+    begin
+      instance_users[instance_user] << user unless user.user_keys.length == 0
+    rescue
+    end
+end
+
+@server.server_user_accesses.each do |sua|
+    user = sua.user
+    instance_user = sua.server_user
+    instance_users[instance_user] ||= []
+    instance_users[instance_user] << user unless user.user_keys.length == 0
+end
+
+instance_users.each do |instance_user, users|
+	chars = ('A'..'Z').to_a
+	reol = (0...10).collect { chars[Kernel.rand(chars.length)] }.join
+	if instance_user == 'root'
+		user_home = '/root'
+	else
+		user_home = '/home/' + instance_user
+	end
+-%>
+SSH_DIR="<%= user_home %>/.ssh"
+mkdir -p $SSH_DIR
+cat <<'EOLEOLEOL' >> $SSH_DIR/authorized_keys
+<%
+  users.each do |user|
+    user.user_keys.each do |key|
+      unless key.public_key.blank? or key.public_key !~ /^ssh-/
+-%>
+<%= key.public_key.delete("\C-M").delete("\r").delete("\n") %>
+<%
+      end
+    end
+  end
+-%>
+EOLEOLEOL
+
+chmod 700 $SSH_DIR
+chmod 600 $SSH_DIR/authorized_keys
+chown -R <%= instance_user %> $SSH_DIR
+<%
+end
+-%>
+
+# Seed the /etc/hosts file
+<% account = @server.cluster.provider_account -%>
+cat <<'EOL' > /etc/hosts
+127.0.0.1       localhost
+<%= DnsAdapter.static_dns_entries(@server.cluster.provider_account).join("\n") %>
+EOL
+
+<%= @cloudrc %>
+
+# populate the hosts file by forcing an update
+# Note: this has to be done /after/ cloudrc is built
+if [ -x /root/bin/hostsfile_updater.sh ]; then
+  source /etc/cloudrc
+  /root/bin/hostsfile_updater.sh
+fi
+
+# Set the environment
+source /etc/bashrc
+
+# Deploy extra keys if any
+if [ -x /etc/init.d/ec2-extra-keys ]; then
+        /etc/init.d/ec2-extra-keys
+fi
+
+# startup scripts
+<% @startup_scripts.collect{ |s| s unless s.body.blank? }.compact.each do |s| -%>
+# <%= s.name %>
+FILE="/tmp/$(basename $0).$RANDOM"
+touch $FILE
+chmod 700 $FILE
+cat <<'EOLEOLEOL' > $FILE
+<%= s.body.delete("\C-M") %>
+EOLEOLEOL
+$FILE
+unlink $FILE
+<% end -%>
+
+yum install -y gcc
+
+gem update --system --no-ri --no-rdoc
+gem install bundler --no-ri --no-rdoc
+
+emissary stop
+gem install emissary && gem update emisssary
+
+yum erase -y gcc
+
+#bundle exec `which emissary` stop
+
+# configure emissary
+mkdir -p /etc/emissary
+cat << 'EOF' > /etc/emissary/config.ini
+<%= @emissary_config -%>
+EOF
+
+# restart emissary with the updated events configuration
+emissary start -d
+
+exit 0

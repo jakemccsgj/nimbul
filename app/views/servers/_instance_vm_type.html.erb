@@ -1,0 +1,6 @@
+<% unless @instance_vm_type.nil? -%>
+    Platform(s): <%= @instance_vm_type.cpu_profiles.collect{|c| c.api_name}.join(',') %>
+    Storage: <%= @instance_vm_type.storage_types.collect{|c| c.api_name}.join(',') %>
+    RAM: <%= @instance_vm_type.ram_gb %>GB
+    CPU: <%= @instance_vm_type.cpu_units %> Units
+<% end -%>

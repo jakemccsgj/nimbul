@@ -1,0 +1,8 @@
+if @error_messages.empty?
+    page["edit_region"].hide
+    page["add_region"].appear if @parent.can_use_more_of?('Region')
+    page.insert_html :bottom, params[:update], :partial => "region", :object => @region
+else
+    page['error_redbox'].replace_html :partial => 'shared/error_redbox'
+    page['error_redbox'].appear
+end

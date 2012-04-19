@@ -1,0 +1,33 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  position: 1
+  provider_id: 1
+  name: MyString
+  api_name: MyString
+  desc: MyText
+  ram_gb: 1.5
+  ram_type: MyString
+  ram_desc: MyString
+  cpu_units: 1.5
+  cpu_type: MyString
+  cpu_desc: MyString
+  storage_gb: 1
+  storage_type: MyString
+  storage_desc: MyString
+
+two:
+  position: 1
+  provider_id: 1
+  name: MyString
+  api_name: MyString
+  desc: MyText
+  ram_gb: 1.5
+  ram_type: MyString
+  ram_desc: MyString
+  cpu_units: 1.5
+  cpu_type: MyString
+  cpu_desc: MyString
+  storage_gb: 1
+  storage_type: MyString
+  storage_desc: MyString

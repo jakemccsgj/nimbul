@@ -1,0 +1,12 @@
+<% semantic_form_for @io_profile do |f| %>
+  <%= f.error_messages %>
+  <% f.inputs do %>
+    <%= f.input :name, :hint => 'Name the Profile, for example, Very High' %>
+    <%= f.input :desc, :hint => 'Description, for example, 10 Gigabit Ethernet',
+      :required => false %>
+  <% end %>
+  <% f.buttons do %>
+    <%= f.submit %>
+    <%= submit_tag 'Cancel', :name => 'cancel_button' %>
+  <% end %>
+<% end %>

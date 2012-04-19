@@ -1,0 +1,15 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  cluster_id: 1
+  server_id: 1
+  instance_type: MyString
+  instance_count: 1
+  taken_at: 2011-06-18 11:33:28
+
+two:
+  cluster_id: 1
+  server_id: 1
+  instance_type: MyString
+  instance_count: 1
+  taken_at: 2011-06-18 11:33:28

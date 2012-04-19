@@ -1,0 +1,13 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  position: 1
+  name: MyString
+  api_name: MyString
+  desc: MyString
+
+two:
+  position: 1
+  name: MyString
+  api_name: MyString
+  desc: MyString

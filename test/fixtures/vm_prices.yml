@@ -1,0 +1,21 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  provider_id: 1
+  vm_price_type_id: 1
+  region_id: 1
+  instance_vm_type_id: 1
+  vm_os_type_id: 1
+  price: 1
+  price_unit: MyString
+  price_period: MyString
+
+two:
+  provider_id: 1
+  vm_price_type_id: 1
+  region_id: 1
+  instance_vm_type_id: 1
+  vm_os_type_id: 1
+  price: 1
+  price_unit: MyString
+  price_period: MyString

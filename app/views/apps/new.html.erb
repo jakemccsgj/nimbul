@@ -1,0 +1,11 @@
+<% subtitle "New App" %>
+
+<h1>
+  <%= link_to 'Admin Controls', admin_controls_path %>
+  / <%= link_to 'Apps', send("#{ @parent_type }_apps_path", @parent) %>
+  / New App 
+</h1>
+
+<br/>
+
+<%= render :partial => 'form' %>

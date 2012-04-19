@@ -1,0 +1,4 @@
+page["#{@parent_type}_#{@parent.id}_total"].replace_html :text => number_to_currency(@total, :unit => '$', :precision => 2)
+unless @projection.nil?
+    page["#{@parent_type}_#{@parent.id}_projection"].replace_html :text => number_to_currency(@projection, :unit => '$', :precision => 2)
+end

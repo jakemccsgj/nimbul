@@ -1,0 +1,11 @@
+<% subtitle "Edit Price" %>
+
+<h1>
+  <%= link_to 'Admin Controls', admin_controls_path %>
+  / <%= link_to 'Prices', send("#{ @parent_type }_load_balancer_listeners_path", @parent) %>
+  / Edit Price 
+</h1>
+
+<br/>
+
+<%= render :partial => 'form' %>

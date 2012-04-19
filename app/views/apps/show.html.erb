@@ -1,0 +1,28 @@
+<p>
+  <b>Account group:</b>
+  <%=h @app.account_group_id %>
+</p>
+
+<p>
+  <b>Api name:</b>
+  <%=h @app.api_name %>
+</p>
+
+<p>
+  <b>Name:</b>
+  <%=h @app.name %>
+</p>
+
+<p>
+  <b>Description:</b>
+  <%=h @app.description %>
+</p>
+
+<p>
+  <b>Position:</b>
+  <%=h @app.position %>
+</p>
+
+
+<%= link_to 'Edit', edit_app_path(@app) %> |
+<%= link_to 'Back', apps_path %>
