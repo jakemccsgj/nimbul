@@ -145,5 +145,7 @@ class InstanceResource < ActiveRecord::Base
       end
     end
     alias :perform :process
+
+    def queue; :resources; end
   end
 end

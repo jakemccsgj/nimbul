@@ -215,5 +215,9 @@ class Task < BaseModel
         end
       end
       alias :perform :process
+
+      def queue
+        :tasks
+      end
     end
 end

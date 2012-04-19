@@ -6,13 +6,23 @@ class DnsRequest < BaseModel
     validates_presence_of :instance_id, :dns_hostname_assignment_id
     validates_presence_of :request_type
 
-    def self.process_requests
-        (DnsRequest.find(:all) || []).sort!{ |a,b| a.id <=> b.id }.each { |request| request.run }
-        true
-    end
+    class << self
+      def process_requests
+          (find(:all) || []).sort!{ |a,b| a.id <=> b.id }.each { |request| request.run }
+      end
+      alias :perform :process_requests
 
-    def self.perform
-      self.process_requests
+      def perform
+        process_requests
+      end
+
+      def queue
+        :dns_jobs
+      end
+      
+      def self.process
+        self.process_requests
+      end
     end
 
     def run 
@@ -22,10 +32,6 @@ class DnsRequest < BaseModel
             when :release
                 release
         end
-    end
-    
-    def self.process
-      self.process_requests
     end
 
     private

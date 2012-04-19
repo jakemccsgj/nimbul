@@ -11,6 +11,15 @@ GIT
     cloudmaster (1.0.0)
 
 GIT
+  remote: git://github.com/nimbul/resque-scheduler.git
+  revision: 1a1f02719aaf86acbb5289d295e0b6d43d1d2b11
+  specs:
+    resque-scheduler (2.0.0.f)
+      redis (>= 2.0.1)
+      resque (>= 1.19.0)
+      rufus-scheduler
+
+GIT
   remote: http://github.com/rabbitt/carrot
   revision: aa2b5de5d03515d27e95ee49adaad54b4753dbeb
   specs:
@@ -23,16 +32,6 @@ GIT
   specs:
     open_id_authentication (1.0.0)
       rack-openid (~> 1.3)
-
-GIT
-  remote: https://github.com/bvandenbos/resque-scheduler.git
-  revision: 88820f336c5951c4c8c3d8bda51863c81dee7064
-  branch: v2.0
-  specs:
-    resque-scheduler (2.0.0.a)
-      redis (>= 2.0.1)
-      resque (>= 1.8.0)
-      rufus-scheduler
 
 GIT
   remote: https://github.com/jayniz/resque-loner.git

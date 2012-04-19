@@ -7,6 +7,9 @@ module ProviderAccountRefresh
           Resque.enqueue(ProviderAccountRefresh::Account, acc.id)
         end
       end
+      def queue
+        :provider_account_refresh_jobs
+      end
     end
   end
 

@@ -181,6 +181,8 @@ protected
       end
     end
     alias :perform :process
+
+    def queue; :operations; end
   end
 end
 
