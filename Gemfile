@@ -61,3 +61,4 @@ group :production do
 end
 
 gem 'daemon_controller'
+gem 'attr_encrypted'

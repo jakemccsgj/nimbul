@@ -12,6 +12,10 @@ class ProviderAccount < BaseModel
     belongs_to :provider
     belongs_to :account_group
 
+    has_one :provider_account_id
+    has_one :provider_account_secret_key
+    has_one :provider_account_access_key
+
     has_many :provider_account_regions
     has_many :regions, :through => :provider_account_regions, :order => :position
     has_many :zones, :through => :regions, :order => :name

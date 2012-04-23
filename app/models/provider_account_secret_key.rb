@@ -1,0 +1,2 @@
+class ProviderAccountSecretKey < ProviderAccountKey
+end
