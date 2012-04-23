@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120402193824) do
+ActiveRecord::Schema.define(:version => 20120423211740) do
 
   create_table "access_requests", :force => true do |t|
     t.string   "state"
@@ -285,21 +285,6 @@ ActiveRecord::Schema.define(:version => 20120402193824) do
     t.integer "cpu_profile_id"
     t.integer "instance_vm_type_id"
   end
-
-  create_table "delayed_jobs", :force => true do |t|
-    t.integer  "priority",   :default => 0
-    t.integer  "attempts",   :default => 0
-    t.text     "handler"
-    t.text     "last_error"
-    t.datetime "run_at"
-    t.datetime "locked_at"
-    t.datetime "failed_at"
-    t.string   "locked_by"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "delayed_jobs", ["priority", "run_at"], :name => "delayed_jobs_priority"
 
   create_table "dns_hostname_assignments", :force => true do |t|
     t.integer  "dns_hostname_id", :null => false
@@ -778,6 +763,25 @@ ActiveRecord::Schema.define(:version => 20120402193824) do
   add_index "messages", ["provider_account_id", "type"], :name => "index_messages_on_provider_account_id_and_type"
   add_index "messages", ["type"], :name => "index_messages_on_type"
 
+  create_table "nomad_action", :force => true do |t|
+    t.datetime "date",                       :null => false
+    t.string   "action",       :limit => 50, :null => false
+    t.integer  "migration_id"
+    t.integer  "svn_revision"
+    t.string   "username"
+    t.boolean  "forced",                     :null => false
+    t.boolean  "completed",                  :null => false
+    t.integer  "duration_sec"
+  end
+
+  add_index "nomad_action", ["date"], :name => "ix_nomad_action_date"
+  add_index "nomad_action", ["migration_id"], :name => "migration_id"
+
+  create_table "nomad_migration", :force => true do |t|
+    t.string  "name",     :null => false
+    t.boolean "is_local", :null => false
+  end
+
   create_table "open_id_authentication_associations", :force => true do |t|
     t.integer "issued"
     t.integer "lifetime"
@@ -832,6 +836,14 @@ ActiveRecord::Schema.define(:version => 20120402193824) do
   end
 
   add_index "os_types", ["api_name"], :name => "index_os_types_on_api_name"
+
+  create_table "provider_account_keys", :force => true do |t|
+    t.string   "encrypted_value"
+    t.string   "type"
+    t.integer  "provider_account_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "provider_account_parameters", :force => true do |t|
     t.integer  "provider_account_id"
