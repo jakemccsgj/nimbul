@@ -230,7 +230,7 @@ class CloudResource < BaseModel
         end
 
         # detach the resource if required
-        unless self.instance_id.blank? and not force_allocation
+        if force_allocation and not self.instance_id.blank?
             unless self.detach! force_allocation
                 self.errors.add :instance_id, "failed to detach from #{self.instance.name}"
                 return false
@@ -269,11 +269,11 @@ class CloudResource < BaseModel
                 self.update_attributes(attrs)
                 return true
             else
-                self.errors.add(:state, "failed to detach #{self.cloud_id} from #{instance.instance_id} [#{instance.id}]")
+                self.errors.add(:state, "failed to detach #{self.cloud_id} from #{self.instance.instance_id} [#{self.id}]")
                 return false
             end
         rescue
-            self.errors.add(:state, "failed to detach #{self.cloud_id} from #{instance.instance_id} [#{instance.id}]: #{$!}")
+            self.errors.add(:state, "failed to detach #{self.cloud_id} from #{self.instance.instance_id} [#{self.id}]: #{$!}")
             return false
         end
 
