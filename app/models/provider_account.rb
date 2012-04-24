@@ -1,6 +1,4 @@
-require 'transient_key_store'
 require 'tempfile'
-require 'digest/md5'
 require 'carrot'
 
 class ProviderAccount < BaseModel
@@ -12,9 +10,9 @@ class ProviderAccount < BaseModel
     belongs_to :provider
     belongs_to :account_group
 
-    has_one :provider_account_id
     has_one :provider_account_secret_key
     has_one :provider_account_access_key
+    has_one :provider_account_ssh_master_key
 
     has_many :provider_account_regions
     has_many :regions, :through => :provider_account_regions, :order => :position
@@ -80,7 +78,6 @@ class ProviderAccount < BaseModel
     include TrackChanges # must follow any before filters
 
     default_scope :conditions => ["account_id is not null and account_id not in (?)", YAML.load(File.read(File.join(RAILS_ROOT, 'config', 'skip_accounts.yml')))]
-    #default_scope :conditions => { :id => 3 }
 
     def instance_vm_types
         provider.instance_vm_types
@@ -94,7 +91,6 @@ class ProviderAccount < BaseModel
     end
 
   def messaging_valid?
-    service = service(:events)
     if service.nil? or service.empty? or service.first.first_active_instance.nil?
       errors.add(:messaging_uri, 'Events Service does not appear to be created. Please go to Admin Controls -> Services and create an Events service, and provider.')
     else
@@ -169,58 +165,43 @@ class ProviderAccount < BaseModel
   #        return (self.iam_groups.empty? or ( self.iam_groups.size < 150 )) if (iam_resource == 'IamGroup')
   #    end
 
-    # interfacing with TransientKeyStore and User Interface
-    def aws_access_key_attribute
-        "provider_account_#{Digest::MD5.hexdigest(name || 'unknown')}_aws_access_key"
-    end
-
     def aws_access_key_ui=(key)
-        key.strip!
-        @aws_secret_key_ui ||= keystore[self.aws_access_key_attribute] = key if name and !key.blank?
+        self.provider_account_access_key = create_provider_account_access_key :value => key.strip
     end
 
     def aws_access_key_ui
-        return nil if aws_access_key.blank?
-        # make sure we have at least 4 characters, grab last 4 and fill the rest with 'x's
-        key = ((aws_access_key.rjust(4,'x'))[-4,4]).rjust(16,'x')
-        "#{key} - Click to Change"
+      return nil if provider_account_access_key.nil? or provider_account_access_key.value.blank?
+      # make sure we have at least 4 characters, grab last 4 and fill the rest with 'x's
+      key = ((provider_account_access_key.value.rjust(4,'x'))[-4,4]).rjust(16,'x')
+      "#{key} - Click to Change"
     end
 
     def aws_access_key
-        @aws_access_key ||= keystore[self.aws_access_key_attribute] || ''
-    end
-
-    def aws_secret_key_attribute
-        "provider_account_#{Digest::MD5.hexdigest(name || 'unknown')}_aws_secret_key"
+      provider_account_access_key.value
     end
 
     def aws_secret_key_ui=(key)
-        key.strip!
-        @aws_secret_key_ui ||= keystore[self.aws_secret_key_attribute] = key if name and !key.blank?
+      self.provider_account_secret_key = create_provider_account_secret_key :value => key.strip
     end
 
     def aws_secret_key_ui
-        return nil if aws_secret_key.blank?
-        # make sure we have at least 4 characters, grab last 4 and fill the rest with 'x's
-        key = ((aws_secret_key.rjust(4,'x'))[-4,4]).rjust(16,'x')
-        "#{key} - Click to Change"
+      return nil if provider_account_secret_key.nil?
+      # make sure we have at least 4 characters, grab last 4 and fill the rest with 'x's
+      key = ((provider_account_secret_key.value.rjust(4,'x'))[-4,4]).rjust(16,'x')
+      "#{key} - Click to Change"
     end
 
     def aws_secret_key
-        @aws_secret_key ||= keystore[self.aws_secret_key_attribute] || ''
-    end
-
-    def ssh_master_key_attribute
-        "provider_account_#{Digest::MD5.hexdigest(name || 'unknown')}_ssh_master_key"
+      provider_account_secret_key.value
     end
 
     def ssh_master_key_ui=(key)
-        @ssh_master_key_ui ||= keystore[self.ssh_master_key_attribute] = key if name
+      self.provider_account_ssh_master_key = create_provider_account_ssh_master_key :value => key
     end
 
     def ssh_master_key_ui
-        return nil if ssh_master_key.blank?
-        key = ssh_master_key
+        return nil if provider_account_ssh_master_key.nil? or provider_account_ssh_master_key.value.blank?
+        key = provider_account_ssh_master_key
         # find trailing meaningful characters of the key, make sure we have at least 6 of them, grab last 6 and fill the rest with 'x's
         key = key + '=' unless key.include?('=')
         key = /(.*=)/.match(key)[0]
@@ -229,13 +210,13 @@ class ProviderAccount < BaseModel
     end
 
     def ssh_master_key
-        @ssh_master_key ||= keystore[self.ssh_master_key_attribute] || ''
+      return nil if provider_account_ssh_master_key.nil?
+      provider_account_ssh_master_key.value
     end
 
     def with_ssh_master_key(&block)
         return false if ssh_master_key.blank?
         return false if not block_given?
-        
         f = Tempfile.new('.tmp-io-')
         begin
             f.write(ssh_master_key)
@@ -244,7 +225,7 @@ class ProviderAccount < BaseModel
         ensure
             f.close!
         end
-        
+
         true
     end
 
@@ -473,9 +454,5 @@ class ProviderAccount < BaseModel
 
     def class_type
         return self[:type]
-    end
-
-    def keystore
-      @keystore ||= TransientKeyStore.instance ENV['RAILS_ENV']
     end
 end
