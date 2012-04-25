@@ -1,3 +1,5 @@
+require 'daemons'
+
 class DaemonsController < ApplicationController
     before_filter :login_required
     require_role :admin

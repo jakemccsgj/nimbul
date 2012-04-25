@@ -22,13 +22,13 @@ class TransientKeyStore
   private
   attr_accessor :uri, :env, :logger, :drb, :data
 
-  SERVER_ADDR    = '127.0.0.1'
+  SERVER_ADDR    = 'keystore.ec2.nytimes.com'
   SERVER_PORT    = '55534'
   DEFAULT_URI    = "druby://#{SERVER_ADDR}:#{SERVER_PORT}"
   DEFAULT_LOGGER = Logger.new($stderr)
   DEFAULT_LOGGER.level = Logger::WARN
   DEFAULT_ENVIRONMENTS = [ :development, :testing, :production ]
-  DEFAULT_TIMEOUT      = 2 #seconds
+  DEFAULT_TIMEOUT      = 5 #seconds
 
   public
 

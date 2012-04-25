@@ -38,7 +38,7 @@ class ProviderAccount < BaseModel
     has_many :addresses, :class_name => 'CloudAddress', :dependent => :destroy
     has_many :volumes, :class_name => 'CloudVolume', :dependent => :destroy
     has_many :snapshots, :class_name => 'CloudSnapshot', :dependent => :destroy
-    has_many :storage_types, :through => :provider, :order => :name
+    delegate :storage_types, :to => :provider
     has_many :server_profiles, :order => :name, :dependent => :destroy
     has_many :server_image_categories, :order => :position, :dependent => :destroy
     has_many :server_image_groups, :order => 'server_image_category_id, position', :dependent => :destroy
@@ -75,6 +75,9 @@ class ProviderAccount < BaseModel
   
     include TrackChanges # must follow any before filters
 
+    default_scope :conditions => ["account_id is not null and account_id not in (?)", YAML.load(File.read(File.join(RAILS_ROOT, 'config', 'skip_accounts.yml')))]
+    #default_scope :conditions => { :id => 3 }
+
     def instance_vm_types
         provider.instance_vm_types
     end
@@ -87,7 +90,8 @@ class ProviderAccount < BaseModel
     end
 
   def messaging_valid?
-    if service(:events).nil? or service(:events).first_active_instance.nil?
+    service = service(:events)
+    if service.nil? or service.empty? or service.first.first_active_instance.nil?
       errors.add(:messaging_uri, 'Events Service does not appear to be created. Please go to Admin Controls -> Services and create an Events service, and provider.')
     else
       unless messaging_can_connect?
@@ -168,7 +172,7 @@ class ProviderAccount < BaseModel
 
     def aws_access_key_ui=(key)
         key.strip!
-        keystore[self.aws_access_key_attribute] = key if name and !key.blank?
+        @aws_secret_key_ui ||= keystore[self.aws_access_key_attribute] = key if name and !key.blank?
     end
 
     def aws_access_key_ui
@@ -179,7 +183,7 @@ class ProviderAccount < BaseModel
     end
 
     def aws_access_key
-        keystore[self.aws_access_key_attribute] || ''
+        @aws_access_key ||= keystore[self.aws_access_key_attribute] || ''
     end
 
     def aws_secret_key_attribute
@@ -188,7 +192,7 @@ class ProviderAccount < BaseModel
 
     def aws_secret_key_ui=(key)
         key.strip!
-        keystore[self.aws_secret_key_attribute] = key if name and !key.blank?
+        @aws_secret_key_ui ||= keystore[self.aws_secret_key_attribute] = key if name and !key.blank?
     end
 
     def aws_secret_key_ui
@@ -199,7 +203,7 @@ class ProviderAccount < BaseModel
     end
 
     def aws_secret_key
-        keystore[self.aws_secret_key_attribute] || ''
+        @aws_secret_key ||= keystore[self.aws_secret_key_attribute] || ''
     end
 
     def ssh_master_key_attribute
@@ -207,7 +211,7 @@ class ProviderAccount < BaseModel
     end
 
     def ssh_master_key_ui=(key)
-        keystore[self.ssh_master_key_attribute] = key if name
+        @ssh_master_key_ui ||= keystore[self.ssh_master_key_attribute] = key if name
     end
 
     def ssh_master_key_ui
@@ -221,7 +225,7 @@ class ProviderAccount < BaseModel
     end
 
     def ssh_master_key
-        keystore[self.ssh_master_key_attribute] || ''
+        @ssh_master_key ||= keystore[self.ssh_master_key_attribute] || ''
     end
 
     def with_ssh_master_key(&block)
@@ -430,16 +434,17 @@ class ProviderAccount < BaseModel
 
     # refresh
     def refresh(resources = nil)
-        Ec2Adapter.refresh_account(self, resources)
-        AsAdapter.refresh_account(self, resources)
-        StatsAdapter.refresh_account(self) if resources.nil?
+      e = Ec2Adapter.new(:account => self)
+      e.refresh_account resources
+      AsAdapter.refresh_account(self, resources)
+      StatsAdapter.refresh_account(self) if resources.nil?
   
-        now = Time.now
-        refresh_attr = {
-            :refreshed_at => now,
-            :refresh_at => (now + 10.seconds),
-        }
-        update_attributes(refresh_attr)
+      now = Time.now
+      refresh_attr = {
+        :refreshed_at => now,
+        :refresh_at => (now + 10.seconds),
+      }
+      update_attributes(refresh_attr)
     end
 
     # Factory to create instances of subclasses
@@ -467,6 +472,6 @@ class ProviderAccount < BaseModel
     end
 
     def keystore
-      TransientKeyStore.instance ENV['RAILS_ENV']
+      @keystore ||= TransientKeyStore.instance ENV['RAILS_ENV']
     end
 end

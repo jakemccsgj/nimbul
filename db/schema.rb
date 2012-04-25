@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111205154652) do
+ActiveRecord::Schema.define(:version => 20120402193824) do
 
   create_table "access_requests", :force => true do |t|
     t.string   "state"
@@ -201,6 +201,7 @@ ActiveRecord::Schema.define(:version => 20111205154652) do
     t.string   "cloud_instance_id"
   end
 
+  add_index "cloud_resources", ["cloud_id", "type"], :name => "index_cloud_resources_on_cloud_id_and_type"
   add_index "cloud_resources", ["cloud_instance_id"], :name => "index_cloud_resources_on_cloud_instance_id"
   add_index "cloud_resources", ["description"], :name => "index_cloud_resources_on_description"
   add_index "cloud_resources", ["owner_id"], :name => "index_cloud_resources_on_owner_id"
@@ -284,6 +285,21 @@ ActiveRecord::Schema.define(:version => 20111205154652) do
     t.integer "cpu_profile_id"
     t.integer "instance_vm_type_id"
   end
+
+  create_table "delayed_jobs", :force => true do |t|
+    t.integer  "priority",   :default => 0
+    t.integer  "attempts",   :default => 0
+    t.text     "handler"
+    t.text     "last_error"
+    t.datetime "run_at"
+    t.datetime "locked_at"
+    t.datetime "failed_at"
+    t.string   "locked_by"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "delayed_jobs", ["priority", "run_at"], :name => "delayed_jobs_priority"
 
   create_table "dns_hostname_assignments", :force => true do |t|
     t.integer  "dns_hostname_id", :null => false

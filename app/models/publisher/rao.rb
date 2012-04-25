@@ -1,4 +1,6 @@
 class Publisher::Rao < Publisher::Nagios
+  include Resque::Plugins::UniqueJob
+  @queue = :rao_publishers
   def description
     "Publishes list of instances with DNS information and roles. Doesn't care about the Maintenance flag."
   end

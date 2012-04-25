@@ -1,4 +1,8 @@
+require 'daemons'
+
 class Publisher < BaseModel
+  include Resque::Plugins::UniqueJob
+
   belongs_to :provider_account
   has_many :publisher_parameters, :dependent => :destroy
 
@@ -7,6 +11,8 @@ class Publisher < BaseModel
   after_update :save_publisher_parameters
 
   attr_accessor :should_destroy
+
+  default_scope :conditions => ["provider_account_id is not null and provider_account_id not in (select ID from provider_accounts where account_id in (?))", YAML.load(File.read(File.join(RAILS_ROOT, 'config', 'skip_accounts.yml')))]
 
   def should_destroy?
     should_destroy.to_i == 1
@@ -84,5 +90,27 @@ class Publisher < BaseModel
 
   def self.label
     "Publisher"
+  end
+
+  class << self
+    def queue
+      :publishers
+    end
+
+    def publish_delayed
+      self.all.each { |p|
+        Resque.enqueue(p.class, p.id)
+      }
+    end
+
+    def perform *args
+      if !args.empty?
+        args.each do |a|
+          self[a].publish!
+        end
+      else
+        publish_delayed
+      end
+    end
   end
 end

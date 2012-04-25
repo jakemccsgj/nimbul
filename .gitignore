@@ -2,8 +2,8 @@ tmp
 nimbul.kpf
 cucumber.yml
 pki
-vendor/bundle
-vendor/cache
 .htaccess
 .ctags
 app/tags
+tags
+.bundle/ruby

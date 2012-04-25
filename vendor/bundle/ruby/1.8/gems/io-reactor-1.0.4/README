@@ -1,0 +1,77 @@
+
+= IO-Reactor
+
+An implementation of the Reactor design pattern for multiplexed asynchronous
+single-thread IO.
+
+== Authors
+
+ Michael Granger <ged@FaerieMUD.org>
+
+
+== Description
+
+This module is a pure-Ruby implementation of an asynchronous multiplexed IO
+Reactor which is based on the Reactor design pattern found in _Pattern-Oriented
+Software Architecture, Volume 2: Patterns for Concurrent and Networked
+Objects_. It allows a single thread to demultiplex and dispatch events from one
+or more IO objects to the appropriate handler.
+
+This module used to be called Ruby-Poll, and used to use the poll(2) system
+call, but this strategy was not portable, and didn't work with Ruby's
+threads. It now uses IO::select, which should work everywhere Ruby does.
+
+I would greatly appreciate feedback on any aspect of this software. Suggestions,
+feature requests, questions, design critiques, and bug reports are most
+welcome. Relevant patches and minimal test cases are particularly helpful. I may
+be reached by email at <ged@FaerieMUD.org>.
+
+
+== Requirements
+
+* Ruby >= 1.8.0
+
+Optional:
+
+* Dave Thomas's RDoc documentation tool to make HTML documentation.
+* The Test::Unit module, to run the included test suite.
+
+
+== Installation
+
+  $ su
+  # ruby install.rb
+
+If you have the Test::Unit module installed, you can run the test suite by
+doing:
+
+  $ ruby test.rb
+
+
+== More Information
+
+You can find more information about IO-Reactor, including the latest version, at
+its project page:
+
+  http://www.devEiate.org/code/IO-Reactor.shtml
+
+
+== Legal
+
+IO-Reactor is Open Source Software which is Copyright (c) 2001-2003 by The
+FaerieMUD Consortium.
+
+You may use, modify, and/or redistribute this software under the same terms as
+Ruby itself.
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES,
+INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND
+FITNESS FOR A PARTICULAR PURPOSE.
+
+
+ $Id: README 85 2008-08-19 20:30:57Z deveiant $
+
+
+
+
+

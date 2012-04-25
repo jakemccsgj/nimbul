@@ -2,6 +2,7 @@ require 'AWS/EC2'
 require 'md5'
 
 class Ec2Adapter
+  include Loggable
   extend Erby
 
   BASE_TEMPLATE = 'base.erb' unless const_defined? :BASE_TEMPLATE
@@ -16,86 +17,82 @@ class Ec2Adapter
   end
 
   def get_ec2 account = nil
-    account ||= @account
-    Rails.logger.info "Have account?"
-    raise AccountError.new if account.nil?
-    Rails.logger.info "Have access keys?"
-    raise AccountError.new if account.aws_access_key.blank? or account.aws_secret_key.blank?
-    Rails.logger.info "Get an AWS::EC2 object then"
-    @ec2 ||= AWS::EC2.new(account.aws_access_key, account.aws_secret_key)
-    Rails.logger.info "Got an AWS::EC2 object: #{@ec2}"
+    if @ec2.nil?
+      account ||= @account
+      logger.debug "Have account? #{account.id}"
+      raise AccountError.new if account.nil?
+      logger.debug "Have access keys #{account.name}?"
+      raise AccountError.new if account.aws_access_key.blank? or account.aws_secret_key.blank?
+      logger.info "Get an AWS::EC2 object"
+      @ec2 ||= AWS::EC2.new(account.aws_access_key, account.aws_secret_key)
+    end
     @ec2
   end
 
     def refresh_account resources = nil
       # don't proceed if we can't get the ec2 account object
-      if get_ec2.nil?
-        Rails.logger.error "Account [#{@account.id} - #{@account.name}] failed to refresh - unable to load AWS::EC2 object using account credentials."
+      if get_ec2(@account).nil?
+        logger.error "Account [#{account.id} - #{account.name}] failed to refresh - unable to load AWS::EC2 object using account credentials."
         return
       end
 
-#      # always refresh zones
-#      begin
-#        refresh_zones
-#      rescue Exception => e 
-#        Rails.logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
-#      end
-      
       # always refresh key pairs
       methods = []
-      methods << lambda { refresh_key_pairs }
+      methods << :refresh_key_pairs
 
       methods += \
         case resources
         when 'server_images'
-          lambda { refresh_server_images }
+          :refresh_server_images
         when 'security_groups'
-          lambda { refresh_security_groups }
+          :refresh_security_groups
         when 'instances'
           [
-            lambda { refresh_security_groups },
-            lambda { refresh_instances }
+            :refresh_security_groups,
+            :refresh_instances
           ]
         when 'volumes'
-          lambda { refresh_volumes }
+          :refresh_volumes
         when 'snapshots'
-          lambda { refresh_snapshots }
+          :refresh_snapshots
         when 'addresses'
-          lambda { refresh_addresses }
+          :refresh_addresses
         when 'reserved_instances'
-          lambda { refresh_reserved_instances }
+          :refresh_reserved_instances
         else
           [
-            lambda { refresh_server_images },
-            lambda { refresh_security_groups },
-            lambda { refresh_security_groups },
-            lambda { refresh_instances },
-            lambda { refresh_volumes },
-            lambda { refresh_snapshots },
-            lambda { refresh_addresses },
-            lambda { refresh_reserved_instances },
+            :refresh_server_images,
+            :refresh_security_groups,
+            :refresh_security_groups,
+            :refresh_instances,
+            :refresh_volumes,
+            :refresh_snapshots,
+            :refresh_addresses,
+            :refresh_reserved_instances,
           ]
         end
-      methods.each { |m| m.call }
-      #Process.waitall
+      methods.map do |m|
+        logger.info "Running #{m.to_s} for account #{@account.id} - #{@account.name}"
+        self.send m
+      end
     end
 
     def refresh_addresses
-        ec2 = get_ec2
+        ec2 = get_ec2(@account)
         cloud_addresses = ec2.describe_addresses
         account_addresses = CloudAddress.find_all_by_provider_account_id(@account.id, :include => :instance_addresses)
         account_instances = Instance.find_all_by_provider_account_id(@account.id, :include => :addresses)
-        
+
         account_addresses.each do |a|
             a.should_destroy = 1
         end
-        
+
         cloud_addresses.each do |ca|
             ca[:cloud_id] = ca[:public_ip]
             instance_id = ca[:instance_id]
             ca[:state] = instance_id.blank? ? 'available' : 'in-use'
             ca.delete(:public_ip)
-            
+
             # parse instance info
             instance_id = ca[:instance_id]
             ca.delete(:instance_id)
@@ -113,13 +110,13 @@ class Ec2Adapter
             aa = account_addresses.detect{ |a| a.cloud_id == ca[:cloud_id] }
             if aa.nil?
                 ca[:name] = ca[:cloud_id]
-                aa = account.addresses.build(ca)
+                aa = @account.addresses.build(ca)
             else
                 aa.attributes = ca
                 aa.should_destroy = 0
             end
                aa.save if aa.changed?
-               
+
             # update instance resources
             conditions = [ "state != ?", 'pending' ]
             unless instance.nil?
@@ -140,7 +137,7 @@ class Ec2Adapter
             end
             aa.instance_addresses.update_all("state = 'detached'", conditions )
         end
-        
+
         account_addresses.each do |aa|
             aa.destroy if aa.should_destroy?
         end
@@ -152,11 +149,11 @@ class Ec2Adapter
         zones = @account.zones
         account_volumes = CloudVolume.find_all_by_provider_account_id(@account.id, :include => :instance_volumes)
         account_instances = Instance.find_all_by_provider_account_id(@account.id, :include => :volumes)
-        
+
         account_volumes.each do |account_volume|
             account_volume.should_destroy = 1
         end
-        
+
         cloud_volumes.each do |cloud_volume|
             # remove attachment set before saving
             attachment_set = cloud_volume[:attachment_set]
@@ -167,25 +164,25 @@ class Ec2Adapter
             account_volume = account_volumes.detect{ |volume| volume.cloud_id == cloud_volume[:cloud_id] }
             if account_volume.nil?
                 cloud_volume[:name] = cloud_volume[:cloud_id]
-                account_volume = account.volumes.build(cloud_volume)
+                account_volume = @account.volumes.build(cloud_volume)
             else
                 account_volume.attributes = cloud_volume
                 account_volume.should_destroy = 0
             end
             account_volume.save if account_volume.changed?
-               
+
             # parse attachment set
             parse_volume_attachment_set(account_volume, attachment_set, account_instances)
         end
-        
+
         account_volumes.each do |account_volume|
             account_volume.destroy if account_volume.should_destroy?
         end
     end
-    
+
     def parse_volume_info(attributes, zones=nil)
         zones ||= @account.zones
-        
+
         # parse attributes
         attributes[:cloud_id] = attributes[:volume_id]
         attributes.delete(:volume_id)
@@ -193,7 +190,7 @@ class Ec2Adapter
         attributes.delete(:snapshot_id)
         attributes[:state] = attributes[:status]
         attributes.delete(:status)
-        
+
         # parse zone info
         zone_name = attributes[:availability_zone]
         attributes.delete(:availability_zone)
@@ -205,26 +202,26 @@ class Ec2Adapter
 
     def parse_volume_attachment_set(account_volume, attachment_set, account_instances=nil)
         account_instances ||= Instance.find_all_by_provider_account_id(@account.id, :include => :volumes)
-        
+
         attachment_state = nil
         attach_time = nil
         device = nil
         attached_cloud_instance_id = nil
         attached_instance_id = nil
         attachment_instance_ids = []
-        
+
         # parse attachments one by one
         attachment_set.each do |a_set|
             attachment_state = a_set[:status]
             attach_time = a_set[:attach_time]
             device = a_set[:device]
-            
+
             # find the instance
             cloud_instance_id = a_set[:instance_id]
             instance_id = nil
             instance = account_instances.detect{ |i| i.instance_id == cloud_instance_id }
             instance_id = instance.id unless instance.nil?
-            
+
             # update instance resources
             unless instance.nil?
                 attachment_instance_ids << instance_id
@@ -242,14 +239,14 @@ class Ec2Adapter
                 end
                 i_resource.save if i_resource.changed?
             end
-            
+
             # for the instance that has this volume attached - memorize it's ids
             if attachment_state == 'attached'
                 attached_cloud_instance_id = cloud_instance_id
                 attached_instance_id = instance_id
             end
         end
-            
+
         # update volume with the last attachment information
         account_volume.update_attributes({
             :cloud_instance_id => attached_cloud_instance_id,
@@ -286,16 +283,16 @@ class Ec2Adapter
         ec2 = adapter.get_ec2(volume.provider_account)
         ec2.delete_volume(volume.cloud_id)
     end
-    
+
     def refresh_snapshots
         ec2 = get_ec2
         cloud_snapshots = ec2.describe_snapshots
         account_snapshots = @account.snapshots
-        
+
         account_snapshots.each do |account_snapshot|
             account_snapshot.should_destroy = 1
         end
-        
+
         cloud_snapshots.each do |cloud_snapshot|
             # parse snapshot info
             cloud_snapshot = parse_snapshot_info(cloud_snapshot)
@@ -309,7 +306,7 @@ class Ec2Adapter
             end
             account_snapshot.save if account_snapshot.changed?
         end
-        
+
         account_snapshots.each do |account_snapshot|
             account_snapshot.destroy if account_snapshot.should_destroy?
         end
@@ -338,7 +335,7 @@ class Ec2Adapter
         group.delete(:vpc_id)
         group.delete(:ip_permissions_egress)
         group.delete(:tag_set)
-        
+
         account_group = account_groups.detect{ |g| g.name == group[:name] }
         if account_group.nil?
           account_group = @account.security_groups.build(group)
@@ -369,13 +366,13 @@ class Ec2Adapter
             fr.name = "Allow access from #{fr.ip_range} to #{fr.protocol} #{fr.from_port}-#{fr.to_port}"
             fr.save
           end
-          
+
           begin
             account_group.firewall_rules << fr unless account_group.firewall_rules.include?(fr)
             account_firewall_rules << fr if account_firewall_rules.detect{ |r| r.protocol == grant[:protocol] and r.from_port == grant[:from_port] and r.to_port == grant[:to_port] and r.ip_range == grant[:ip_range]}.nil?
           rescue ActiveRecord::RecordInvalid => e
             # only log the error for now
-            Rails.logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
+            logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
           end
         end
 
@@ -385,15 +382,15 @@ class Ec2Adapter
           grant[:groups].each { |g| hash["#{g[:group_user_id]}:#{g[:group_name]}"] = grant } unless grant[:groups].nil?
           hash
         }.values
-        
+
         # process group-based rule 
         group_grants.each do |grant|
           # analyze all groups
-          
+
           grant[:groups].each do |g|
             grant[:group_user_id] = g[:user_id]
             grant[:group_name] = g[:name]
-            
+
             fr = account_firewall_rules.detect{ |r| r.group_user_id == grant[:group_user_id] and r.group_name == grant[:group_name] }
             if fr.nil?
               fr = @account.firewall_rules.build({
@@ -403,18 +400,18 @@ class Ec2Adapter
               fr.name = "Allow access from #{fr.group_user_id}/#{fr.group_name}"
               fr.save
             end
-            
+
             begin
               account_group.firewall_rules << fr unless account_group.firewall_rules.include?(fr)
               account_firewall_rules << fr if account_firewall_rules.detect{ |r| r.group_user_id == grant[:group_user_id] and r.group_name == grant[:group_name] }.nil?
             rescue ActiveRecord::RecordInvalid => e
               # only log the error for now
-              Rails.logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
+              logger.error "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
             end
           end
         end
       end
-      
+
       account_groups.each do |account_group|
         account_group.destroy if account_group.should_destroy?
       end
@@ -424,7 +421,7 @@ class Ec2Adapter
         ec2 = get_ec2
         zones = ec2.describe_availability_zones
         account_zones = @account.zones
-        
+
         zones.each do |i|
             zone = account_zones.detect{ |s| s.name == i[:name] }
             if zone.nil?
@@ -440,7 +437,7 @@ class Ec2Adapter
         ec2 = get_ec2
         key_pairs = ec2.describe_keypairs
         account_key_pairs = @account.key_pairs
-        
+
         key_pairs.each do |i|
             key_pair = account_key_pairs.detect{ |s| s.name == i[:name] }
             if key_pair.nil?
@@ -453,7 +450,7 @@ class Ec2Adapter
     end
 
     def refresh_server_images
-        account = ProviderAccount.find(@account.id, :include => [:server_images, :storage_types])
+        account = ProviderAccount.find(@account.id, :include => [:server_images])
         ec2 = get_ec2
         account_server_images = @account.server_images
         account_storage_types = @account.storage_types
@@ -493,12 +490,12 @@ class Ec2Adapter
         ec2 = get_ec2
         opts = { :image_ids => [ server_image.image_id ] }
         begin
-            @images ||= ec2.describe_images(opts)
+            images ||= ec2.describe_images(opts)
             if images.size > 0
                 i = images[0]
                 # preserve the name
                 i[:name] = server_image.name if i[:name].blank?
-                server_image = parse_server_image_info(i, account_server_images, account_storage_types)
+                server_image = parse_server_image_info(i, @account_server_images, @account_storage_types)
                 server_image.save if server_image.changed?
             else
                 server_image.update_attribute(:state, 'unavailable')
@@ -511,9 +508,9 @@ class Ec2Adapter
     end
 
     def parse_server_image_info(attributes, account_server_images=nil, account_storage_types=nil, cpu_profiles=nil)
-        @account_server_images ||= @account.server_images
-        @account_storage_types ||= @account.storage_types
-        @cpu_profiles ||= CpuProfile.all
+        account_server_images ||= @account.server_images
+        account_storage_types ||= @account.storage_types
+        cpu_profiles ||= CpuProfile.all
 
         # delete :id attribute before building a server image record - :id is a special rails attribute
         attributes[:image_id] = attributes[:id]
@@ -558,7 +555,7 @@ class Ec2Adapter
 
     def refresh_instances
         account = ProviderAccount.find(@account.id,
-          :include => [ { :provider => [:instance_vm_types] }, { :instances => [:security_groups] }, :security_groups, :storage_types])
+          :include => [ { :provider => [:instance_vm_types] }, { :instances => [:security_groups] }, :security_groups])
         ec2 = get_ec2
         # there is a bug in EC2 library that calls reservations "instances"
         reservations = ec2.describe_instances
@@ -568,14 +565,14 @@ class Ec2Adapter
         account_instance_vm_types = @account.instance_vm_types
         account_storage_types = @account.storage_types
         cpu_profiles = CpuProfile.all
-        
+
         # mark all the instances that are not in 'requested' state as to be destroyed
         # this will be reverted when we find a corresponding instance on the cloud
         account_instances.each do |i|
             i.should_destroy = 1 unless i.requested?
         end
         account_storage_types = @account.storage_types
-        
+
         reservations.each do |r|
             r[:instances].each do |i|
                 instance = parse_instance_info(r, i, account_instances, account_zones, account_security_groups, account_instance_vm_types)
@@ -583,7 +580,7 @@ class Ec2Adapter
                 instance.save if instance.changed?
             end
         end
-        
+
         account_instances.each do |i|
             i.destroy if i.should_destroy?
         end
@@ -618,33 +615,33 @@ class Ec2Adapter
     end
 
     def self.run_instances(server, count, p)
-        Rails.logger.info "Starting instance of server: #{server}"
+        logger.info "Starting instance of server: #{server}"
         cluster = Cluster.find(server.cluster_id, :include => [ :provider_account ])
         account = cluster.provider_account
         adapter = self.new :account => account
-        Rails.logger.info "Getting adapter for account: #{account}"
+        logger.info "Getting adapter for account: #{account}"
         ec2 = adapter.get_ec2(account)
-        Rails.logger.info "Got adapter for account: #{account}"
-        
+        logger.info "Got adapter for account: #{account}"
+
         # if a launch configuration was specified - find it
         rb = server.resource_bundles.detect{ |rb| rb.id == p[:resource_bundle_id] } unless p[:resource_bundle_id].blank?
-        
+
         # default prefix for messages
         msg_prefix = "Ec2Adapter.run_instances: server #{server.name} [#{server.id}]"
-        
+
         # assign parameters
         dns_active = p[:dns_active].nil? ? true : p[:dns_active]
         user_id = p[:user_id] || nil
         image_id = server.image_id
 
         security_groups = server.security_groups.collect{|g| g.name}
-        unless @account.default_security_group.blank?
-            security_groups << @account.default_security_group unless security_groups.include?(@account.default_security_group)
+        unless account.default_security_group.blank?
+            security_groups << account.default_security_group unless security_groups.include?(account.default_security_group)
         end
-        
+
         key_name = server.key_name
-        unless @account.default_main_key.blank?
-            key_name = @account.default_main_key
+        unless account.default_main_key.blank?
+            key_name = account.default_main_key
         end
 
         compress_user_data = true # false by default
@@ -671,11 +668,11 @@ class Ec2Adapter
                 rb = server.next_available_resource_bundle if rb.nil?
                 if rb.nil?
                     msg = "Not enough launch configurations configured and no default launch configuration for this server. #{c} instances started."
-                    Rails.logger.error "#{msg_prefix} - #{msg}"
+                    logger.error "#{msg_prefix} - #{msg}"
                     raise msg
                 end
             end
-            
+
             # if zone is not set - suggest one
             zone = (rb.nil? or rb.zone_id.blank?) ? find_best_zone(server) : rb.zone
             options[:zone] = zone.name unless zone.nil?
@@ -699,11 +696,12 @@ class Ec2Adapter
                 # store information about pending launch configuration
                 i.merge!({ :pending_launch_configuration_id => rb.id }) unless rb.nil?
 
-                instance = parse_instance_info(account, reservation, i)
+                obj = self.new :account => account
+                instance = obj.parse_instance_info(reservation, i)
                 instance.save
                 instances << instance
 
-                Rails.logger.debug "#{msg_prefix} - started instance: #{instance.name} [#{instance.id}]"
+                logger.debug "#{msg_prefix} - started instance: #{instance.name} [#{instance.id}]"
             end
         end
 
@@ -719,7 +717,7 @@ class Ec2Adapter
             raise "Unrecognized cloud resource type: #{cloud_resource.class_type}"
         end
     end
-    
+
     def self.attach_address(address, instance)
         account = address.provider_account
         refresh_addresses
@@ -731,7 +729,7 @@ class Ec2Adapter
         ec2.associate_address(instance.instance_id, a.cloud_id)
         return true
     end
-    
+
     def self.attach_volume(volume, instance, mount_point)
         account = volume.provider_account
         refresh_volumes
@@ -753,7 +751,7 @@ class Ec2Adapter
             raise "Unrecognized cloud resource type: #{cloud_resource.class_type}"
         end
     end
-    
+
     def self.detach_address(address, force=false)
         account = address.provider_account
         adapter = self.new :account => account
@@ -761,7 +759,7 @@ class Ec2Adapter
         ec2.disassociate_address(address.cloud_id)
         return true
     end
-    
+
     def self.detach_volume(volume, force=false)
         account = volume.provider_account
         adapter = self.new :account => account
@@ -781,13 +779,13 @@ class Ec2Adapter
     end
 
     def self.start_instance(instance)
-        Rails.logger.info "Starting instance #{instance}"
+        logger.info "Starting instance #{instance}"
         return nil if instance.nil?
         account = instance.provider_account
         adapter = self.new :account => account
-        Rails.logger.info "Getting ec2 adapter"
+        logger.info "Getting ec2 adapter"
         ec2 = adapter.get_ec2(account)
-        Rails.logger.info "Got ec2 adapter"
+        logger.info "Got ec2 adapter"
         # returns {:state=>"starting", :previous_state=>"stopped", :id=>"i-1392c97a"}
         result = ec2.start_instances([instance.instance_id])
         return true
@@ -846,7 +844,7 @@ class Ec2Adapter
             running = Instance.count(:all, :conditions => ['provider_account_id=? AND zone_id=? AND instance_vm_type_id in (select id from instance_vm_types where api_name = ?) AND (state=? OR state=?)', provider_account.id, zone_id, server.instance_type, 'running', 'pending'])
             free_zone_ids << zone_id if reserved > running
         end
-        
+
         # use free zones if they are available
         zone_ids = free_zone_ids if free_zone_ids.size > 0
 
@@ -858,6 +856,7 @@ class Ec2Adapter
         return Zone.find(zone_id)
     end
 
+    public
     # also used by AsAdapter to process info about AS Group's instances
     def parse_instance_info(reservation, attributes, account_instances=nil, account_zones=nil, account_security_groups=nil, account_instance_vm_types=nil, cpu_profiles=nil, account_storage_types=nil)
         as_lifecycle_state_to_ec2_state = {}
@@ -872,7 +871,7 @@ class Ec2Adapter
         account_instance_vm_types ||= @account.instance_vm_types
         cpu_profiles ||= CpuProfile.all
         account_storage_types ||= @account.storage_types
-        
+
         # delete :id attribute before building a instance record - :id is a special rails attribute
         attributes[:instance_id] = attributes[:id]
         attributes.delete(:id)
@@ -881,7 +880,7 @@ class Ec2Adapter
         vm_type = account_instance_vm_types.detect{ |t| t.api_name == attributes[:type] }
         attributes[:instance_vm_type_id] = vm_type.id unless vm_type.nil?
         attributes.delete(:type)
-   
+
         # map architecture to cpu profile
         if attributes[:architecture]
           cpu_profile = cpu_profiles.detect{ |p| p.api_name == attributes[:architecture] }
@@ -915,7 +914,7 @@ class Ec2Adapter
             zone_name = attributes[:availability_zone]
             attributes.delete(:availability_zone)
         end
-        
+
         # replace states like shutting-down with states like shutting_down
         attributes[:state].gsub!('-','_')
 
@@ -991,8 +990,9 @@ class Ec2Adapter
 
     def self.add_security_group_firewall_rule(security_group, firewall_rule)
         return false if security_group.nil? or firewall_rule.nil?
+        account = security_group.provider_account
         adapter = self.new :account => account
-        ec2 = adapter.get_ec2(security_group.provider_account)
+        ec2 = adapter.get_ec2(account)
         if !firewall_rule.group_name.blank? and !firewall_rule.group_user_id.blank?
             ec2.authorize_ingress_by_group(security_group.name, firewall_rule.group_name, firewall_rule.group_user_id)
         else
@@ -1025,21 +1025,21 @@ class Ec2Adapter
         address.cloud_id = ec2.allocate_address
         return true
     end
-    
+
     def self.release_address(address)
       adapter = self.new :account => account
         ec2 = adapter.get_ec2(address.provider_account)
         ec2.release_address(address.cloud_id)
         return true
     end
-    
+
     def self.register_server_image(server_image)
       adapter = self.new :account => account
         ec2 = adapter.get_ec2(server_image.provider_account)
         image_id = ec2.register_image(server_image.location)
         return image_id
     end
-    
+
     def self.deregister_server_image(server_image, remove_parts=true)
         account = server_image.provider_account
 

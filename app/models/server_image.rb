@@ -86,7 +86,7 @@ class ServerImage < BaseModel
 
     # fill out attributes from the Provider Account (e.g. when registering a new image
     def self.refresh(server_image)
-        Ec2Adapter.refresh_server_image(server_image)
+      Ec2Adapter.new.refresh_server_image(server_image)
     end
 
     def self.options_for_find_by_user(user, options={})
@@ -144,9 +144,9 @@ class ServerImage < BaseModel
     def allocate!
         #begin
             if self.image_id
-                Ec2Adapter.refresh_server_image(self)
+              Ec2Adapter.new.refresh_server_image(self)
             else
-                Ec2Adapter.register_server_image(self)
+              Ec2Adapter.new.register_server_image(self)
             end
             self.save
         #rescue
@@ -165,7 +165,7 @@ class ServerImage < BaseModel
     def release!
         begin
             if self.destroy
-              Ec2Adapter.deregister_server_image(self)
+              Ec2Adapter.new.deregister_server_image(self)
             end
         rescue
             self.errors.add(:id, "#{$!}")

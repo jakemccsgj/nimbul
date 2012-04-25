@@ -73,3 +73,6 @@ begin
 rescue LoadError
   STDERR.puts "The query_reviewer gem could not be found!"
 end
+
+require 'resque/tasks'
+require 'resque_scheduler/tasks'

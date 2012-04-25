@@ -1,0 +1,7 @@
+# pack-refs with: peeled 
+b30cfdce532fe722ac73fe4039907460bbc44210 refs/tags/v1.0.1
+^2295e93886d8ccaa751ddbbb1f2b581d09dfd3a9
+6d04b9247eacbfaf5078b40f0204a3b42963a82b refs/tags/v1.0
+^844238b4c39b94214da38cd64be22760570a3807
+3eaf699324b2e619b2883f694f9a402975f3e4b7 refs/heads/master
+d18b8211b1d648c8eb5b66ab3e7d277761eb2e9d refs/heads/edge
