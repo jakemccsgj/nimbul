@@ -3,6 +3,10 @@ source 'http://gems.rubyforge.org'
 source 'http://gemcutter.org'
 
 gem 'aws'
+<<<<<<< HEAD
+=======
+gem 'daemons', '= 1.0.10'
+>>>>>>> Cherry picking some fixes from the daemons rewrite branch for rvm/bundler fixes
 gem 'statemachine'
 gem 'rails', '~> 2.3.0'
 gem 'Ruby-MemCache', :require => 'memcache'
