@@ -11,7 +11,6 @@ gem 'facter'
 gem 'aasm'
 gem 'carrot', :git => 'http://github.com/rabbitt/carrot'
 gem 'chronic'
-gem 'emissary'
 gem 'fastthread'
 #
 ## IF you are having an issue with the following error:
