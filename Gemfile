@@ -5,11 +5,14 @@ source 'http://gemcutter.org'
 gem 'aws'
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 gem 'daemons', '= 1.0.10'
 >>>>>>> Cherry picking some fixes from the daemons rewrite branch for rvm/bundler fixes
 =======
 >>>>>>> Updating gem deps
+=======
+>>>>>>> 6a1e9e2ba5a117f5120758e950dee8a156027f89
 gem 'statemachine'
 gem 'rails', '~> 2.3.0'
 gem 'Ruby-MemCache', :require => 'memcache'
