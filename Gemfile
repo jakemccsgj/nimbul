@@ -2,8 +2,12 @@ source 'http://rubygems.org'
 source 'http://gems.rubyforge.org'
 source 'http://gemcutter.org'
 
+gem 'activemessaging'
+gem 'amqp'
+gem 'bert'
+gem 'emissary'
+gem 'daemons'
 gem 'aws'
-gem 'daemons', '= 1.0.10'
 gem 'statemachine'
 gem 'rails', '~> 2.3.0'
 gem 'Ruby-MemCache', :require => 'memcache'
@@ -12,7 +16,6 @@ gem 'facter'
 gem 'aasm'
 gem 'carrot', :git => 'http://github.com/rabbitt/carrot'
 gem 'chronic'
-gem 'emissary'
 gem 'fastthread'
 #
 ## IF you are having an issue with the following error:
@@ -33,7 +36,6 @@ gem "query_reviewer", :git => "git://github.com/nesquena/query_reviewer.git"
 gem 'net-sftp', :require => 'net/sftp'
 gem 'net-ssh', :require => 'net/ssh'
 gem 'rufus-scheduler'
-gem 'work_queue', '~> 1.0.0'
 git 'git://github.com/nimbul/cloudmaster.git' do
   gem 'cloudmaster'
 end
@@ -57,10 +59,10 @@ end
 group :production do
 end
 
-gem 'daemon_controller'
 gem 'resque'
 gem 'resque-scheduler', :git => 'git://github.com/nimbul/resque-scheduler.git'
 gem 'resque-loner', :git => 'https://github.com/jayniz/resque-loner.git'
 gem 'grit'
 gem 'god'
 gem 'log4r'
+gem 'attr_encrypted'

@@ -1,5 +1,3 @@
-require 'daemons'
-
 class Publisher < BaseModel
   include Resque::Plugins::UniqueJob
 
