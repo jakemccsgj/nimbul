@@ -976,7 +976,7 @@ class Ec2Adapter
 
     def self.create_security_group(group, vpc_api_name=nil)
         return false if group.nil?
-        adapter = self.new :account => account
+        adapter = self.new :account => group.provider_account
         ec2 = adapter.get_ec2(group.provider_account)
         security_group = ec2.create_security_group(group.name, group.description, vpc_api_name)
     end
