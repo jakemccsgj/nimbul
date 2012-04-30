@@ -1,3 +1,4 @@
+require 'provider_account_key'  ## Do not remove this!  It will cause method_missing errors in development mode (cache_classes=false)
 require 'tempfile'
 require 'carrot'
 
