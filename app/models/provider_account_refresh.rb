@@ -1,6 +1,7 @@
 module ProviderAccountRefresh
   class Accounts
     include Resque::Plugins::UniqueJob
+    @loner_ttl = 60 #Timeout lock after a minute
     class << self
       def perform
         ProviderAccount.all.each do |acc|
@@ -15,6 +16,7 @@ module ProviderAccountRefresh
 
   class Account
     include Resque::Plugins::UniqueJob
+    @loner_ttl = 60 #Timeout lock after a minute
     class << self
       def perform id
         ProviderAccount[id].refresh
