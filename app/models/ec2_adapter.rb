@@ -1034,7 +1034,7 @@ class Ec2Adapter
     end
 
     def self.register_server_image(server_image)
-      adapter = self.new :account => account
+      adapter = self.new :account => server_image.provider_account
         ec2 = adapter.get_ec2(server_image.provider_account)
         image_id = ec2.register_image(server_image.location)
         return image_id
