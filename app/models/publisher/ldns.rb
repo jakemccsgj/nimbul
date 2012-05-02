@@ -2,6 +2,7 @@ require 's3_adapter'
 
 class Publisher::Ldns < Publisher
   include Resque::Plugins::UniqueJob
+  @loner_ttl = 300
   @queue = :ldns_publishers
 
   URL_PARAM_NAME = 'HOSTS_FILE_URL'
