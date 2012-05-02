@@ -1077,23 +1077,7 @@ class Ec2Adapter
     end
 
     def self.seed_hosts provider_account
-      hosts = DnsAdapter.static_dns_entries(provider_account)
-      ## Ensure that the main nimbul address is not unknown.  If it is, replace it with a good guess (using nimbul-fe security group as an identifier)
-      nimbul_fe = SecurityGroup.find_by_name_and_provider_account_id('nimbul-fe', provider_account.id)
-      if nimbul_fe
-        if i = hosts.rindex { |h| h =~ /^256.0.0.0\s+nimbul.nytimes.com/ }
-          hosts[i] = "%s\tnimbul.nytimes.com" % nimbul_fe.instances.select { |i| i.is_ready? }.first.private_ip
-        end
-      end
-
-      ##  Same for nimbul-redis - Look to thyself nimbul
-      nimbul_fe = SecurityGroup.find_by_name_and_provider_account_id('nimbul-redis', provider_account.id)
-      if nimbul_fe
-        if i = hosts.rindex { |h| h =~ /^256.0.0.0\s+nimbul-redis.ec2.nytimes.com/ }
-          hosts[i] = "%s\tnimbul.nytimes.com" % nimbul_fe.instances.select { |i| i.is_ready? }.first.private_ip
-        end
-      end
-      hosts
+      DnsAdapter.static_dns_entries(provider_account, true)
     end
 
     ## For use as a daemon... does an account refresh
