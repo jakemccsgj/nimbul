@@ -40,7 +40,7 @@ class Cluster < BaseModel
 
   BASE_INSTANCE_USER = 'root'
 
-  default_scope :joins => 'INNER JOIN provider_accounts papap on papap.id = clusters.provider_account_id', :conditions => ['papap.account_id not in (?)', YAML.load(File.read(File.join(RAILS_ROOT, 'config', 'skip_accounts.yml')))]
+  default_scope :conditions => ['not clusters.provider_account_id in ( select pa.id from provider_accounts pa where pa.account_id in (?))', YAML.load(File.read(File.join(RAILS_ROOT, 'config', 'skip_accounts.yml')))]
 
   def zones
     self.provider_account.zones
