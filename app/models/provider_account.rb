@@ -202,7 +202,7 @@ class ProviderAccount < BaseModel
 
     def ssh_master_key_ui
         return nil if provider_account_ssh_master_key.nil? or provider_account_ssh_master_key.value.blank?
-        key = provider_account_ssh_master_key
+        key = self.ssh_master_key
         # find trailing meaningful characters of the key, make sure we have at least 6 of them, grab last 6 and fill the rest with 'x's
         key = key + '=' unless key.include?('=')
         key = /(.*=)/.match(key)[0]
