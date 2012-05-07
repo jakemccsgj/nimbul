@@ -483,6 +483,7 @@ class Ec2Adapter
 
     def refresh_server_image(server_image, account_server_images=nil, account_storage_types=nil, cpu_profiles=nil)
         account = server_image.provider_account
+        @account ||= account
         @account_server_images ||= account.server_images
         @account_storage_types ||= account.storage_types
         @cpu_profiles ||= CpuProfile.all
