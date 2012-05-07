@@ -43,22 +43,22 @@ class Ec2Adapter
       methods += \
         case resources
         when 'server_images'
-          :refresh_server_images
+          [ :refresh_server_images ]
         when 'security_groups'
-          :refresh_security_groups
+          [ :refresh_security_groups ]
         when 'instances'
           [
             :refresh_security_groups,
             :refresh_instances
           ]
         when 'volumes'
-          :refresh_volumes
+          [ :refresh_volumes ]
         when 'snapshots'
-          :refresh_snapshots
+          [ :refresh_snapshots ]
         when 'addresses'
-          :refresh_addresses
+          [ :refresh_addresses ]
         when 'reserved_instances'
-          :refresh_reserved_instances
+          [ :refresh_reserved_instances ]
         else
           [
             :refresh_server_images,
