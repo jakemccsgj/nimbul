@@ -1,5 +1,6 @@
 class Publisher < BaseModel
   include Resque::Plugins::UniqueJob
+  @loner_ttl = 60
 
   belongs_to :provider_account
   has_many :publisher_parameters, :dependent => :destroy

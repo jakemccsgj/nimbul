@@ -67,7 +67,7 @@ end
 <% account = @server.cluster.provider_account -%>
 cat <<'EOL' > /etc/hosts
 127.0.0.1       localhost
-<%= DnsAdapter.static_dns_entries(@server.cluster.provider_account).join("\n") %>
+<%= DnsAdapter.static_dns_entries(@server.cluster.provider_account, true).join("\n") %>
 EOL
 
 <%= @cloudrc %>

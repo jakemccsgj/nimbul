@@ -11,7 +11,7 @@ class ClustersController < ApplicationController
     @clusters = Cluster.find_all_by_user(
       current_user,
       :include => [
-        :provider_account,
+        #:provider_account,
         :instances
       ]
     )

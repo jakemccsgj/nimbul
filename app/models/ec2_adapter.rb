@@ -43,22 +43,22 @@ class Ec2Adapter
       methods += \
         case resources
         when 'server_images'
-          :refresh_server_images
+          [ :refresh_server_images ]
         when 'security_groups'
-          :refresh_security_groups
+          [ :refresh_security_groups ]
         when 'instances'
           [
             :refresh_security_groups,
             :refresh_instances
           ]
         when 'volumes'
-          :refresh_volumes
+          [ :refresh_volumes ]
         when 'snapshots'
-          :refresh_snapshots
+          [ :refresh_snapshots ]
         when 'addresses'
-          :refresh_addresses
+          [ :refresh_addresses ]
         when 'reserved_instances'
-          :refresh_reserved_instances
+          [ :refresh_reserved_instances ]
         else
           [
             :refresh_server_images,
@@ -483,6 +483,7 @@ class Ec2Adapter
 
     def refresh_server_image(server_image, account_server_images=nil, account_storage_types=nil, cpu_profiles=nil)
         account = server_image.provider_account
+        @account ||= account
         @account_server_images ||= account.server_images
         @account_storage_types ||= account.storage_types
         @cpu_profiles ||= CpuProfile.all
@@ -976,7 +977,7 @@ class Ec2Adapter
 
     def self.create_security_group(group, vpc_api_name=nil)
         return false if group.nil?
-        adapter = self.new :account => account
+        adapter = self.new :account => group.provider_account
         ec2 = adapter.get_ec2(group.provider_account)
         security_group = ec2.create_security_group(group.name, group.description, vpc_api_name)
     end
@@ -1034,7 +1035,7 @@ class Ec2Adapter
     end
 
     def self.register_server_image(server_image)
-      adapter = self.new :account => account
+      adapter = self.new :account => server_image.provider_account
         ec2 = adapter.get_ec2(server_image.provider_account)
         image_id = ec2.register_image(server_image.location)
         return image_id
@@ -1077,7 +1078,7 @@ class Ec2Adapter
     end
 
     def self.seed_hosts provider_account
-      DnsAdapter.static_dns_entries(provider_account)
+      DnsAdapter.static_dns_entries(provider_account, true)
     end
 
     ## For use as a daemon... does an account refresh

@@ -28,7 +28,7 @@ To add a new Service Override, click here:
     <tr>
       <td><%=h (service_override.type.nil? ? '' : service_override.type.name.titleize ) %></td>
       <td><%=h service_override.provider.name %></td>
-      <td><%=h "#{service_override.target_type}: #{service_override.target.name}" %></td>
+      <td><%=h (service_override.target.nil?) ? '' : "#{service_override.target_type}: #{service_override.target.name}" %></td>
       <td><%=h service_override.overridable ? 'Yes' : 'No' %></td>
       <td>
         <%= link_to image_tag('verify.png', { :alt => "Edit", :class => 'control-icon' }), edit_service_override_path(service_override)-%>
