@@ -301,7 +301,8 @@ class AsAdapter
             i.to_hash.each do |key,value|
                 h[key.to_sym] = value
             end
-            instance = Ec2Adapter.parse_instance_info(account, {}, h)
+            e = Ec2Adapter.new account
+            instance = e.parse_instance_info(account, {}, h)
             unless server.nil?
                 instance.server_id = server.id
                 instance.server_name = server.name

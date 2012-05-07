@@ -1,4 +1,4 @@
-require 'pp'
+require 'AWS/S3'
 
 class S3Adapter
     def self.get_s3(account)

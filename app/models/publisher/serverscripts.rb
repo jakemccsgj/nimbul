@@ -1,6 +1,9 @@
 require 's3_adapter'
 
 class Publisher::Serverscripts < Publisher
+  include Resque::Plugins::UniqueJob
+  @loner_ttl = 300
+  @queue = :serverscripts_publishers
   def description
     'Publishes server user data information to an S3 bucket.'
   end
@@ -50,7 +53,7 @@ class Publisher::Serverscripts < Publisher
     
     server_images = ServerImage.all(
       :joins => [
-        'INNER JOIN server_profile_revisions AS spr ON server_images.image_id = spr.image_id',
+        'INNER JOIN server_profile_revisions AS spr ON server_images.image_id = spr.server_image_id',
         'INNER JOIN servers ON spr.id = servers.server_profile_revision_id',
         'INNER JOIN clusters ON servers.cluster_id = clusters.id'
       ],

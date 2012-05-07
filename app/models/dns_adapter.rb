@@ -71,10 +71,29 @@ class DnsAdapter
     end
   end
 
-  def self.static_dns_entries provider
+  def self.static_dns_entries provider, force_nimbul=false
     static = []
     static |= provider.service_dns_records.try(:split, /\r*\n/).to_a 
     static |= provider.static_dns_records.try(:split, /\r*\n/).to_a
+
+    if force_nimbul
+      ## Ensure that the main nimbul address is not unknown.  If it is, replace it with a good guess (using nimbul-fe security group as an identifier)
+      nimbul_fe = SecurityGroup.find_by_name_and_provider_account_id('nimbul-fe', provider.id)
+      if nimbul_fe
+        if i = static.rindex { |h| h =~ /^256.0.0.0\s+nimbul.nytimes.com/ }
+          static[i] = "%s\tnimbul.nytimes.com" % nimbul_fe.instances.select { |i| i.is_ready? }.first.private_ip
+        end
+      end
+
+      ##  Same for nimbul-redis - Look to thyself nimbul
+      nimbul_fe = SecurityGroup.find_by_name_and_provider_account_id('nimbul-redis', provider.id)
+      if nimbul_fe
+        if i = static.rindex { |h| h =~ /^256.0.0.0\s+nimbul-redis.ec2.nytimes.com/ }
+          static[i] = "%s\tnimbul-redis.ec2.nytimes.com" % nimbul_fe.instances.select { |i| i.is_ready? }.first.private_ip
+        end
+      end
+    end
+
     static.select { |v| v !~ /^\s*(|#.*)$/ }
   end
 

@@ -118,9 +118,6 @@ class Rails::Boot
       def load_gems
         begin
           @bundler_loaded ||= ::Bundler.require :default, Rails.env
-        rescue NameError
-          require 'bundler'
-          retry
         end
       end
     end
