@@ -178,6 +178,7 @@ class ProviderAccount < BaseModel
     end
 
     def aws_access_key
+      return nil if provider_account_access_key.nil?
       provider_account_access_key.value
     end
 
@@ -193,6 +194,7 @@ class ProviderAccount < BaseModel
     end
 
     def aws_secret_key
+      return nil if provider_account_secret_key.nil?
       provider_account_secret_key.value
     end
 
