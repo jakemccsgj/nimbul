@@ -1021,22 +1021,22 @@ class Ec2Adapter
     end
 
     def self.allocate_address(address)
-      adapter = self.new :account => account
-        ec2 = adapter.get_ec2(address.provider_account)
-        address.cloud_id = ec2.allocate_address
-        return true
+      adapter = self.new :account => address.provider_account
+      ec2 = adapter.get_ec2
+      address.cloud_id = ec2.allocate_address
+      return true
     end
 
     def self.release_address(address)
-      adapter = self.new :account => account
-        ec2 = adapter.get_ec2(address.provider_account)
+      adapter = self.new :account => address.provider_account
+        ec2 = adapter.get_ec2
         ec2.release_address(address.cloud_id)
         return true
     end
 
     def self.register_server_image(server_image)
       adapter = self.new :account => server_image.provider_account
-        ec2 = adapter.get_ec2(server_image.provider_account)
+        ec2 = adapter.get_ec2
         image_id = ec2.register_image(server_image.location)
         return image_id
     end
