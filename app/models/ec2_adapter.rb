@@ -274,7 +274,7 @@ class Ec2Adapter
         else
             res = ec2.create_volume(size_or_snapshot, zone)
         end
-        return adapter.parse_volume_info(account, res)
+        return adapter.parse_volume_info(res)
     end
 
     def self.delete_volume(volume)
