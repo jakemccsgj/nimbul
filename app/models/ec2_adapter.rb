@@ -274,7 +274,7 @@ class Ec2Adapter
         else
             res = ec2.create_volume(size_or_snapshot, zone)
         end
-        return adapter.parse_volume_info(account, res)
+        return adapter.parse_volume_info(res)
     end
 
     def self.delete_volume(volume)
@@ -733,12 +733,12 @@ class Ec2Adapter
 
     def self.attach_volume(volume, instance, mount_point)
         account = volume.provider_account
-        refresh_volumes
+        adapter = self.new :account => account
+        ec2 = adapter.get_ec2(account)
+        adapter.refresh_volumes
         v = account.volumes.find_by_cloud_id(volume.cloud_id)
         raise "volume '#{volume.cloud_id}' is no longer available" if v.nil?
         raise "volume '#{v.cloud_id}' is already attached to #{instance.instance_id}" if v.cloud_instance_id == instance.instance_id
-        adapter = self.new :account => account
-        ec2 = adapter.get_ec2(account)
         ec2.attach_volume(v.cloud_id, instance.instance_id, mount_point)
         return true
     end
@@ -965,7 +965,7 @@ class Ec2Adapter
         adapter = self.new :account => account
         ec2 = adapter.get_ec2(volume.provider_account)
         res = ec2.create_snapshot(volume.cloud_id)
-        return parse_snapshot_info(account, res)
+        return adapter.parse_snapshot_info(res)
     end
 
     def self.delete_snapshot(snapshot)
@@ -1021,22 +1021,22 @@ class Ec2Adapter
     end
 
     def self.allocate_address(address)
-      adapter = self.new :account => account
-        ec2 = adapter.get_ec2(address.provider_account)
-        address.cloud_id = ec2.allocate_address
-        return true
+      adapter = self.new :account => address.provider_account
+      ec2 = adapter.get_ec2
+      address.cloud_id = ec2.allocate_address
+      return true
     end
 
     def self.release_address(address)
-      adapter = self.new :account => account
-        ec2 = adapter.get_ec2(address.provider_account)
+      adapter = self.new :account => address.provider_account
+        ec2 = adapter.get_ec2
         ec2.release_address(address.cloud_id)
         return true
     end
 
     def self.register_server_image(server_image)
       adapter = self.new :account => server_image.provider_account
-        ec2 = adapter.get_ec2(server_image.provider_account)
+        ec2 = adapter.get_ec2
         image_id = ec2.register_image(server_image.location)
         return image_id
     end
