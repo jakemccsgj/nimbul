@@ -721,11 +721,11 @@ class Ec2Adapter
 
     def self.attach_address(address, instance)
         account = address.provider_account
-        refresh_addresses
+        adapter = self.new :account => account
+        adapter.refresh_addresses
         a = account.addresses.find_by_cloud_id(address.cloud_id)
         raise "address '#{address.cloud_id}' is no longer available" if a.nil?
         raise "address '#{a.cloud_id}' is already attached to #{instance.instance_id}" if a.cloud_instance_id == instance.instance_id
-        adapter = self.new :account => account
         ec2 = adapter.get_ec2(account)
         ec2.associate_address(instance.instance_id, a.cloud_id)
         return true
