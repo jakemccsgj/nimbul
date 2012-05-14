@@ -192,4 +192,12 @@ class Cluster < BaseModel
   def self.search_fields
       %w(name description)
   end
+
+  def get_overrides
+    ## return an array of overrides for this cluster (if any)
+    service_overrides.collect do |override|
+      p = override.service_provider
+      { :ip => p.private_ip, :fqdn => p.fqdn }
+    end
+  end
 end
