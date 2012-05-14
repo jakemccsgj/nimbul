@@ -76,7 +76,14 @@ class Publisher::Ldns < Publisher
       account.clusters.each do |cluster|
         # example: /provider-1/cluster-1.hosts
         cluster_path = File.join(provider_path, "cluster-#{cluster.id.to_s}.hosts")
-        S3Adapter.put_object(account, bucket, cluster_path, hostfile, 'public-read')
+        cluster_hosts = intro + \
+                        DnsAdapter.render_as_hosts_file(
+                          DnsAdapter.cluster_overrides(
+                            :hosts => hosts_hash,
+                            :cluster => cluster
+                          )
+                        ).join
+        S3Adapter.put_object(account, bucket, cluster_path, cluster_hosts, 'public-read')
         urls << cluster_path
       end
 

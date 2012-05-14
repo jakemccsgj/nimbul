@@ -8,6 +8,26 @@ class DnsAdapter
     DnsHostnameAssignment.create(server, hostname)
   end
 
+  def self.cluster_overrides args
+    ##  We need a deep copy of the passed hash.  Otherwise we end up changing
+    ##  the original while iterating.
+    cluster_hosts = Marshal.load(Marshal.dump(args[:hosts][:__static__]))
+
+    ## The hash and array subkeys are both sorted (hash is an array of hashes) and have 
+    ## the same indexes.  Only find the index once.
+    args[:cluster].get_overrides.map do |override|
+      index = cluster_hosts[:hash].index { |host| host[:fqdn] == override[:fqdn] }
+      if index
+        cluster_hosts[:hash][index] = override
+        cluster_hosts[:array][index] = [ override[:ip], override[:fqdn] ]
+      end
+    end
+    cluster_hosts[:text] = cluster_hosts[:array].inject('') do |text, h|
+      text += "%15s        %s\n" % h
+    end
+    args[:hosts].merge( { :__static__ => cluster_hosts } )
+  end
+
   def self.get_account_dns(account)
     dns = {}
     instances = Instance.find_all_by_provider_account_id(account.id, :include => [
