@@ -7,3 +7,5 @@ pki
 app/tags
 tags
 .bundle/ruby
+log/*
+gitflow/
