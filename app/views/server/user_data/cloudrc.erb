@@ -48,7 +48,9 @@ if [ -r /etc/cloudrc.private ]; then
 	source /etc/cloudrc.private
 fi
 
+hostname "$(INSTANCE_NAME)"
+
 <% @server.parameters.collect{ |p| p unless p.is_protected? }.compact.each do |p| -%>
-export <%= p.name %>='<%= p.value.delete("\n").delete("\C-M").sub("'","\'") %>'
+export <%= p.name %>="<%= p.value.delete("\n").delete("\C-M").sub("'","'") %>"
 <% end -%>
 EOL
