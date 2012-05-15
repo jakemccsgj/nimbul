@@ -23,7 +23,7 @@ class DnsAdapter
       end
     end
     cluster_hosts[:text] = cluster_hosts[:array].inject('') do |text, h|
-      text += "%15s        %s\n" % h
+      text += "%-15s        %s\n" % h
     end
     args[:hosts].merge( { :__static__ => cluster_hosts } )
   end
