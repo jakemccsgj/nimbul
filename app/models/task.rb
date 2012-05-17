@@ -1,5 +1,6 @@
 class Task < BaseModel
-    LOOP_SLEEP = 10
+    LOOP_SLEEP = 60
+    include Loggable
 
     belongs_to :parent, :polymorphic => true
     belongs_to :taskable, :polymorphic => true
@@ -159,21 +160,18 @@ class Task < BaseModel
 
     class << self
       def process
+        # Initialize the Scheduler
+        $scheduler = Rufus::Scheduler.start_new
+
         loop do
+          logger.warn "Task daemons is still running"
           # Mark all active task 'unscheduled', in case there was a crash
           Task.update_all( ['is_scheduled=?', 0], { :is_active => 1, :is_scheduled => 1 } )
   
-          # Initialize the Scheduler
-          $scheduler = Rufus::Scheduler.start_new
-  
           Signal.trap("TERM") do 
             # Unschedule all the tasks
-            $scheduler.all_jobs.each do |job|
-              job.unschedule
-            end
-            # Mark all active task 'unscheduled' before terminating the daemon
+            $scheduler.all_jobs.map { |id, job| job.unschedule }
             Task.update_all( ['is_scheduled=?', 0], { :is_active => 1, :is_scheduled => 1 } )
-            $running = false
           end
   
           # unschedule all non-active tasks
@@ -183,8 +181,7 @@ class Task < BaseModel
               job.unschedule
             end
             t.update_attribute( :is_scheduled, false )
-            ActiveRecord::Base.logger.info "Unscheduled Task #{t.name} [#{t.id}]\n"
-            # Rails.logger.info "Unscheduled Task #{t.name} [#{t.id}]\n"
+            logger.info "Unscheduled Task #{t.name} [#{t.id}]\n"
           end
   
           # unschedule all one-time tasks with run_at in the past
@@ -195,8 +192,7 @@ class Task < BaseModel
                 job.unschedule
               end
               t.update_attributes( { :is_active => false, :is_scheduled => false } )
-              ActiveRecord::Base.logger.info "Unscheduled Task #{t.name} [#{t.id}]\n"
-              # Rails.logger.info "Unscheduled Task #{t.name} [#{t.id}]\n"
+              logger.info "Unscheduled Task #{t.name} [#{t.id}]\n"
             end
           end
   
@@ -204,6 +200,7 @@ class Task < BaseModel
           schedule_tasks = self.find_all_by_is_active_and_is_scheduled( true, false )
           schedule_tasks.each do |t|
             # make sure we haven't scheduled the task already
+            logger.info("Before iterating is this tag there? #{t.scheduler_tag} == #{$scheduler.find_by_tag(t.scheduler_tag)}")
             if $scheduler.find_by_tag(t.scheduler_tag).length == 0
               if t.is_repeatable?
                 # repeatable tasks - make sure first_at is in the future
@@ -223,14 +220,17 @@ class Task < BaseModel
                   end
                 end
               end
+              logger.info "Scheduled Task #{t.name} [#{t.id}]\n"
+            else
+              logger.info "Task #{t.name} is already in the scheduler"
             end
             # mark the task as scheduled
             t.update_attribute( :is_scheduled, true )
-            ActiveRecord::Base.logger.info "Scheduled Task #{t.name} [#{t.id}]\n"
-            Rails.logger.info "Scheduled Task #{t.name} [#{t.id}]\n"
           end
+          logger.info "Tasks in scheduler: \n#{$scheduler.jobs.collect { |i, j| "#{i} => #{j.tags}" }.join("\n")}"
   
-        sleep LOOP_SLEEP
+          logger.info "Sleeping for #{LOOP_SLEEP} now"
+          sleep LOOP_SLEEP
         end
         $scheduler.join
       end
