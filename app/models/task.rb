@@ -1,4 +1,6 @@
 class Task < BaseModel
+    LOOP_SLEEP = 10
+
     belongs_to :parent, :polymorphic => true
     belongs_to :taskable, :polymorphic => true
     has_many :task_parameters, :dependent => :destroy
@@ -157,76 +159,79 @@ class Task < BaseModel
 
     class << self
       def process
-        # Mark all active task 'unscheduled', in case there was a crash
-        Task.update_all( ['is_scheduled=?', 0], { :is_active => 1, :is_scheduled => 1 } )
-
-        # Initialize the Scheduler
-        $scheduler = Rufus::Scheduler.start_new
-
-        Signal.trap("TERM") do 
-          # Unschedule all the tasks
-          $scheduler.all_jobs.each do |job|
-            job.unschedule
-          end
-          # Mark all active task 'unscheduled' before terminating the daemon
+        loop do
+          # Mark all active task 'unscheduled', in case there was a crash
           Task.update_all( ['is_scheduled=?', 0], { :is_active => 1, :is_scheduled => 1 } )
-          $running = false
-        end
-
-        # unschedule all non-active tasks
-        unschedule_tasks = self.find_all_by_is_active_and_is_scheduled( false, true )
-        unschedule_tasks.each do |t|
-          $scheduler.find_by_tag(t.scheduler_tag).each do |job|
-            job.unschedule
+  
+          # Initialize the Scheduler
+          $scheduler = Rufus::Scheduler.start_new
+  
+          Signal.trap("TERM") do 
+            # Unschedule all the tasks
+            $scheduler.all_jobs.each do |job|
+              job.unschedule
+            end
+            # Mark all active task 'unscheduled' before terminating the daemon
+            Task.update_all( ['is_scheduled=?', 0], { :is_active => 1, :is_scheduled => 1 } )
+            $running = false
           end
-          t.update_attribute( :is_scheduled, false )
-          ActiveRecord::Base.logger.info "Unscheduled Task #{t.name} [#{t.id}]\n"
-          # Rails.logger.info "Unscheduled Task #{t.name} [#{t.id}]\n"
-        end
-
-        # unschedule all one-time tasks with run_at in the past
-        unschedule_tasks = self.find_all_by_is_active_and_is_scheduled_and_is_repeatable( true, true, false )
-        unschedule_tasks.each do |t|
-          if t.run_at < Time.now.utc
+  
+          # unschedule all non-active tasks
+          unschedule_tasks = self.find_all_by_is_active_and_is_scheduled( false, true )
+          unschedule_tasks.each do |t|
             $scheduler.find_by_tag(t.scheduler_tag).each do |job|
               job.unschedule
             end
-            t.update_attributes( { :is_active => false, :is_scheduled => false } )
+            t.update_attribute( :is_scheduled, false )
             ActiveRecord::Base.logger.info "Unscheduled Task #{t.name} [#{t.id}]\n"
             # Rails.logger.info "Unscheduled Task #{t.name} [#{t.id}]\n"
           end
-        end
-
-        # schedule all active tasks
-        schedule_tasks = self.find_all_by_is_active_and_is_scheduled( true, false )
-        schedule_tasks.each do |t|
-          # make sure we haven't scheduled the task already
-          if $scheduler.find_by_tag(t.scheduler_tag).length == 0
-            if t.is_repeatable?
-              # repeatable tasks - make sure first_at is in the future
-              # otherwise scheduler will schedule all the "missed" runs
-              first_at = t.run_at
-              while first_at < Time.now.utc
-                first_at = first_at + Rufus.parse_time_string(t.run_every)
+  
+          # unschedule all one-time tasks with run_at in the past
+          unschedule_tasks = self.find_all_by_is_active_and_is_scheduled_and_is_repeatable( true, true, false )
+          unschedule_tasks.each do |t|
+            if t.run_at < Time.now.utc
+              $scheduler.find_by_tag(t.scheduler_tag).each do |job|
+                job.unschedule
               end
-              $scheduler.every t.run_every, :first_at => first_at, :tags => t.scheduler_tag do |job|
-                t.call(job)
-              end
-            else
-              # non-repeatable tasks - only schedule if the run_at time is in the future
-              if t.run_at > Time.now.utc
-                $scheduler.at t.run_at, :tags => t.scheduler_tag do |job|
+              t.update_attributes( { :is_active => false, :is_scheduled => false } )
+              ActiveRecord::Base.logger.info "Unscheduled Task #{t.name} [#{t.id}]\n"
+              # Rails.logger.info "Unscheduled Task #{t.name} [#{t.id}]\n"
+            end
+          end
+  
+          # schedule all active tasks
+          schedule_tasks = self.find_all_by_is_active_and_is_scheduled( true, false )
+          schedule_tasks.each do |t|
+            # make sure we haven't scheduled the task already
+            if $scheduler.find_by_tag(t.scheduler_tag).length == 0
+              if t.is_repeatable?
+                # repeatable tasks - make sure first_at is in the future
+                # otherwise scheduler will schedule all the "missed" runs
+                first_at = t.run_at
+                while first_at < Time.now.utc
+                  first_at = first_at + Rufus.parse_time_string(t.run_every)
+                end
+                $scheduler.every t.run_every, :first_at => first_at, :tags => t.scheduler_tag do |job|
                   t.call(job)
+                end
+              else
+                # non-repeatable tasks - only schedule if the run_at time is in the future
+                if t.run_at > Time.now.utc
+                  $scheduler.at t.run_at, :tags => t.scheduler_tag do |job|
+                    t.call(job)
+                  end
                 end
               end
             end
+            # mark the task as scheduled
+            t.update_attribute( :is_scheduled, true )
+            ActiveRecord::Base.logger.info "Scheduled Task #{t.name} [#{t.id}]\n"
+            Rails.logger.info "Scheduled Task #{t.name} [#{t.id}]\n"
           end
-          # mark the task as scheduled
-          t.update_attribute( :is_scheduled, true )
-          ActiveRecord::Base.logger.info "Scheduled Task #{t.name} [#{t.id}]\n"
-          Rails.logger.info "Scheduled Task #{t.name} [#{t.id}]\n"
+  
+        sleep LOOP_SLEEP
         end
-
         $scheduler.join
       end
       alias :perform :process
