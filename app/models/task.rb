@@ -1,6 +1,3 @@
-require 'rubygems'
-require 'chronic'
-
 class Task < BaseModel
     belongs_to :parent, :polymorphic => true
     belongs_to :taskable, :polymorphic => true
@@ -160,6 +157,22 @@ class Task < BaseModel
 
     class << self
       def process
+        # Mark all active task 'unscheduled', in case there was a crash
+        Task.update_all( ['is_scheduled=?', 0], { :is_active => 1, :is_scheduled => 1 } )
+
+        # Initialize the Scheduler
+        $scheduler = Rufus::Scheduler.start_new
+
+        Signal.trap("TERM") do 
+          # Unschedule all the tasks
+          $scheduler.all_jobs.each do |job|
+            job.unschedule
+          end
+          # Mark all active task 'unscheduled' before terminating the daemon
+          Task.update_all( ['is_scheduled=?', 0], { :is_active => 1, :is_scheduled => 1 } )
+          $running = false
+        end
+
         # unschedule all non-active tasks
         unschedule_tasks = self.find_all_by_is_active_and_is_scheduled( false, true )
         unschedule_tasks.each do |t|
@@ -211,8 +224,10 @@ class Task < BaseModel
           # mark the task as scheduled
           t.update_attribute( :is_scheduled, true )
           ActiveRecord::Base.logger.info "Scheduled Task #{t.name} [#{t.id}]\n"
-          #Rails.logger.info "Scheduled Task #{t.name} [#{t.id}]\n"
+          Rails.logger.info "Scheduled Task #{t.name} [#{t.id}]\n"
         end
+
+        $scheduler.join
       end
       alias :perform :process
 
