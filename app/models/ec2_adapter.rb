@@ -63,7 +63,6 @@ class Ec2Adapter
           [
             :refresh_server_images,
             :refresh_security_groups,
-            :refresh_security_groups,
             :refresh_instances,
             :refresh_volumes,
             :refresh_snapshots,
