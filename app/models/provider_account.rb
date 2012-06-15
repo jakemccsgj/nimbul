@@ -92,7 +92,7 @@ class ProviderAccount < BaseModel
     end
 
   def messaging_valid?
-    if service.nil? or service.empty? or service.first.first_active_instance.nil?
+    if service.nil? or service.empty? or service(:events).first.first_active_instance.nil?
       errors.add(:messaging_uri, 'Events Service does not appear to be created. Please go to Admin Controls -> Services and create an Events service, and provider.')
     else
       unless messaging_can_connect?
@@ -234,7 +234,7 @@ class ProviderAccount < BaseModel
 
   def send_control_update type, args = {}
     begin
-      unless (instance = service(:events).first_active_instance).nil?
+      unless (instance = service(:events).first.first_active_instance).nil?
         type = "operation/rabbit_mq/#{type.to_s}".classify
         options = { :args => args.merge({ :provider_account_id => self.id }) }
         puts "Creating Operation '#{type}' with arguments: #{options.inspect}"
