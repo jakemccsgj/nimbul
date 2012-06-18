@@ -196,7 +196,11 @@ class DnsLease < BaseModel
 	end
 
 	def state
-		instance.nil? ? INACTIVE : ACTIVE
+      case
+      when instance.running? then ACTIVE
+      when instance.nil?     then INACTIVE
+      else                        ACTIVE
+      end
 	end
 	
 	def ip
