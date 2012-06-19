@@ -52,6 +52,7 @@ class Publisher::Ldns < Publisher
 
   def publish!
     account = ProviderAccount.find(self.provider_account_id, :include => { :clusters => :servers } )
+    logger.debug "Running ldns publisher for account: #{account.id}"
     return unless account.aws_access_key and account.aws_secret_key
     bucket = parameter_value('s3_bucket_name')
     base_path = parameter_value('s3_object_name')
@@ -96,6 +97,7 @@ class Publisher::Ldns < Publisher
         :state_text => urls.join('<br />')
       })
     rescue Exception => e
+      logger.error "Failed to publish LDNS for #{account.id}: #{e}"
       update_attributes({
         :state => 'failed',
         :state_text => "Error: <pre>#{e.message}\n\t#{e.backtrace.join("\n\t")}</pre>",

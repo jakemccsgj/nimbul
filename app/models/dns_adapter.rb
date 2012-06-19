@@ -56,7 +56,7 @@ class DnsAdapter
         dns_hostnames.id                          as hostname_id,
         dns_hostnames.name                        AS hostname_base,
         dns_leases.idx                            AS lease_index, 
-        (dns_leases.instance_id IS NOT NULL)      AS state,
+        (dns_leases.instance_id IS NOT NULL and instances.state = 'running')      AS state,
         instances.public_dns                      AS instance_public_dns,
         instances.private_dns                     AS instance_private_dns,
         instances.public_ip                       AS instance_public_ip,
