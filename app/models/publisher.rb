@@ -1,4 +1,5 @@
 class Publisher < BaseModel
+  include Loggable
   include Resque::Plugins::UniqueJob
   @loner_ttl = 60
 
