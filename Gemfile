@@ -36,9 +36,10 @@ gem "query_reviewer", :git => "git://github.com/nesquena/query_reviewer.git"
 gem 'net-sftp', :require => 'net/sftp'
 gem 'net-ssh', :require => 'net/ssh'
 gem 'rufus-scheduler'
-git 'git://github.com/nimbul/cloudmaster.git' do
+git 'git://github.com/nimbul/cloudmaster.git', :branch => 'feature/xml_to_nokogiri' do
   gem 'cloudmaster'
 end
+gem 'nokogiri'
 git 'https://github.com/justinfrench/formtastic.git', :branch => '1.2-stable' do
   gem 'formtastic', :branch => '1.2-stable'
 end
