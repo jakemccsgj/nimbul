@@ -197,9 +197,9 @@ class DnsLease < BaseModel
 
 	def state
       case
-      when !instance.running? then INACTIVE
-      when instance.nil?      then INACTIVE
-      else                         ACTIVE
+        when instance.nil?      then INACTIVE
+        when !instance.running? then INACTIVE
+        else                         ACTIVE
       end
 	end
 	
