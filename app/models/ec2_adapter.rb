@@ -969,7 +969,7 @@ class Ec2Adapter
 
     def self.delete_snapshot(snapshot)
         return nil if snapshot.nil?
-        adapter = self.new :account => account
+        adapter = self.new :account => snapshot.provider_account
         ec2 = adapter.get_ec2(snapshot.provider_account)
         ec2.delete_snapshot(snapshot.cloud_id)
     end
@@ -983,7 +983,7 @@ class Ec2Adapter
 
     def self.delete_security_group(group)
         return false if group.nil?
-        adapter = self.new :account => account
+        adapter = self.new :account => group.provider_account
         ec2 = adapter.get_ec2(group.provider_account)
         ec2.delete_security_group(group.name)
     end
