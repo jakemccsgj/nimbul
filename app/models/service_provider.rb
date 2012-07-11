@@ -49,7 +49,7 @@ class ServiceProvider < BaseModel
   end
   
   def active_instances
-    active_instances = instances.select { |i| i.has_dns_lease? }
+    active_instances = instances.select { |i| i.has_dns_lease? and i.running? and i.is_ready? }
     raise ServiceWithoutActiveInstance unless not active_instances.empty?
     active_instances
   end
