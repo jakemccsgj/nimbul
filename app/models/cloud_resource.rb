@@ -156,12 +156,12 @@ class CloudResource < BaseModel
 
         mount_type_lookup = {}
         unless mount_types.empty?
-            mount_types.each do |mt|
-                cloud_resource_types = mt.value.constantize.selectable_resource_types
-                cloud_resource_types.each do |crt|
-                    mtl = mount_type_lookup[crt] || []
-                    mtl << mt.value
-                    mount_type_lookup[crt] = mtl
+            mount_types.each do |mount_type|
+                mount_type_class = mount_type.value.constantize
+                is_zone_aware = mount_type_class.care_about_zone?
+                mount_type_class.selectable_resource_types.each do |cloud_resource_type|
+                  mount_type_lookup[cloud_resource_type] << mount_type.value \
+                    rescue mount_type_lookup[cloud_resource_type] = [mount_type.value, is_zone_aware]
                 end
             end
         end
@@ -175,11 +175,13 @@ class CloudResource < BaseModel
             end
             # collect resources replacing resource class with mount type if necessary
             resource_group.each do |r|
+              pp mount_type_lookup
                 if mount_type_lookup.empty?
                     resources << GroupLabelValueFilter.new(r.class_type, r.name_zone_state, r.id, (r.zone_id.nil? ? '' : r.zone_id))
                 elsif !mount_type_lookup[r.class_type].nil?
-                    mount_type_lookup[r.class_type].each do |mtl|
-                        resources << GroupLabelValueFilter.new(mtl, r.name_zone_state, r.id, (!mtl.constantize.care_about_zone? || r.zone_id.nil? ? '' : r.zone_id))
+                    mount_type_lookup[r.class_type].each do |mtl, is_zone_aware|
+                      #puts mtl, is_zone_aware
+                        resources << GroupLabelValueFilter.new(mtl, r.name_zone_state, r.id, (!is_zone_aware || r.zone_id.nil? ? '' : r.zone_id))
                     end
                 end
             end

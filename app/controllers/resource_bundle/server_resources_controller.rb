@@ -22,7 +22,7 @@ class ResourceBundle::ServerResourcesController < ApplicationController
             @volume_classes = []
             @volume_resources = []
             @mount_type = params[:mount_type]
-            mount_types = SERVER_VOLUME_MOUNT_TYPES.collect{|t| t if (@mount_type.blank? || @mount_type == t.value)}.compact
+            mount_types = SERVER_VOLUME_MOUNT_TYPES.select{|t| (@mount_type.blank? || @mount_type == t.value)}
             CloudResource.classes_and_resources([@volumes, @snapshots], mount_types) do |c, r|
                 @volume_classes = c
                 @volume_resources = r
