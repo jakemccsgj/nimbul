@@ -48,6 +48,9 @@ git 'https://github.com/Velir/open_id_authentication.git', :tag => 'v1.0.0' do
 end
 group :development do
   gem 'wirble'
+  gem 'guard'
+  gem 'guard-shell'
+  gem 'growl'
 end
 
 group :test do
