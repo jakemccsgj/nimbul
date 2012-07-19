@@ -2,7 +2,10 @@ require "models/volume"
 require "models/ec2_adapter"
 
 class Operation::Snapshot < Operation
-  
+  private
+  step_errors = {}
+
+  public
   def self.label
     'EBS Snapshot'
   end
@@ -27,35 +30,31 @@ class Operation::Snapshot < Operation
   def post_snapshot_steps() nil; end
   
   def snapshot_step
-    Operation::Step.new('create_erb_snapshot') do
-      success = false
+    steps = CloudVolume.find_all_by_instance_id(instance.id).collect do |vol|
+      Operation::Step.new('create_ebs_snapshot') do
+        snapshot = vol.snapshot!
+        error = snapshot.nil? ? "There was an error creating the snapshot: #{vol.errors.collect{|attr,msg| "#{attr} - #{msg}" }.join("; ")}" \
+              :                  nil
+        self.step_errors[vol.name] = error
+  
+        self[:result_code] =  \
+          case self.step_errors.values.count(nil)
+            when self.step_errors.count then 'Success'
+            when 0            then 'Failure'
+            else              'Partial Success'
+          end
+        self[:result_message] = "Created #{self.step_errors.values.count(nil)} / #{self.step_errors.count} snapshots"
+        operation_logs << OperationLog.new(
+          :step_name => "create_ebs_snapshot: #{vol.name}",
+          :is_success => error.nil?,
+          :result_code => error.nil? ? 'Success' : 'Failure',
+          :result_message => error.nil? ? "Created snapshot #{snapshot.name}" : error
+        )
 
-      #Find EBSes for this instance:
-      volumes = CloudVolume.find_all_by_instance_id(instance.id)
-
-      volumes.each do |volume|
-        snapshot = volume.snapshot!
-        if snapshot.nil?
-          self[:result_code] = 'ClientError'
-          self[:result_message] = 'There was an error creating the snapshot: '+volume.errors.collect{|attr,msg| "#{attr} - #{msg}" }.join("; ")
-        else
-          success = true
-          self[:result_code] = 'Success'
-          self[:result_message] = "Created snapshot: #{snapshot.name}"
-        end
+        #(self.step_errors.values.count(nil) == self.step_errors.count) ? wait! : fail!
       end
-
-      operation_logs << OperationLog.new( {
-        :step_name => 'create_erb_snapshot',
-        :is_success => success,
-        :result_code => self[:result_code],
-        :result_message => self[:result_message],
-      } )
-      
-      unless success
-        fail! && next
-      end
-      proceed! if not failed?
     end
+    proceed! if can_proceed?
+    steps
   end
 end
