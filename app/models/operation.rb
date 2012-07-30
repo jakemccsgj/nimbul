@@ -7,6 +7,8 @@ class Operation < BaseModel
   behaviors :operating, :event_publisher
   
   serialize :args, Hash
+  attr_accessor :step_metadata
+  serialize :step_metadata, OpenStruct
   
   belongs_to :instance
   belongs_to :task
@@ -43,6 +45,10 @@ class Operation < BaseModel
     transitions :from => [ :proceed, :waiting ], :to => :failed
   end
   
+  def after_initialize *args
+    @step_errors = {}
+  end
+
   def account() instance.provider_account if instance; end
   
   def data() self[:parameter]; end
@@ -158,7 +164,7 @@ class Operation < BaseModel
   def initialize_parameters
     []
   end
-    
+
 protected
   
   def initiate_proceed() timeout_reset(); end
@@ -173,7 +179,9 @@ protected
       # and handle operations that need to timeout
 
       find_all_by_state(:proceed).each do |operation|
-        operation.step!
+        while operation.proceed? do
+          operation.step!
+        end
       end
 
       find_all_by_state(:waiting, :conditions => [ 'timeout_at <= ?', Time.zone.now ]).each do |operation|
