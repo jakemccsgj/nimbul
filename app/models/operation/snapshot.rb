@@ -2,11 +2,6 @@ require "models/volume"
 require "models/ec2_adapter"
 
 class Operation::Snapshot < Operation
-  def initialize *args
-    @step_errors = {}
-    super(*args)
-  end
-
   def self.label
     'EBS Snapshot'
   end
