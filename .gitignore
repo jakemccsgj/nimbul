@@ -9,3 +9,14 @@ tags
 .bundle/ruby
 log/*
 gitflow/
+bin/*
+*.orig
+*.original
+*.bak
+config/database.yml
+config/broker.yml.original
+config/skip_accounts.yml
+config/resque_schedule.yml
+config/resque_web.rb
+config/config.yml
+config/broker.yml
