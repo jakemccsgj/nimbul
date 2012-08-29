@@ -1006,8 +1006,9 @@ class Ec2Adapter
 
     def self.remove_security_group_firewall_rule(security_group, firewall_rule)
         return false if security_group.nil? or firewall_rule.nil?
+        account = security_group.provider_account
         adapter = self.new :account => account
-        ec2 = adapter.get_ec2(security_group.provider_account)
+        ec2 = adapter.get_ec2(account)
         if !firewall_rule.group_name.blank? and !firewall_rule.group_user_id.blank?
             ec2.revoke_ingress_by_group(security_group.name, firewall_rule.group_name, firewall_rule.group_user_id)
         else
