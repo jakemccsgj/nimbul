@@ -13,7 +13,7 @@ class DnsAdapter
     ##  the original while iterating.
     cluster_hosts = Marshal.load(Marshal.dump(args[:hosts][:__static__]))
 
-    ## The hash and array subkeys are both sorted (hash is an array of hashes) and have 
+    ## The hash and array subkeys are both sorted (hash is an array of hashes) and have
     ## the same indexes.  Only find the index once.
     args[:cluster].get_overrides.map do |override|
       index = cluster_hosts[:hash].index { |host| host[:fqdn] == override[:fqdn] }
@@ -35,7 +35,7 @@ class DnsAdapter
       :dns_hostname_assignments
     ])
     instances.each do |i|
-    end  
+    end
   end
 
   def self.get_account_leases(account)
@@ -55,7 +55,7 @@ class DnsAdapter
         instances.instance_id                     AS cloud_id,
         dns_hostnames.id                          as hostname_id,
         dns_hostnames.name                        AS hostname_base,
-        dns_leases.idx                            AS lease_index, 
+        dns_leases.idx                            AS lease_index,
         (dns_leases.instance_id IS NOT NULL and instances.state = 'running')      AS state,
         instances.public_dns                      AS instance_public_dns,
         instances.private_dns                     AS instance_private_dns,
@@ -63,7 +63,7 @@ class DnsAdapter
         instances.private_ip                      AS instance_private_ip,
         addresses.cloud_id                        AS elastic_ip_address,
         addresses.name                            AS elastic_ip_name,
-        server_profile_revision_parameters.value  AS roles 
+        server_profile_revision_parameters.value  AS roles
       ),
       :joins => [
         'LEFT  JOIN cloud_resources AS addresses ON instances.instance_id = addresses.cloud_instance_id AND addresses.state = "in-use"',
@@ -93,7 +93,7 @@ class DnsAdapter
 
   def self.static_dns_entries provider, force_nimbul=false
     static = []
-    static |= provider.service_dns_records.try(:split, /\r*\n/).to_a 
+    static |= provider.service_dns_records.try(:split, /\r*\n/).to_a
     static |= provider.static_dns_records.try(:split, /\r*\n/).to_a
 
     if force_nimbul
@@ -123,12 +123,12 @@ class DnsAdapter
 
   def self.as_hash(model, options = {})
     options = { :only_active => false, :with_static => true }.merge!(options)
-    
+
     leases = {
       :__timestamp__ => Time.now.to_s,
       :all => {},
       :active => {},
-      :inactive => {} 
+      :inactive => {}
     }
 
     unless not options[:with_static]
@@ -138,10 +138,10 @@ class DnsAdapter
       else
         model
       end
-      
+
       unless account.nil?
         static_entries = static_dns_entries(account).collect{ |e| [e.split(/\s+/)[0], e.split(/\s+/)[1..-1].join(" ") ] }
-        
+
         leases[:__static__] = {
           :array => static_entries,
           :text  => static_entries.collect{ |e| sprintf("%-16s   %s", e[0], e[1]) }.join("\n"),
@@ -149,14 +149,14 @@ class DnsAdapter
         }
       end
     end
-    
+
     get_account_leases(model).each do |lease|
       cluster_name = lease[:cluster_name].gsub(' ','_').downcase.gsub(/[^\w\d]+/, '-')
-      server_name  = lease[:server_name].gsub(' ','_').downcase.gsub(/[^\w\d]+/, '-') 
+      server_name  = lease[:server_name].gsub(' ','_').downcase.gsub(/[^\w\d]+/, '-')
       hostname     = sprintf("%s-%05d", lease[:hostname_base], lease[:lease_index])
       fqdn         = "#{hostname}.#{server_name}.#{cluster_name}"
       base_name    = lease[:hostname_base]
-      
+
       entry = {
         :state         => lease[:state],
         :cloud_id      => lease[:cloud_id],
@@ -171,20 +171,19 @@ class DnsAdapter
         :cluster_id    => lease[:cluster_id] || -1,
         :server_id     => lease[:server_id]  || -1,
         :roles         => lease[:roles].gsub(/\s/, ''),
-
         :cluster_state => lease[:cluster_state] || 'active',
-        :index        => lease[:lease_index],
-        :public_dns   => lease[:instance_public_dns],
-        :public_ip    => lease[:instance_public_ip],
-        :private_dns  => lease[:instance_private_dns],
-        :private_ip   => lease[:instance_private_ip],
-        :elastic_ip   => lease[:elastic_ip_address],
-        :elastic_name => lease[:elastic_ip_name],
-        :nimbul_fqdn  => fqdn.gsub('_', '-'),
-        :nimbul_host  => hostname,
-        :base_name    => base_name
+        :index         => lease[:lease_index],
+        :public_dns    => lease[:instance_public_dns],
+        :public_ip     => lease[:instance_public_ip],
+        :private_dns   => lease[:instance_private_dns],
+        :private_ip    => lease[:instance_private_ip],
+        :elastic_ip    => lease[:elastic_ip_address],
+        :elastic_name  => lease[:elastic_ip_name],
+        :nimbul_fqdn   => fqdn.gsub('_', '-'),
+        :nimbul_host   => hostname,
+        :base_name     => base_name
       }
-      
+
       (leases[:all][base_name] ||= []) << entry
       if lease[:state] == DnsLease::INACTIVE
         (leases[:inactive][base_name]||=[]) << entry
@@ -195,14 +194,14 @@ class DnsAdapter
 
     leases
   end
-  
+
   def self.render_as_nagios_file(leases)
     entries = {}
-    
+
     required_fields = [
       :private_ip, :nimbul_fqdn, :state, :cloud_id, :cluster_name, :server_name, :roles, :public_dns, :nimbul_host
     ]
-    
+
     entries = leases[:active].sort.inject([]) do |array,(hostname,entries)|
       entries.select {|e| e[:cluster_state] == 'active' }.each do |lease|
         data = required_fields.inject([]) do |line,k|
@@ -213,6 +212,20 @@ class DnsAdapter
     end
 
     return entries.join "\n"
+  end
+
+  def self.render_as_instancelist_file(leases)
+    entries = {}
+
+    required_fields = [
+      :private_ip, :nimbul_fqdn, :state, :cloud_id, :cluster_name, :server_name, :roles, :public_dns, :nimbul_host, :cluster_state
+    ]
+
+    leases[:active].sort.collect { |(hostname,entries)|
+      entries.collect { |lease|
+        required_fields.collect { |field| lease[field] }.join("\t")
+      }
+    }.join("\n")
   end
 
   def self.render_as_hosts_file leases
@@ -230,16 +243,16 @@ EOS
     tree = leases[:all].inject({}) do |h,(k,v)|
       v.each { |l| ((h[l[:cluster_raw]] ||= {})[l[:base_name]] ||= []) << l }; h
     end
-    
+
     display += tree.sort.inject([]) do |clusters,(cluster,hosts)|
       clust = "# Cluster START: #{cluster} #\n"
-      clust << hosts.sort{|a,b| a[0] <=> b[0]}.inject([]) do |groups,(host,leases)| 
+      clust << hosts.sort{|a,b| a[0] <=> b[0]}.inject([]) do |groups,(host,leases)|
         group = "# Group START: #{host} #\n"
         leases.each do |lease|
           group << sprintf("%-16s   %s %-6s %s\n", lease[:private_ip], lease[:nimbul_fqdn], lease[:state], lease[:cloud_id])
         end
         group << "# Group END: #{host} #\n"
-        groups << group 
+        groups << group
       end.join("\n")
       clusters << "#{clust}# Cluster END: #{cluster} #\n"
     end
@@ -247,7 +260,7 @@ EOS
     display << "\n#### EC2LDNS END ####\n"
     display.collect { |line| "#{line}\n" }
   end
-  
+
   def self.get_host_entries(provider, options={})
     unless !!options[:include_server_info] or options[:format] == :nagios
       render_as_hosts_file(as_hash(provider))
