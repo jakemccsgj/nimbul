@@ -215,15 +215,13 @@ class DnsAdapter
   end
 
   def self.render_as_instancelist_file(leases)
-    entries = {}
-
     required_fields = [
       :private_ip, :nimbul_fqdn, :state, :cloud_id, :cluster_name, :server_name, :roles, :public_dns, :nimbul_host, :cluster_state
     ]
 
     leases[:active].sort.collect { |(hostname,entries)|
       entries.collect { |lease|
-        required_fields.collect { |field| lease[field] }.join("\t")
+        required_fields.collect { |field| lease[field] }.join(" ")
       }
     }.join("\n")
   end
@@ -262,10 +260,13 @@ EOS
   end
 
   def self.get_host_entries(provider, options={})
-    unless !!options[:include_server_info] or options[:format] == :nagios
-      render_as_hosts_file(as_hash(provider))
-    else
+    case
+    when (options[:format] == :nagios or options[:include_server_info])
       render_as_nagios_file(as_hash(provider, :only_active => true, :with_static => false))
+    when options[:format] == :all_instances
+      render_as_instancelist_file as_hash(provider)
+    else
+      render_as_hosts_file(as_hash(provider))
     end
   end
 end
