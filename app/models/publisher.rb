@@ -49,23 +49,20 @@ class Publisher < BaseModel
   end
 
   # Factory to create instances of subclasses
-  def self.factory(klass_type, *params)
-    class_name = klass_type.nil? ? 'Publisher' : klass_type
-  
+  def self.factory(class_name = 'Publisher', *params)
     # make sure the class is included first, and don't fail on error loading library
-    require File.join(File.dirname(__FILE__), class_name.gsub(/::/, '/').downcase) rescue false
-  
-    _class = class_name.constantize rescue nil
-    if not _class.nil? and _class.name == class_name
-      return _class.new(*params)
+    require File.join(File.dirname(__FILE__), class_name.underscore) rescue false
+
+    begin
+      class_name.constantize.new *params
+    rescue
+      # fallback to operation base
+      Publisher.new(params)
     end
-  
-    # fallback to operation base
-    return Publisher.new(params)
   end
 
-	def class_type=(value) self[:type] = value; end
-	def class_type() return self[:type]; end
+  def class_type=(value) self[:type] = value; end
+  def class_type() return self[:type]; end
 
   #methods should be overwritten in subclasses
   def initialize_parameters
