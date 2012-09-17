@@ -61,10 +61,10 @@ class Publisher::InstanceList < Publisher
       hostfile = <<-EOF
 # Published by InstanceList Publisher on #{Time.now.to_s}
 
-#{DnsAdapter.render_as_instancelist_file(DnsAdapter.as_hash(provider_account))}
+#{DnsAdapter.get_host_entries provider_account, :format => :all_instances}
       EOF
-      provider_path = File.join(base_path, "provider-#{account.id.to_s}.instancelist.txt")
-      S3Adapter.put_object(account, bucket, provider_path, hostfile, 'public-read')
+
+      S3Adapter.put_object(account, bucket, base_path, hostfile, 'public-read')
 
       account.set_provider_account_parameter(URL_PARAM_NAME , s3_url_for(bucket, provider_path), true)
 
