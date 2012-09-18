@@ -66,12 +66,12 @@ class Publisher::InstanceList < Publisher
 
       S3Adapter.put_object(account, bucket, base_path, hostfile, 'public-read')
 
-      account.set_provider_account_parameter(URL_PARAM_NAME , s3_url_for(bucket, provider_path), true)
+      account.set_provider_account_parameter(URL_PARAM_NAME , s3_url_for(bucket, base_path), true)
 
       update_attributes({
         :last_published_at => Time.now,
         :state => 'success',
-        :state_text => s3_url_for(bucket, provider_path)
+        :state_text => s3_url_for(bucket, base_path)
       })
     rescue Exception => e
       raise
