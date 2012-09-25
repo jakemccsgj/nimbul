@@ -17,6 +17,7 @@ gem 'aasm'
 gem 'carrot', :git => 'http://github.com/rabbitt/carrot'
 gem 'chronic'
 gem 'fastthread'
+gem 'recaptcha', :require => "recaptcha/rails"
 #
 ## IF you are having an issue with the following error:
 #    ... Please install the mysql2 adapter: `gem install activerecord-mysql2-adapter.... Library not loaded: libmysqlclient.18.dylib
@@ -67,3 +68,4 @@ gem 'grit'
 gem 'god'
 gem 'log4r'
 gem 'attr_encrypted'
+gem 'rye'
