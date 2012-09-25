@@ -14,10 +14,7 @@
 	</div>
 
 <% if_recaptcha? do %>
-	<div class="field_row">
-		<label for="recaptcha">Please enter the following words below.</label>
-		<%= recaptcha_tags %><br />
-	</div>
+		<%= recaptcha_tags :ssl => true %>
 <% end %>
 
   <%= f.submit "Reset Your Password" %>
