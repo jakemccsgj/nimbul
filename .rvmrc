@@ -44,5 +44,5 @@ then
 fi
 if [[ -s Gemfile ]] && builtin command -v bundle >/dev/null
 then
-  bundle install | grep -vE '^Using|Your bundle is complete'
+  bundle install --local | grep -vE '^Using|Your bundle is complete'
 fi
