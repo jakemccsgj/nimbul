@@ -2,7 +2,8 @@
 
 <%
 if @task.task_parameters.size == 0
-    @parameters = @task.initialize_parameters
+    #@parameters = @task.initialize_parameters
+    @parameters = []
 else
     @parameters = @task.task_parameters
 end
