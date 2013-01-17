@@ -2,7 +2,7 @@ source 'http://rubygems.org'
 source 'http://gems.rubyforge.org'
 source 'http://gemcutter.org'
 
-gem 'activemessaging', :git => 'https://github.com/nimbul/activemessaging.git'
+gem 'activemessaging', :git => 'https://github.com/kookster/activemessaging.git'
 gem 'amqp'
 gem 'bert'
 gem 'emissary'

@@ -22,19 +22,19 @@ log4r_config:
   outputters:
     - type: DateFileOutputter
       name: Ec2Adapter
-      dirname: log
+      dirname: /opt/nyt/nimbul/log
       filename: ec2_adapter.log
       formatter: *STANDARD
 
     - type: DateFileOutputter
       name: ec2_adapter
-      dirname: log
+      dirname: /opt/nyt/nimbul/log
       filename: ec2_adapter.log
       formatter: *STANDARD
 
     - type: DateFileOutputter
       name: default
-      dirname: log
+      dirname: /opt/nyt/nimbul/log
       filename: nimbul.log
       formatter: *STANDARD
 

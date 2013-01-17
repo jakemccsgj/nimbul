@@ -7,8 +7,6 @@ tmp_dir = File.join(APP_ROOT, 'tmp')
 
 require 'rubygems'
 require 'daemons'
-require 'activesupport'
-require 'activemessaging'
 
 options = {
   :app_name   => "poller",
