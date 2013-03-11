@@ -1,13 +1,11 @@
 require 'aws'
 
 namespace :ami do
-  namespace :promote do
-    desc "Promote an AMI from the staging account to the production account"
-    task :to_prod, [:image] => [:environment] do |t, args|
-      source_account = ProviderAccount.find_by_account_id '155565490060'
-      target_account = ProviderAccount.find_by_account_id '771521388140'
-      promote source_account, target_account, args[:image]
-    end
+  desc "Promote an AMI from one account to another.  Defaults to promotion from the staging account to the production account"
+  task :promote, [:image] => [:environment] do |t, args|
+    source_account = ProviderAccount.find_by_account_id (ENV['SOURCE_ACCOUNT'] || '155565490060') # Default to stg
+    target_account = ProviderAccount.find_by_account_id (ENV['TARGET_ACCOUNT'] || '771521388140') # Default to prd
+    promote source_account, target_account, args[:image]
   end
 end
 
