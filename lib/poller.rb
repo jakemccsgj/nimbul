@@ -15,9 +15,6 @@ else
 #Rails.logger = Logger.new(STDOUT)
 ActiveMessaging.logger = Rails.logger
 
-# Load ActiveMessaging processors
-ActiveMessaging::load_activemessaging
-
 # Start it up!
 ActiveMessaging.load_activemessaging
 ActiveMessaging::start
