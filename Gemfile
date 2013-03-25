@@ -1,6 +1,6 @@
 source 'http://rubygems.org'
 
-gem 'activemessaging', :git => 'https://github.com/kookster/activemessaging.git'
+gem 'activemessaging', :git => 'https://github.com/nimbul/activemessaging.git'
 gem 'amqp'
 gem 'bert'
 gem 'emissary'
