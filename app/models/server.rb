@@ -15,7 +15,7 @@ class Server < BaseModel
 
   belongs_to :cluster, :counter_cache => true, :include => :provider_account
   belongs_to :server_profile_revision
-  has_many :service_provider, :dependent => :delete
+  has_many :service_provider, :dependent => :delete_all
 
   has_and_belongs_to_many :security_groups, :order => :name, :uniq => true
   has_many :instances, :dependent => :nullify
