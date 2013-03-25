@@ -1,4 +1,7 @@
 require 'aasm'
+require 'activemessaging'
+
+ActiveMessaging.load_activemessaging
 
 class Operation < BaseModel
   class InvalidOperationTypeError < TypeError; end

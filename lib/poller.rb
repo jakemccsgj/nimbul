@@ -16,5 +16,6 @@ else
 ActiveMessaging.logger = Rails.logger
 
 # Start it up!
-ActiveMessaging.load_activemessaging
+ActiveMessaging.load_extensions
+ActiveMessaging.reload_activemessaging
 ActiveMessaging::start
